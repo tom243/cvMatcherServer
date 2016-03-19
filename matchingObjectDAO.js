@@ -451,7 +451,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {user_id: userId, job_id: jobId,status: "unread",active:true},
+            {user_id: userId, job_id: jobId},
             {cvs:1}
         );
 
@@ -469,7 +469,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
                 })*/
 
                 var query = MatchingObjectsModel.find(
-                    {matching_object_id: {$in: results[0].cvs},active:true}
+                    {matching_object_id: {$in: results[0].cvs},"status.current_status": "unread",active:true}
                 );
                 query.exec(function (err, results) {
                     if (err) {
@@ -485,7 +485,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
                 errorMessage = "jobs are empty"
                 console.log(errorMessage);
                 mongoose.disconnect();
-                callback( results[0].jobs);
+                callback( results);
             }
 
 

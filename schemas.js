@@ -127,13 +127,13 @@ var matchingObjectsSchema = new matching_objects_schema({
         required: true
     },
     scope_of_position: {
-        type: String,
+        type: [String],
         required: true
     },
     academy: [{
         academy_name: String,
         degree_name: String,
-        degree_type: String
+        degree_type: [String]
     }],
     sub_sector: {
         type: [String],
