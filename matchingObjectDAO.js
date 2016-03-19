@@ -428,7 +428,7 @@ var getJobsBySector = function getJobsBySector(userId, sector, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {user_id: userId, sector: sector,active:true}
+            {google_user_id: userId, sector: sector,active:true}
         );
 
         query.exec(function (err, results) {
@@ -451,7 +451,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {user_id: userId, job_id: jobId},
+            {google_user_id: userId, job_id: jobId},
             {cvs:1}
         );
 
