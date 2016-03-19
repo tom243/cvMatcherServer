@@ -9,8 +9,9 @@ var MatchingObjectsModel = mongoose.model('MatchingObjectsModel', newMatchingObj
 var newFormula = require('./schemas').formulasSchema;
 var FormulaModel = mongoose.model('FormulaModel', newFormula);
 
-var newUser = require('./schemas').usersSchema;
-var UserModel = mongoose.model('UserModel', newUser);
+var UserModel = require('./schemas').UserModel;
+var StatusModel = require('./schemas').StatusModel;
+
 
 var errorMessage;
 
@@ -451,7 +452,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {google_user_id: userId, job_id: jobId},
+            {_id: jobId,google_user_id: userId, active:true},
             {cvs:1}
         );
 
@@ -469,17 +470,20 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
                 })*/
 
                 var query = MatchingObjectsModel.find(
-                    {matching_object_id: {$in: results[0].cvs},"status.current_status": "unread",active:true}
-                );
+                    {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread"}
+                ).populate('user');
                 query.exec(function (err, results) {
                     if (err) {
                         console.log("error");
                         mongoose.disconnect();
                         callback(false);
                     }
-                    console.log(results);
-                    mongoose.disconnect();
-                    callback(results);
+
+                        console.log();
+                        mongoose.disconnect();
+                        callback(results);
+
+
                 });
             }else {
                 errorMessage = "jobs are empty"

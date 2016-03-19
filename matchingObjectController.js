@@ -75,7 +75,7 @@ function getJobsBySector(userId,sector, callback) {
 
 //** get Unread for specific job  **//
 function getUnreadCvsForJob(userId, jobId, callback) {
-    matchingObjectDAO.getUnreadCvsForJob(userId, jobId, status, function (result) {
+    matchingObjectDAO.getUnreadCvsForJob(userId, jobId, function (result) {
         callback(result);
     });
 };

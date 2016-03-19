@@ -132,6 +132,32 @@ app.post('/getUnreadCvsForJob', jsonParser, function (req, res) {
     });
 });
 
+// get Unread CV'S
+app.post('/getUnreadCvsForJob', jsonParser, function (req, res) {
+
+    console.log("Im in getCvsForJob post");
+    if (!req.body) return res.sendStatus(400);
+    console.log("jobId" + req.body.job_id);
+    console.log("userId" + req.body.google_user_id)
+
+    matchingObjectController.getUnreadCvsForJob(req.body.google_user_id, req.body.job_id, function (cvs) {
+        res.json(cvs);
+    });
+});
+
+// get Unread CV'S
+app.post('/getLikedCvsForJob', jsonParser, function (req, res) {
+
+    console.log("Im in getCvsForJob post");
+    if (!req.body) return res.sendStatus(400);
+    console.log("jobId" + req.body.job_id);
+    console.log("userId" + req.body.google_user_id)
+
+    matchingObjectController.getUnreadCvsForJob(req.body.google_user_id, req.body.job_id, function (cvs) {
+        res.json(cvs);
+    });
+});
+
 
 
 /////////////////////////////////////////////////////////////// *** JobSeeker *** //////////////////////////////////////

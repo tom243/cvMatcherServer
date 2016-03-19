@@ -4,6 +4,7 @@ var formulas_schema = mongoose.Schema;
 var key_words_schema = mongoose.Schema;
 var matching_objects_schema = mongoose.Schema;
 var users_schema = mongoose.Schema;
+var status_schema = mongoose.Schema;
 
 
 // Users Schema
@@ -38,7 +39,6 @@ var usersSchema = new users_schema({
     personal_properties: String,
     company: String,
     phone_number: String,
-    jobs: [String],
     favorites: [String],
     user_type: {
         type: String,
@@ -51,18 +51,12 @@ var usersSchema = new users_schema({
     }
 }, {collection: 'Users'});
 
-exports.usersSchema = usersSchema;
+
 
 
 // Companies Schema
 var companiesSchema = new companies_schema({
 
-    company_id: {
-        type: Number,
-        required: true,
-        index: 1,
-        unique: true
-    },
     name: {
         type: String,
         required: true,
@@ -88,7 +82,7 @@ var companiesSchema = new companies_schema({
     }
 }, {collection: 'Companies'});
 
-exports.companiesSchema = companiesSchema;
+
 
 
 // Matching Objects Schema
@@ -99,7 +93,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         required: true,
         index: 1
     },
-    user_id:{
+    google_user_id:{
         type:String,
         required:true,
         index : 1
@@ -146,7 +140,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         required: true
     },
     status:{
-        status_id: String,
+        status_id: { type: Number, ref: 'StatusModel' },
         current_status: String
     },
     favorites: [String],
@@ -155,11 +149,12 @@ var matchingObjectsSchema = new matching_objects_schema({
         index: 1,
         type: Boolean,
         required: true
-    }
+    },
+    user: { type: Number, ref: 'UserModel' }
 
 }, {collection: 'Matching_Objects'});
 
-exports.matchingObjectsSchema = matchingObjectsSchema;
+
 
 
 // Formulas Schema
@@ -187,8 +182,31 @@ var formulasSchema = new formulas_schema({
     }
 }, {collection: 'Formulas'});
 
+// Status Schema
+var statusSchema = new status_schema({
+
+    seen: {
+        status: Boolean,
+        timestamp: String
+    },
+    rate: {
+        status: Boolean,
+        stars: Number,
+        description: String,
+        timestamp: String
+    },
+    received: {
+        status: Boolean,
+        timestamp: String
+    }
+}, {collection: 'Status'});
+
+
+var UserModel = mongoose.model('UserModel', usersSchema);
+var StatusModel = mongoose.model('StatusModel',statusSchema);
+
+exports.companiesSchema = companiesSchema;
+exports.matchingObjectsSchema = matchingObjectsSchema;
 exports.formulasSchema = formulasSchema;
-
-
-
-
+exports.UserModel = UserModel;
+exports.StatusModel = StatusModel;
