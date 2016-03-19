@@ -429,7 +429,7 @@ var getJobsBySector = function getJobsBySector(userId, sector, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {google_user_id: userId, sector: sector,active:true}
+            {google_user_id: userId, sector: sector, active:true,matching_object_type:"job"}
         );
 
         query.exec(function (err, results) {
@@ -464,10 +464,6 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
                 callback(false);
             }
             if ( results[0].cvs.length > 0) {
-  /*              var cvs = [];
-                results[0].cvs.forEach(function (item) {
-                    cvs.push(item.job_id);
-                })*/
 
                 var query = MatchingObjectsModel.find(
                     {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread"}
@@ -479,10 +475,56 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
                         callback(false);
                     }
 
-                        console.log();
-                        mongoose.disconnect();
-                        callback(results);
+                    console.log();
+                    mongoose.disconnect();
+                    callback(results);
 
+                });
+            }else {
+                errorMessage = "jobs are empty"
+                console.log(errorMessage);
+                mongoose.disconnect();
+                callback( results);
+            }
+
+
+        });
+    });
+};
+
+var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, callback) {
+
+    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
+
+    mongoose.connection.once('open', function () {
+
+        var query = MatchingObjectsModel.find(
+            {_id: jobId,google_user_id: userId, active:true},
+            {cvs:1}
+        );
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("error");
+                mongoose.disconnect();
+                callback(false);
+            }
+            if ( results[0].cvs.length > 0) {
+
+                var query = MatchingObjectsModel.find(
+                    {_id: {$in: results[0].cvs},active:true, "status.current_status": current_status}
+                ).populate('user').populate('status.status_id');
+                query.exec(function (err, results) {
+                    if (err) {
+                        console.log("error");
+                        mongoose.disconnect();
+                        callback(false);
+                    }
+
+                    console.log();
+                    mongoose.disconnect();
+                    callback(results);
 
                 });
             }else {
@@ -515,6 +557,8 @@ exports.getFormula = getFormula;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob= getUnreadCvsForJob;
+exports.getRateCvsForJob = getRateCvsForJob;
+
 
 //////////// example to split data ////////
 

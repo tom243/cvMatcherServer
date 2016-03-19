@@ -81,6 +81,14 @@ function getUnreadCvsForJob(userId, jobId, callback) {
 };
 
 
+//** get liked or unliked CV'S **//
+function getRateCvsForJob(userId, jobId,current_status, callback) {
+    matchingObjectDAO.getRateCvsForJob(userId, jobId, current_status, function (result) {
+        callback(result);
+    });
+};
+
+
 
 ///////////////////////////////////////////// *** CVS *** ///////////////////////
 
@@ -97,3 +105,4 @@ exports.getFormula= getFormula;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob= getUnreadCvsForJob;
+exports.getRateCvsForJob = getRateCvsForJob;
