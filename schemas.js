@@ -144,6 +144,11 @@ var matchingObjectsSchema = new matching_objects_schema({
     },
     favorites: [String],
     cvs: [String],
+    archive:{
+        index: 1,
+        type: Boolean,
+        required: true
+    },
     active: {
         index: 1,
         type: Boolean,

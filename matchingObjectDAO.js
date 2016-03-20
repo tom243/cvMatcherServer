@@ -429,7 +429,7 @@ var getJobsBySector = function getJobsBySector(userId, sector, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {google_user_id: userId, sector: sector, active:true,matching_object_type:"job"}
+            {google_user_id: userId, sector: sector, active:true,matching_object_type:"job",archive:false}
         );
 
         query.exec(function (err, results) {
@@ -452,7 +452,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job"},
+            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job",archive:false},
             {cvs:1}
         );
 
@@ -466,7 +466,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
             if ( results[0].cvs.length > 0) {
 
                 var query = MatchingObjectsModel.find(
-                    {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread",matching_object_type:"cv"}
+                    {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread",matching_object_type:"cv",archive:false}
                 ).populate('user');
                 query.exec(function (err, results) {
                     if (err) {
@@ -499,7 +499,7 @@ var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, c
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job"},
+            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job",archive:false},
             {cvs:1}
         );
 
@@ -514,7 +514,7 @@ var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, c
 
                 var query = MatchingObjectsModel.find(
                     {_id: {$in: results[0].cvs},active:true,
-                        "status.current_status": current_status,matching_object_type:"cv"}
+                        "status.current_status": current_status,matching_object_type:"cv",archive:false}
                 ).populate('user').populate('status.status_id');
                 query.exec(function (err, results) {
                     if (err) {
@@ -548,7 +548,7 @@ var getFavoriteCvs = function getFavoriteCvs(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true, matching_object_type:"job"},
+            {_id: jobId,google_user_id: userId, active:true, matching_object_type:"job",archive:false},
             {favorites:1}
         );
 
@@ -562,7 +562,8 @@ var getFavoriteCvs = function getFavoriteCvs(userId, jobId, callback) {
             if ( results[0].favorites.length > 0) {
 
                 var query = MatchingObjectsModel.find(
-                    {_id: {$in: results[0].favorites},active:true ,"status.favorite": true, matching_object_type:"cv"}
+                    {_id: {$in: results[0].favorites},active:true ,
+                        "status.favorite": true, matching_object_type:"cv",archive:false}
                 ).populate('user').populate('status.status_id');
                 query.exec(function (err, results) {
                     if (err) {
@@ -612,7 +613,7 @@ var getAllJobsBySector = function getAllJobsBySector(userId, sector, callback) {
             }
             console.log(results);
             var query = MatchingObjectsModel.find(
-                {sector: sector, active:true,matching_object_type:"job",_id:{$nin:results[0].jobs}}
+                {sector: sector, active:true,matching_object_type:"job",_id:{$nin:results[0].jobs},archive:false}
             );
 
             query.exec(function (err, results) {
