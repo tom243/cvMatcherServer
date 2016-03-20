@@ -334,7 +334,7 @@ var getFormula = function getFormula(jobId,callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {matching_object_id: jobId},
+            {_id: jobId},
             {formula: 1}
         );
 
@@ -372,7 +372,7 @@ var getFormula = function getFormula(jobId,callback) {
 
 
 
-///////////////////////////////////////////// *** JOBS *** ///////////////////////
+///////////////////////////////////////////// *** Employer *** ///////////////////////
 
 /*var getJobsBySector = function getJobsBySector(userId, sector, callback) {
 
@@ -452,7 +452,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true},
+            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job"},
             {cvs:1}
         );
 
@@ -466,7 +466,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
             if ( results[0].cvs.length > 0) {
 
                 var query = MatchingObjectsModel.find(
-                    {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread"}
+                    {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread",matching_object_type:"cv"}
                 ).populate('user');
                 query.exec(function (err, results) {
                     if (err) {
@@ -499,7 +499,7 @@ var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, c
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true},
+            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job"},
             {cvs:1}
         );
 
@@ -513,7 +513,8 @@ var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, c
             if ( results[0].cvs.length > 0) {
 
                 var query = MatchingObjectsModel.find(
-                    {_id: {$in: results[0].cvs},active:true, "status.current_status": current_status}
+                    {_id: {$in: results[0].cvs},active:true,
+                        "status.current_status": current_status,matching_object_type:"cv"}
                 ).populate('user').populate('status.status_id');
                 query.exec(function (err, results) {
                     if (err) {
@@ -540,24 +541,115 @@ var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, c
 };
 
 
+var getFavoriteCvs = function getFavoriteCvs(userId, jobId, callback) {
 
-///////////////////////////////////////////// *** CVS *** ///////////////////////
+    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
+    mongoose.connection.once('open', function () {
+
+        var query = MatchingObjectsModel.find(
+            {_id: jobId,google_user_id: userId, active:true, matching_object_type:"job"},
+            {favorites:1}
+        );
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("error");
+                mongoose.disconnect();
+                callback(false);
+            }
+            if ( results[0].favorites.length > 0) {
+
+                var query = MatchingObjectsModel.find(
+                    {_id: {$in: results[0].favorites},active:true ,"status.favorite": true, matching_object_type:"cv"}
+                ).populate('user').populate('status.status_id');
+                query.exec(function (err, results) {
+                    if (err) {
+                        console.log("error");
+                        mongoose.disconnect();
+                        callback(false);
+                    }
+
+                    console.log();
+                    mongoose.disconnect();
+                    callback(results);
+
+                });
+            }else {
+                errorMessage = "jobs are empty";
+                console.log(errorMessage);
+                mongoose.disconnect();
+                callback( results);
+            }
+
+
+        });
+    });
+};
+
+
+
+///////////////////////////////////////////// *** JobSeeker *** ///////////////////////
+
+
+var getAllJobsBySector = function getAllJobsBySector(userId, sector, callback) {
+
+    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
+
+    mongoose.connection.once('open', function () {
+
+        var query = UserModel.find(
+            {google_user_id: userId, active: true}
+        );
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("error");
+                mongoose.disconnect();
+                callback(false);
+            }
+            console.log(results);
+            var query = MatchingObjectsModel.find(
+                {sector: sector, active:true,matching_object_type:"job",_id:{$nin:results[0].jobs}}
+            );
+
+            query.exec(function (err, results) {
+
+                if (err) {
+                    console.log("error");
+                    mongoose.disconnect();
+                    callback(false);
+                }
+                mongoose.disconnect();
+                callback(results);
+            });
+
+        });
+
+
+
+    });
+};
 
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
-exports.addObject = addObject;
-exports.deleteObject = deleteObject;
-exports.updateObject = updateObject;
+exports.addObject       = addObject;
+exports.deleteObject    = deleteObject;
+exports.updateObject    = updateObject;
 
-exports.addFormula = addFormula;
-exports.deleteFormula = deleteFormula;
-exports.updateFormula = updateFormula;
-exports.getFormula = getFormula;
+exports.addFormula      = addFormula;
+exports.deleteFormula   = deleteFormula;
+exports.updateFormula   = updateFormula;
+exports.getFormula      = getFormula;
 
-exports.getJobsBySector = getJobsBySector;
-exports.getUnreadCvsForJob= getUnreadCvsForJob;
-exports.getRateCvsForJob = getRateCvsForJob;
+exports.getJobsBySector     = getJobsBySector;
+exports.getUnreadCvsForJob  = getUnreadCvsForJob;
+exports.getRateCvsForJob    = getRateCvsForJob;
+exports.getFavoriteCvs      = getFavoriteCvs;
+
+exports.getAllJobsBySector  = getAllJobsBySector
 
 
 //////////// example to split data ////////

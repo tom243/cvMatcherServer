@@ -107,7 +107,7 @@ app.post('/updateMatchingObject', jsonParser, function (req, res) {
 //////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
 
 // get Jobs
-app.post('/getJobsBySector', jsonParser, function (req, res) {
+app.post('/employer/getJobsBySector', jsonParser, function (req, res) {
 
     console.log("Im in getJobsBySector post");
     if (!req.body) return res.sendStatus(400);
@@ -120,7 +120,7 @@ app.post('/getJobsBySector', jsonParser, function (req, res) {
 });
 
 // get Unread CV'S
-app.post('/getUnreadCvsForJob', jsonParser, function (req, res) {
+app.post('/employer/getUnreadCvsForJob', jsonParser, function (req, res) {
 
     console.log("Im in getCvsForJob post");
     if (!req.body) return res.sendStatus(400);
@@ -133,7 +133,7 @@ app.post('/getUnreadCvsForJob', jsonParser, function (req, res) {
 });
 
 // get Unread CV'S
-app.post('/getUnreadCvsForJob', jsonParser, function (req, res) {
+app.post('/employer/getUnreadCvsForJob', jsonParser, function (req, res) {
 
     console.log("Im in getCvsForJob post");
     if (!req.body) return res.sendStatus(400);
@@ -146,7 +146,7 @@ app.post('/getUnreadCvsForJob', jsonParser, function (req, res) {
 });
 
 // get liked or unliked CV'S
-app.post('/getRateCvsForJob', jsonParser, function (req, res) {
+app.post('/employer/getRateCvsForJob', jsonParser, function (req, res) {
 
     console.log("Im in getRateCvsForJob post");
     if (!req.body) return res.sendStatus(400);
@@ -159,16 +159,42 @@ app.post('/getRateCvsForJob', jsonParser, function (req, res) {
     });
 });
 
+// get favorites CV'S
+app.post('/employer/getFavoriteCvs', jsonParser, function (req, res) {
+
+    console.log("Im in getFavorites post");
+    if (!req.body) return res.sendStatus(400);
+    console.log("jobId" + req.body.job_id);
+    console.log("userId" + req.body.google_user_id);
+
+    matchingObjectController.getFavoriteCvs(req.body.google_user_id, req.body.job_id, function (cvs) {
+        res.json(cvs);
+    });
+});
+
 
 
 /////////////////////////////////////////////////////////////// *** JobSeeker *** //////////////////////////////////////
+
+// get Jobs by sector
+app.post('/JobSeeker/getJobsBySector', jsonParser, function (req, res) {
+
+    console.log("Im in getJobsBySector post");
+    if (!req.body) return res.sendStatus(400);
+    console.log(req.body.google_user_id);
+    console.log(req.body.sector);
+
+    matchingObjectController.getAllJobsBySector(req.body.google_user_id,req.body.sector, function (jobs) {
+        res.json(jobs);
+    });
+});
 
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
 
 // Add Company
-app.post('/addCompany', jsonParser, function (req, res) {
+app.post('/employer/addCompany', jsonParser, function (req, res) {
 
     console.log("Im in addCompany post");
     if (!req.body) return res.sendStatus(400);
@@ -181,7 +207,7 @@ app.post('/addCompany', jsonParser, function (req, res) {
 
 
 // Delete Company
-app.post('/deleteCompany', jsonParser, function (req, res) {
+app.post('/employer/deleteCompany', jsonParser, function (req, res) {
 
     console.log("Im in deleteCompany post");
     if (!req.body) return res.sendStatus(400);
@@ -194,7 +220,7 @@ app.post('/deleteCompany', jsonParser, function (req, res) {
 
 
 // Update Company
-app.post('/updateCompany', jsonParser, function (req, res) {
+app.post('/employer/updateCompany', jsonParser, function (req, res) {
 
     console.log("Im in updateCompany post");
     if (!req.body) return res.sendStatus(400);
@@ -210,7 +236,7 @@ app.post('/updateCompany', jsonParser, function (req, res) {
 
 
 // Add Formula
-app.post('/addFormula', jsonParser, function (req, res) {
+app.post('/employer/addFormula', jsonParser, function (req, res) {
 
     console.log("Im in Formula post");
     if (!req.body) return res.sendStatus(400);
@@ -223,7 +249,7 @@ app.post('/addFormula', jsonParser, function (req, res) {
 
 
 // Delete Formula
-app.post('/deleteFormula', jsonParser, function (req, res) {
+app.post('/employer/deleteFormula', jsonParser, function (req, res) {
 
     console.log("Im in deleteFormula post");
     if (!req.body) return res.sendStatus(400);
@@ -235,7 +261,7 @@ app.post('/deleteFormula', jsonParser, function (req, res) {
 });
 
 // Update Formula
-app.post('/updateFormula', jsonParser, function (req, res) {
+app.post('/employer/updateFormula', jsonParser, function (req, res) {
 
     console.log("Im in updateFormula post");
     if (!req.body) return res.sendStatus(400);
@@ -247,7 +273,7 @@ app.post('/updateFormula', jsonParser, function (req, res) {
 });
 
 // get Formula
-app.post('/getFormula', jsonParser, function (req, res) {
+app.post('/employer/getFormula', jsonParser, function (req, res) {
 
     console.log("in getFormula post");
     if (!req.body) return res.sendStatus(400);

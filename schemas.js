@@ -44,6 +44,7 @@ var usersSchema = new users_schema({
         type: String,
         required: true
     },
+    jobs:[String],
     active: {
         index: 1,
         type: Boolean,
@@ -81,9 +82,6 @@ var companiesSchema = new companies_schema({
         required: true
     }
 }, {collection: 'Companies'});
-
-
-
 
 // Matching Objects Schema
 var matchingObjectsSchema = new matching_objects_schema({
@@ -141,6 +139,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     },
     status:{
         status_id: { type: Number, ref: 'StatusModel' },
+        favorite: Boolean,
         current_status: String
     },
     favorites: [String],
@@ -153,8 +152,6 @@ var matchingObjectsSchema = new matching_objects_schema({
     user: { type: Number, ref: 'UserModel' }
 
 }, {collection: 'Matching_Objects'});
-
-
 
 
 // Formulas Schema

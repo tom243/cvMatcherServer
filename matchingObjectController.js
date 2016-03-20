@@ -62,7 +62,7 @@ function getFormula(jobId, callback) {
 };
 
 
-///////////////////////////////////////////// *** JOBS *** ///////////////////////
+///////////////////////////////////////////// *** Employer *** ///////////////////////
 
 
 //** get jobs by sector for specific employer  **//
@@ -88,21 +88,38 @@ function getRateCvsForJob(userId, jobId,current_status, callback) {
     });
 };
 
+//** get Unread for specific job  **//
+function getFavoriteCvs(userId, jobId, callback) {
+    matchingObjectDAO.getFavoriteCvs(userId, jobId, function (result) {
+        callback(result);
+    });
+};
 
 
-///////////////////////////////////////////// *** CVS *** ///////////////////////
+///////////////////////////////////////////// *** JobSeeker *** ///////////////////////
+
+//** get jobs by sector for jobSeeker  **//
+function getAllJobsBySector(userId, sector, callback) {
+    matchingObjectDAO.getAllJobsBySector(userId,sector, function (result) {
+        callback(result);
+    });
+};
+
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 
-exports.addObject = addObject;
-exports.deleteObject = deleteObject;
-exports.updateObject = updateObject;
+exports.addObject       = addObject;
+exports.deleteObject    = deleteObject;
+exports.updateObject    = updateObject;
 
-exports.addFormula = addFormula;
-exports.deleteFormula = deleteFormula;
-exports.updateFormula = updateFormula;
-exports.getFormula= getFormula;
+exports.addFormula      = addFormula;
+exports.deleteFormula   = deleteFormula;
+exports.updateFormula   = updateFormula;
+exports.getFormula      = getFormula;
 
-exports.getJobsBySector = getJobsBySector;
-exports.getUnreadCvsForJob= getUnreadCvsForJob;
-exports.getRateCvsForJob = getRateCvsForJob;
+exports.getJobsBySector     = getJobsBySector;
+exports.getUnreadCvsForJob  = getUnreadCvsForJob;
+exports.getRateCvsForJob    = getRateCvsForJob;
+exports.getFavoriteCvs      = getFavoriteCvs;
+
+exports.getAllJobsBySector = getAllJobsBySector;
