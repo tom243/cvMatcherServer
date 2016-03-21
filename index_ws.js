@@ -111,10 +111,12 @@ app.post('/employer/getJobsBySector', jsonParser, function (req, res) {
 
     console.log("Im in getJobsBySector post");
     if (!req.body) return res.sendStatus(400);
-    console.log(req.body.google_user_id);
-    console.log(req.body.sector);
+    console.log("google user id : " + req.body.google_user_id);
+    console.log("sector " + req.body.sector);
+    console.log("archive" + req.body.archive);
 
-    matchingObjectController.getJobsBySector(req.body.google_user_id, req.body.sector, function (jobs) {
+    matchingObjectController.getJobsBySector(req.body.google_user_id, req.body.sector,
+        req.body.archive, function (jobs) {
         res.json(jobs);
     });
 });
@@ -132,18 +134,6 @@ app.post('/employer/getUnreadCvsForJob', jsonParser, function (req, res) {
     });
 });
 
-// get Unread CV'S
-app.post('/employer/getUnreadCvsForJob', jsonParser, function (req, res) {
-
-    console.log("Im in getCvsForJob post");
-    if (!req.body) return res.sendStatus(400);
-    console.log("jobId" + req.body.job_id);
-    console.log("userId" + req.body.google_user_id)
-
-    matchingObjectController.getUnreadCvsForJob(req.body.google_user_id, req.body.job_id, function (cvs) {
-        res.json(cvs);
-    });
-});
 
 // get liked or unliked CV'S
 app.post('/employer/getRateCvsForJob', jsonParser, function (req, res) {
@@ -171,8 +161,6 @@ app.post('/employer/getFavoriteCvs', jsonParser, function (req, res) {
         res.json(cvs);
     });
 });
-
-
 
 /////////////////////////////////////////////////////////////// *** JobSeeker *** //////////////////////////////////////
 

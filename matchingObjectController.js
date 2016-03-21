@@ -66,8 +66,8 @@ function getFormula(jobId, callback) {
 
 
 //** get jobs by sector for specific employer  **//
-function getJobsBySector(userId,sector, callback) {
-    matchingObjectDAO.getJobsBySector(userId,sector, function (result) {
+function getJobsBySector(userId,sector,isArchive, callback) {
+    matchingObjectDAO.getJobsBySector(userId,sector, isArchive, function (result) {
         callback(result);
     });
 };

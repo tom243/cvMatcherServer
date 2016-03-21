@@ -43,6 +43,7 @@ function addObject(addObject, callback) {
         status: class_data['status'],
         favorites: class_data['favorites'],
         cvs: class_data['cvs'],
+        archive:class_data['archive'],
         active: class_data['active']
     });
 
@@ -132,6 +133,7 @@ function updateObject(updateObject, callback) {
         status: class_data['status'],
         favorites: class_data['favorites'],
         cvs: class_data['cvs'],
+        archive:class_data['archive'],
         active: class_data['active']
     });
 
@@ -158,6 +160,7 @@ function updateObject(updateObject, callback) {
                 status: newtable.status,
                 favorites: newtable.favorites,
                 cvs: newtable.cvs,
+                archive:newtable.archive,
                 active: newtable.active
             }
         });
@@ -422,14 +425,14 @@ var getFormula = function getFormula(jobId,callback) {
     });
 }*/
 
-var getJobsBySector = function getJobsBySector(userId, sector, callback) {
+var getJobsBySector = function getJobsBySector(userId, sector,isArchive, callback) {
 
     mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {google_user_id: userId, sector: sector, active:true,matching_object_type:"job",archive:false}
+            {google_user_id: userId, sector: sector, active:true,matching_object_type:"job",archive:isArchive}
         );
 
         query.exec(function (err, results) {
@@ -452,7 +455,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job",archive:false},
+            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job"},
             {cvs:1}
         );
 
@@ -466,7 +469,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
             if ( results[0].cvs.length > 0) {
 
                 var query = MatchingObjectsModel.find(
-                    {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread",matching_object_type:"cv",archive:false}
+                    {_id: {$in: results[0].cvs},active:true,"status.current_status":"unread",matching_object_type:"cv"}
                 ).populate('user');
                 query.exec(function (err, results) {
                     if (err) {
@@ -499,7 +502,7 @@ var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, c
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job",archive:false},
+            {_id: jobId,google_user_id: userId, active:true,matching_object_type:"job"},
             {cvs:1}
         );
 
@@ -514,7 +517,7 @@ var getRateCvsForJob = function getRateCvsForJob(userId, jobId,current_status, c
 
                 var query = MatchingObjectsModel.find(
                     {_id: {$in: results[0].cvs},active:true,
-                        "status.current_status": current_status,matching_object_type:"cv",archive:false}
+                        "status.current_status": current_status,matching_object_type:"cv"}
                 ).populate('user').populate('status.status_id');
                 query.exec(function (err, results) {
                     if (err) {
@@ -548,7 +551,7 @@ var getFavoriteCvs = function getFavoriteCvs(userId, jobId, callback) {
     mongoose.connection.once('open', function () {
 
         var query = MatchingObjectsModel.find(
-            {_id: jobId,google_user_id: userId, active:true, matching_object_type:"job",archive:false},
+            {_id: jobId,google_user_id: userId, active:true, matching_object_type:"job"},
             {favorites:1}
         );
 
@@ -563,7 +566,7 @@ var getFavoriteCvs = function getFavoriteCvs(userId, jobId, callback) {
 
                 var query = MatchingObjectsModel.find(
                     {_id: {$in: results[0].favorites},active:true ,
-                        "status.favorite": true, matching_object_type:"cv",archive:false}
+                        "status.favorite": true, matching_object_type:"cv"}
                 ).populate('user').populate('status.status_id');
                 query.exec(function (err, results) {
                     if (err) {
@@ -583,7 +586,6 @@ var getFavoriteCvs = function getFavoriteCvs(userId, jobId, callback) {
                 mongoose.disconnect();
                 callback( results);
             }
-
 
         });
     });
