@@ -61,7 +61,6 @@ app.post('/updateUser', jsonParser, function (req, res) {
 });
 
 
-
 /////////////////////////////////////////////////////////////// *** Matching Objects *** //////////////////////
 
 
@@ -100,6 +99,21 @@ app.post('/updateMatchingObject', jsonParser, function (req, res) {
 
     matchingObjectController.updateObject(object, function (object) {
         res.json(object);
+    });
+});
+
+// get MatchingObject
+app.post('/employer/getMatchingObject', jsonParser, function (req, res) {
+
+    console.log("Im in getMatchingObject post");
+    if (!req.body) return res.sendStatus(400);
+    console.log("matchingObjectId " + req.body.matching_object_id);
+    console.log("userId " + req.body.google_user_id);
+    console.log("type " + req.body.matching_object_type);
+
+    matchingObjectController.getMatchingObject(req.body.google_user_id,
+        req.body.matching_object_id,req.body.matching_object_type, function (matchingObject) {
+        res.json(matchingObject);
     });
 });
 
@@ -265,9 +279,9 @@ app.post('/employer/getFormula', jsonParser, function (req, res) {
 
     console.log("in getFormula post");
     if (!req.body) return res.sendStatus(400);
-    console.log(req.body.matching_object_id);
+    console.log(req.body.job_id);
 
-    matchingObjectController.getFormula(req.body.matching_object_id, function (formula) {
+    matchingObjectController.getFormula(req.body.job_id, function (formula) {
         res.json(formula);
     });
 });

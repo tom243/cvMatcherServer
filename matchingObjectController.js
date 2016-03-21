@@ -28,6 +28,14 @@ function updateObject(updateObject, callback) {
     });
 };
 
+//** get Matching Object  **//
+function getMatchingObject(userId, matchingObjectId,matchingObjectType, callback) {
+    matchingObjectDAO.getMatchingObject(userId, matchingObjectId,matchingObjectType, function (result) {
+        callback(result);
+    });
+};
+
+
 
 /////////////////////////////////////////////////////////////// ***  Formulas  *** ///////////////////////////
 
@@ -111,6 +119,7 @@ function getAllJobsBySector(userId, sector, callback) {
 exports.addObject       = addObject;
 exports.deleteObject    = deleteObject;
 exports.updateObject    = updateObject;
+exports.getMatchingObject   = getMatchingObject;
 
 exports.addFormula      = addFormula;
 exports.deleteFormula   = deleteFormula;

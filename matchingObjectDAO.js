@@ -182,6 +182,36 @@ function updateObject(updateObject, callback) {
 
 };
 
+var getMatchingObject = function getMatchingObject(userId, matchingObjectId, matchingObjectType, callback) {
+
+    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
+
+    mongoose.connection.once('open', function () {
+
+        if (matchingObjectType === "user") {
+
+            var query = MatchingObjectsModel.find(
+                {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
+            ).populate('user');
+        } else {//job
+            var query = MatchingObjectsModel.find(
+                {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
+            );
+        }
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("error");
+                mongoose.disconnect();
+                callback(false);
+            }
+            mongoose.disconnect();
+            callback(results);
+        });
+    });
+};
+
 
 /////////////////////////////////////////////////////////////// ***  Formulas  *** ///////////////////////////////////////////////////////////////
 
@@ -373,57 +403,7 @@ var getFormula = function getFormula(jobId,callback) {
 }
 
 
-
-
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
-
-/*var getJobsBySector = function getJobsBySector(userId, sector, callback) {
-
-    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
-
-    mongoose.connection.once('open', function () {
-
-        var query = UserModel.find(
-            {user_id: userId},
-            {"jobs.job_id": 1}
-        );
-
-        query.exec(function (err, results) {
-
-            if (err) {
-                console.log("error");
-                mongoose.disconnect();
-                callback(false);
-            }
-            if ( results[0].jobs.length > 0) {
-                var jobsIds = [];
-                results[0].jobs.forEach(function (item) {
-                    jobsIds.push(item.job_id);
-                })
-
-                var query = MatchingObjectsModel.find(
-                    {matching_object_id: {$in: jobsIds}, sector: sector}
-                );
-                query.exec(function (err, results) {
-                    if (err) {
-                        console.log("error");
-                        mongoose.disconnect();
-                        callback(false);
-                    }
-                    console.log(results);
-                    mongoose.disconnect();
-                    callback(results);
-                });
-            }else {
-                errorMessage = "jobs are empty"
-                console.log(errorMessage);
-                mongoose.disconnect();
-                callback( results[0].jobs);
-            }
-
-        });
-    });
-}*/
 
 var getJobsBySector = function getJobsBySector(userId, sector,isArchive, callback) {
 
@@ -592,7 +572,6 @@ var getFavoriteCvs = function getFavoriteCvs(userId, jobId, callback) {
 };
 
 
-
 ///////////////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 
@@ -641,6 +620,7 @@ var getAllJobsBySector = function getAllJobsBySector(userId, sector, callback) {
 exports.addObject       = addObject;
 exports.deleteObject    = deleteObject;
 exports.updateObject    = updateObject;
+exports.getMatchingObject   = getMatchingObject;
 
 exports.addFormula      = addFormula;
 exports.deleteFormula   = deleteFormula;
