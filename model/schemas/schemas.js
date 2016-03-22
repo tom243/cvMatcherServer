@@ -32,7 +32,7 @@ var usersSchema = new users_schema({
     },
     email:{
         type:String,
-        required:true,
+        required:true
     },
     birth_date: String,
     address: String,
@@ -231,10 +231,13 @@ var requirementSchema = new requirements_schema({
 var UserModel = mongoose.model('UserModel', usersSchema);
 var StatusModel = mongoose.model('StatusModel',statusSchema);
 var RequirementsModel = mongoose.model('RequirementsModel',requirementSchema);
+var CompanyModel = mongoose.model('CompanyModel', companiesSchema);
+var FormulaModel = mongoose.model('FormulaModel', formulasSchema);
+var MatchingObjectsModel = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
 
-exports.companiesSchema = companiesSchema;
-exports.matchingObjectsSchema = matchingObjectsSchema;
-exports.formulasSchema = formulasSchema;
+exports.CompanyModel = CompanyModel;
+exports.MatchingObjectsModel = MatchingObjectsModel;
+exports.FormulaModel = FormulaModel;
 exports.UserModel = UserModel;
 exports.StatusModel = StatusModel;
 exports.RequirementsModel = RequirementsModel;

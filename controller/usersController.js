@@ -1,4 +1,4 @@
-var usersDAO = require("./usersDAO"); // dao = data access object = model 
+var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object = model
 
 //////////////////////////////////// *** Users *** /////////////////////////////////////
 

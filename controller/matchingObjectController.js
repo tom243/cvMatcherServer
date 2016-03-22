@@ -1,4 +1,4 @@
-var matchingObjectDAO = require("./matchingObjectDAO"); // dao = data access object = model 
+var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
 
 
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////

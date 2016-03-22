@@ -1,12 +1,7 @@
 var mongoose = require('mongoose');
-//var db = mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
-//var db = mongoose.createConnection('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
-var newUser = require('./schemas').usersSchema;
-var UserModel = mongoose.model('UserModel', newUser);
-
-var newCompany = require('./schemas').companiesSchema;
-var CompanyModel = mongoose.model('CompanyModel', newCompany);
+var UserModel = require('./../schemas/schemas').UserModel;
+var CompanyModel = require('./../schemas/schemas').CompanyModel;
 
 
 /////////////////////////////////////////////////////////////// *** Users *** ///////////////////////////////////////////////////////////////
@@ -15,13 +10,11 @@ var CompanyModel = mongoose.model('CompanyModel', newCompany);
 // Add User
 function addUser(newUser, callback) {
 
-    var db = mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
-
     console.log("im in addUser function");
 
     var class_data = JSON.parse(newUser);
     var newTable = new UserModel({
-        google_user_id:class_data['google_user_id'],
+        google_user_id: class_data['google_user_id'],
         personal_id: class_data['personal_id'],
         first_name: class_data['first_name'],
         last_name: class_data['last_name'],
@@ -43,7 +36,6 @@ function addUser(newUser, callback) {
         console.log("result.length: " + result.length);
         if (err) {
             console.log("error find personal_id from DB");
-            mongoose.disconnect();
             callback(false);
         }
         if (result.length == 0) {
@@ -51,13 +43,11 @@ function addUser(newUser, callback) {
             /*save the User in db*/
             newTable.save(function (err, doc) {
                 console.log("person saved to DB: " + doc);
-                mongoose.disconnect();
                 callback(doc);
             });
         }
         else {
             console.log("exist user with the same id!!!");
-            mongoose.disconnect();
             callback(false);
         }
     });
@@ -66,7 +56,6 @@ function addUser(newUser, callback) {
 
 // Delete User
 function deleteUser(deleteUser, callback) {
-    var db = mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
     console.log("im in deleteUser function");
 
@@ -83,11 +72,9 @@ function deleteUser(deleteUser, callback) {
 
             if (err) {
                 console.log("error");
-                mongoose.disconnect();
                 callback(false);
             }
             else {
-                mongoose.disconnect();
                 callback(result);
             }
 
@@ -98,13 +85,12 @@ function deleteUser(deleteUser, callback) {
 
 // Update User
 function updateUser(updateUser, callback) {
-    var db = mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
     console.log("im in updateUser function");
 
     var class_data = JSON.parse(updateUser);
     var newTable = new UserModel({
-        google_user_id:class_data['google_user_id'],
+        google_user_id: class_data['google_user_id'],
         personal_id: class_data['personal_id'],
         first_name: class_data['first_name'],
         last_name: class_data['last_name'],
@@ -147,11 +133,9 @@ function updateUser(updateUser, callback) {
 
             if (err) {
                 console.log("error");
-                mongoose.disconnect();
                 callback(false);
             }
             else {
-                mongoose.disconnect();
                 callback(result);
             }
 
@@ -161,24 +145,17 @@ function updateUser(updateUser, callback) {
 
 var getUser = function getUser(userId, userType, callback) {
 
-    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
+    var query = UserModel.find(
+        {google_user_id: userId, user_type: userType, active: true}
+    );
 
-    mongoose.connection.once('open', function () {
+    query.exec(function (err, results) {
 
-            var query = UserModel.find(
-                {google_user_id: userId, user_type:userType , active: true}
-            );
-
-        query.exec(function (err, results) {
-
-            if (err) {
-                console.log("error");
-                mongoose.disconnect();
-                callback(false);
-            }
-            mongoose.disconnect();
-            callback(results);
-        });
+        if (err) {
+            console.log("error");
+            callback(false);
+        }
+        callback(results);
     });
 };
 
@@ -188,7 +165,6 @@ var getUser = function getUser(userId, userType, callback) {
 
 // Add Company
 function addCompany(addCompany, callback) {
-    var db = mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
     console.log("im in addCompany function");
 
@@ -208,7 +184,6 @@ function addCompany(addCompany, callback) {
         console.log("result.length: " + result.length);
         if (err) {
             console.log("error find company_id from DB");
-            mongoose.disconnect();
             callback(false);
         }
         if (result.length == 0) {
@@ -216,13 +191,11 @@ function addCompany(addCompany, callback) {
             /*save the User in db*/
             newTable.save(function (err, doc) {
                 console.log("Company saved to DB: " + doc);
-                mongoose.disconnect();
                 callback(doc);
             });
         }
         else {
             console.log("exist company with the same id!!!");
-            mongoose.disconnect();
             callback(false);
         }
     });
@@ -232,7 +205,6 @@ function addCompany(addCompany, callback) {
 
 // Delete Company
 function deleteCompany(deleteCompany, callback) {
-    var db = mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
     console.log("im in deleteCompany function");
 
@@ -249,11 +221,9 @@ function deleteCompany(deleteCompany, callback) {
 
             if (err) {
                 console.log("error");
-                mongoose.disconnect();
                 callback(false);
             }
             else {
-                mongoose.disconnect();
                 callback(result);
             }
 
@@ -264,7 +234,6 @@ function deleteCompany(deleteCompany, callback) {
 
 // Update Company
 function updateCompany(updateCompany, callback) {
-    var db = mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
 
     console.log("im in updateCompany function");
 
@@ -297,11 +266,9 @@ function updateCompany(updateCompany, callback) {
 
             if (err) {
                 console.log("error");
-                mongoose.disconnect();
                 callback(false);
             }
             else {
-                mongoose.disconnect();
                 callback(result);
             }
 
@@ -313,15 +280,15 @@ function updateCompany(updateCompany, callback) {
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
-exports.addUser     = addUser;
-exports.deleteUser  = deleteUser;
-exports.updateUser  = updateUser;
-exports.getUser     = getUser;
+exports.addUser = addUser;
+exports.deleteUser = deleteUser;
+exports.updateUser = updateUser;
+exports.getUser = getUser;
 
 
-exports.addCompany      = addCompany;
-exports.deleteCompany   = deleteCompany;
-exports.updateCompany   = updateCompany;
+exports.addCompany = addCompany;
+exports.deleteCompany = deleteCompany;
+exports.updateCompany = updateCompany;
 
 
 //////////// example to split data //////// 

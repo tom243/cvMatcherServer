@@ -1,1 +1,1 @@
-web: node index_ws.js
+web: node server.js
