@@ -11,6 +11,8 @@ var FormulaModel = mongoose.model('FormulaModel', newFormula);
 
 var UserModel = require('./schemas').UserModel;
 var StatusModel = require('./schemas').StatusModel;
+var RequirementsModel = require('./schemas').RequirementsModel;
+
 
 
 var errorMessage;
@@ -73,7 +75,7 @@ function addObject(addObject, callback) {
         }
     });
 
-};
+}
 
 
 // Delete Object
@@ -105,7 +107,7 @@ function deleteObject(deleteObject, callback) {
 
         });
     });
-};
+}
 
 
 // Update Object
@@ -180,7 +182,7 @@ function updateObject(updateObject, callback) {
         });
     });
 
-};
+}
 
 var getMatchingObject = function getMatchingObject(userId, matchingObjectId, matchingObjectType, callback) {
 
@@ -196,7 +198,7 @@ var getMatchingObject = function getMatchingObject(userId, matchingObjectId, mat
         } else {//job
             var query = MatchingObjectsModel.find(
                 {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
-            );
+            ).populate('requirements');
         }
 
         query.exec(function (err, results) {
@@ -264,7 +266,7 @@ function addFormula(addFormula, callback) {
         }
     });
 
-};
+}
 
 
 // Delete Formula
@@ -296,7 +298,7 @@ function deleteFormula(deleteFormula, callback) {
 
         });
     });
-};
+}
 
 
 // Update Formula
@@ -357,8 +359,7 @@ function updateFormula(updateFormula, callback) {
 
         });
     });
-
-};
+}
 
 var getFormula = function getFormula(jobId,callback) {
 
@@ -400,7 +401,7 @@ var getFormula = function getFormula(jobId,callback) {
             }
         });
     });
-}
+};
 
 
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
@@ -464,7 +465,7 @@ var getUnreadCvsForJob = function getUnreadCvsForJob(userId, jobId, callback) {
 
                 });
             }else {
-                errorMessage = "jobs are empty"
+                errorMessage = "jobs are empty";
                 console.log(errorMessage);
                 mongoose.disconnect();
                 callback( results);
@@ -615,11 +616,52 @@ var getAllJobsBySector = function getAllJobsBySector(userId, sector, callback) {
     });
 };
 
+var getMyJobs = function getMyJobs(userId, callback) {
+
+    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
+
+    mongoose.connection.once('open', function () {
+
+        var query = UserModel.find(
+            {google_user_id: userId, active: true},{jobs:1}
+        );
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("error");
+                mongoose.disconnect();
+                callback(false);
+            }
+            console.log(results);
+            var query = MatchingObjectsModel.find(
+                {active:true,matching_object_type:"job",_id:{$in:results[0].jobs},archive:false}
+            );
+
+            query.exec(function (err, results) {
+
+                if (err) {
+                    console.log("error");
+                    mongoose.disconnect();
+                    callback(false);
+                }
+                mongoose.disconnect();
+                callback(results);
+            });
+
+        });
+
+
+
+    });
+};
+
+
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
-exports.addObject       = addObject;
-exports.deleteObject    = deleteObject;
-exports.updateObject    = updateObject;
+exports.addObject           = addObject;
+exports.deleteObject        = deleteObject;
+exports.updateObject        = updateObject;
 exports.getMatchingObject   = getMatchingObject;
 
 exports.addFormula      = addFormula;
@@ -632,8 +674,8 @@ exports.getUnreadCvsForJob  = getUnreadCvsForJob;
 exports.getRateCvsForJob    = getRateCvsForJob;
 exports.getFavoriteCvs      = getFavoriteCvs;
 
-exports.getAllJobsBySector  = getAllJobsBySector
-
+exports.getAllJobsBySector  = getAllJobsBySector;
+exports.getMyJobs           = getMyJobs;
 
 //////////// example to split data ////////
 

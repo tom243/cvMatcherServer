@@ -5,7 +5,7 @@ var key_words_schema = mongoose.Schema;
 var matching_objects_schema = mongoose.Schema;
 var users_schema = mongoose.Schema;
 var status_schema = mongoose.Schema;
-
+var requirements_schema = mongoose.Schema;
 
 // Users Schema
 var usersSchema = new users_schema({
@@ -132,7 +132,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         required: true
     },
     formula: String,
-    requirements: [String],
+    requirements: [{ type: Number, ref: 'RequirementsModel' }],
     compatibility_level: {
         type: Number,
         required: true
@@ -203,12 +203,38 @@ var statusSchema = new status_schema({
     }
 }, {collection: 'Status'});
 
+// Status Schema
+var requirementSchema = new requirements_schema({
+
+    combination:[{
+        name: {
+            type : String,
+            required : true
+        },
+        years: {
+            type : Number,
+            required : true
+        },
+        mode: {
+            type : String,
+            required : true
+        },
+        percentage:{
+            type:Number,
+            required:true
+        }
+    }]
+}, {collection: 'Requirements'});
+
+
 
 var UserModel = mongoose.model('UserModel', usersSchema);
 var StatusModel = mongoose.model('StatusModel',statusSchema);
+var RequirementsModel = mongoose.model('RequirementsModel',requirementSchema);
 
 exports.companiesSchema = companiesSchema;
 exports.matchingObjectsSchema = matchingObjectsSchema;
 exports.formulasSchema = formulasSchema;
 exports.UserModel = UserModel;
 exports.StatusModel = StatusModel;
+exports.RequirementsModel = RequirementsModel;

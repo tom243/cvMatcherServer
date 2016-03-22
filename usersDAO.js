@@ -61,8 +61,7 @@ function addUser(newUser, callback) {
             callback(false);
         }
     });
-
-};
+}
 
 
 // Delete User
@@ -73,7 +72,7 @@ function deleteUser(deleteUser, callback) {
 
     var class_data = JSON.parse(deleteUser);
     var newTable = new UserModel({
-        user_id: class_data['personal_id'],
+        user_id: class_data['personal_id']
     });
 
     var query = UserModel.findOne().where('personal_id', newTable.personal_id);
@@ -94,7 +93,7 @@ function deleteUser(deleteUser, callback) {
 
         });
     });
-};
+}
 
 
 // Update User
@@ -158,7 +157,29 @@ function updateUser(updateUser, callback) {
 
         });
     });
+}
 
+var getUser = function getUser(userId, userType, callback) {
+
+    mongoose.connect('mongodb://dbUser:dbPass@ds037145.mongolab.com:37145/dbcvmatcher');
+
+    mongoose.connection.once('open', function () {
+
+            var query = UserModel.find(
+                {google_user_id: userId, user_type:userType , active: true}
+            );
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("error");
+                mongoose.disconnect();
+                callback(false);
+            }
+            mongoose.disconnect();
+            callback(results);
+        });
+    });
 };
 
 
@@ -178,7 +199,7 @@ function addCompany(addCompany, callback) {
         logo: class_data['logo'],
         p_c: class_data['p_c'],
         address: class_data['address'],
-        active: class_data['active'],
+        active: class_data['active']
     });
 
     var query = CompanyModel.find().where('company_id', newTable.company_id);
@@ -206,7 +227,7 @@ function addCompany(addCompany, callback) {
         }
     });
 
-};
+}
 
 
 // Delete Company
@@ -217,7 +238,7 @@ function deleteCompany(deleteCompany, callback) {
 
     var class_data = JSON.parse(deleteCompany);
     var newTable = new CompanyModel({
-        company_id: class_data['company_id'],
+        company_id: class_data['company_id']
     });
 
     var query = CompanyModel.findOne().where('company_id', newTable.company_id);
@@ -238,7 +259,7 @@ function deleteCompany(deleteCompany, callback) {
 
         });
     });
-};
+}
 
 
 // Update Company
@@ -254,7 +275,7 @@ function updateCompany(updateCompany, callback) {
         logo: class_data['logo'],
         p_c: class_data['p_c'],
         address: class_data['address'],
-        active: class_data['active'],
+        active: class_data['active']
     });
 
 
@@ -287,16 +308,20 @@ function updateCompany(updateCompany, callback) {
         });
     });
 
-};
+}
 
 
-exports.addUser = addUser;
-exports.deleteUser = deleteUser;
-exports.updateUser = updateUser;
+///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
-exports.addCompany = addCompany;
-exports.deleteCompany = deleteCompany;
-exports.updateCompany = updateCompany;
+exports.addUser     = addUser;
+exports.deleteUser  = deleteUser;
+exports.updateUser  = updateUser;
+exports.getUser     = getUser;
+
+
+exports.addCompany      = addCompany;
+exports.deleteCompany   = deleteCompany;
+exports.updateCompany   = updateCompany;
 
 
 //////////// example to split data //////// 

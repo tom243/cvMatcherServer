@@ -60,6 +60,18 @@ app.post('/updateUser', jsonParser, function (req, res) {
     });
 });
 
+// get User
+app.post('/getUser', jsonParser, function (req, res) {
+
+    console.log("Im in getUser post");
+    if (!req.body) return res.sendStatus(400);
+    console.log("userId " + req.body.google_user_id);
+    console.log("user_type " + req.body.user_type);
+    usersController.getUser( req.body.google_user_id, req.body.user_type,  function (user) {
+        res.json(user);
+    });
+});
+
 
 /////////////////////////////////////////////////////////////// *** Matching Objects *** //////////////////////
 
@@ -187,6 +199,18 @@ app.post('/JobSeeker/getJobsBySector', jsonParser, function (req, res) {
     console.log(req.body.sector);
 
     matchingObjectController.getAllJobsBySector(req.body.google_user_id,req.body.sector, function (jobs) {
+        res.json(jobs);
+    });
+});
+
+// get the jobs that the user sent his cvs to them
+app.post('/JobSeeker/getMyJobs', jsonParser, function (req, res) {
+
+    console.log("Im in getMyJobs post");
+    if (!req.body) return res.sendStatus(400);
+    console.log("userId " + req.body.google_user_id);
+
+    matchingObjectController.getMyJobs(req.body.google_user_id, function (jobs) {
         res.json(jobs);
     });
 });
