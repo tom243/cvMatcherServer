@@ -277,6 +277,20 @@ function updateCompany(updateCompany, callback) {
 
 }
 
+var getCompany = function getCompany(companyId, callback) {
+
+    var query = CompanyModel.findById(companyId);
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("error");
+            callback(false);
+        }
+        callback(results);
+    });
+};
+
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
@@ -289,6 +303,7 @@ exports.getUser = getUser;
 exports.addCompany = addCompany;
 exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
+exports.getCompany      = getCompany;
 
 
 //////////// example to split data //////// 

@@ -57,6 +57,13 @@ function updateCompany(updateCompany, callback) {
     });
 }
 
+//** get an existing company **//
+function getCompany(companyId, callback) {
+    usersDAO.getCompany(companyId, function (result) {
+        callback(result);
+    });
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addUser     = addUser;
@@ -67,6 +74,7 @@ exports.getUser     = getUser;
 exports.addCompany      = addCompany;
 exports.deleteCompany   = deleteCompany;
 exports.updateCompany   = updateCompany;
+exports.getCompany      = getCompany;
 
 
 

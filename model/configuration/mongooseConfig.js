@@ -32,15 +32,5 @@ module.exports = function () {
         });
     });
 
-    //var db = mongoose.connect(dbURI);
-
-    var MatchingObjectsModel = require('./../schemas/schemas').MatchingObjectsModel;
-    var FormulaModel = require('./../schemas/schemas').FormulaModel;
-    var UserModel = require('./../schemas/schemas').UserModel;
-    var StatusModel = require('./../schemas/schemas').StatusModel;
-    var RequirementsModel = require('./../schemas/schemas').RequirementsModel;
-    var CompanyModel = require('./../schemas/schemas').CompanyModel;
-
-
     return db;
 };

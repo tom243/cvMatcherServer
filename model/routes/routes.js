@@ -103,7 +103,7 @@ module.exports = function (app) {
     });
 
 // get MatchingObject
-    app.post('/employer/getMatchingObject', function (req, res) {
+    app.post('/getMatchingObject', function (req, res) {
 
         console.log("Im in getMatchingObject post");
         if (!req.body) return res.sendStatus(400);
@@ -118,9 +118,37 @@ module.exports = function (app) {
     });
 
 
+    /////////////////////////////////////////////////////////////// *** JobSeeker *** //////////////////////////////////////
+
+    // get Jobs by sector
+    app.post('/jobSeeker/getJobsBySector', function (req, res) {
+
+        console.log("Im in getJobsBySector post");
+        if (!req.body) return res.sendStatus(400);
+        console.log(req.body.google_user_id);
+        console.log(req.body.sector);
+
+        matchingObjectController.getAllJobsBySector(req.body.google_user_id, req.body.sector, function (jobs) {
+            res.json(jobs);
+        });
+    });
+
+    // get the jobs that the user sent his cvs to them
+    app.post('/jobSeeker/getMyJobs', function (req, res) {
+
+        console.log("Im in getMyJobs post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("userId " + req.body.google_user_id);
+
+        matchingObjectController.getMyJobs(req.body.google_user_id, function (jobs) {
+            res.json(jobs);
+        });
+    });
+
 //////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
 
-// get Jobs
+
+    // get Jobs
     app.post('/employer/getJobsBySector', function (req, res) {
 
         console.log("Im in getJobsBySector post");
@@ -135,7 +163,7 @@ module.exports = function (app) {
             });
     });
 
-// get Unread CV'S
+    // get Unread CV'S
     app.post('/employer/getUnreadCvsForJob', function (req, res) {
 
         console.log("Im in getCvsForJob post");
@@ -149,7 +177,7 @@ module.exports = function (app) {
     });
 
 
-// get liked or unliked CV'S
+    // get liked or unliked CV'S
     app.post('/employer/getRateCvsForJob', function (req, res) {
 
         console.log("Im in getRateCvsForJob post");
@@ -163,7 +191,7 @@ module.exports = function (app) {
         });
     });
 
-// get favorites CV'S
+    // get favorites CV'S
     app.post('/employer/getFavoriteCvs', function (req, res) {
 
         console.log("Im in getFavorites post");
@@ -176,38 +204,11 @@ module.exports = function (app) {
         });
     });
 
-/////////////////////////////////////////////////////////////// *** JobSeeker *** //////////////////////////////////////
-
-// get Jobs by sector
-    app.post('/JobSeeker/getJobsBySector', function (req, res) {
-
-        console.log("Im in getJobsBySector post");
-        if (!req.body) return res.sendStatus(400);
-        console.log(req.body.google_user_id);
-        console.log(req.body.sector);
-
-        matchingObjectController.getAllJobsBySector(req.body.google_user_id, req.body.sector, function (jobs) {
-            res.json(jobs);
-        });
-    });
-
-// get the jobs that the user sent his cvs to them
-    app.post('/JobSeeker/getMyJobs', function (req, res) {
-
-        console.log("Im in getMyJobs post");
-        if (!req.body) return res.sendStatus(400);
-        console.log("userId " + req.body.google_user_id);
-
-        matchingObjectController.getMyJobs(req.body.google_user_id, function (jobs) {
-            res.json(jobs);
-        });
-    });
-
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
 
-// Add Company
+    // Add Company
     app.post('/employer/addCompany', function (req, res) {
 
         console.log("Im in addCompany post");
@@ -220,7 +221,7 @@ module.exports = function (app) {
     });
 
 
-// Delete Company
+    // Delete Company
     app.post('/employer/deleteCompany', function (req, res) {
 
         console.log("Im in deleteCompany post");
@@ -233,7 +234,7 @@ module.exports = function (app) {
     });
 
 
-// Update Company
+    // Update Company
     app.post('/employer/updateCompany', function (req, res) {
 
         console.log("Im in updateCompany post");
@@ -245,11 +246,23 @@ module.exports = function (app) {
         });
     });
 
+    // get Company
+    app.post('/employer/getCompany', function (req, res) {
+
+        console.log("Im in getCompany post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("company_id " + req.body.company_id);
+
+        usersController.getCompany(req.body.company_id, function (company) {
+            res.json(company);
+        });
+    });
+
 
 /////////////////////////////////////////////////////////////// ***  Formulas  *** ////////////////////////////////////
 
 
-// Add Formula
+    // Add Formula
     app.post('/employer/addFormula', function (req, res) {
 
         console.log("Im in Formula post");
@@ -262,7 +275,7 @@ module.exports = function (app) {
     });
 
 
-// Delete Formula
+    // Delete Formula
     app.post('/employer/deleteFormula', function (req, res) {
 
         console.log("Im in deleteFormula post");
@@ -274,7 +287,7 @@ module.exports = function (app) {
         });
     });
 
-// Update Formula
+    // Update Formula
     app.post('/employer/updateFormula', function (req, res) {
 
         console.log("Im in updateFormula post");
@@ -286,7 +299,7 @@ module.exports = function (app) {
         });
     });
 
-// get Formula
+    // get Formula
     app.post('/employer/getFormula', function (req, res) {
 
         console.log("in getFormula post");
@@ -298,5 +311,4 @@ module.exports = function (app) {
         });
     });
 
-
-}
+};
