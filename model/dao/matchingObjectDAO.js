@@ -166,7 +166,7 @@ function updateObject(updateObject, callback) {
 
 var getMatchingObject = function getMatchingObject(userId, matchingObjectId, matchingObjectType, callback) {
 
-    if (matchingObjectType === "user") {
+    if (matchingObjectType === "cv") {
 
         var query = MatchingObjectsModel.find(
             {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
