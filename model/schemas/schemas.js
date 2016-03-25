@@ -6,6 +6,8 @@ var matching_objects_schema = mongoose.Schema;
 var users_schema = mongoose.Schema;
 var status_schema = mongoose.Schema;
 var requirements_schema = mongoose.Schema;
+var original_text_schema = mongoose.Schema;
+var personal_properties_schema = mongoose.Schema;
 
 // Users Schema
 var usersSchema = new users_schema({
@@ -36,7 +38,6 @@ var usersSchema = new users_schema({
     },
     birth_date: String,
     address: String,
-    personal_properties: String,
     company: String,
     phone_number: String,
     favorites: [String],
@@ -100,11 +101,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         type: String,
         required: true
     },
-    original_text: [{
-        title: String,
-        description: String,
-        requirements: String
-    }],
+    original_text: { type: Number, ref: 'OriginalTextModel' },
     sector: {
         type: String,
         required: true,
@@ -142,6 +139,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         favorite: Boolean,
         current_status: String
     },
+    personal_properties: String,
     favorites: [String],
     cvs: [String],
     archive:{
@@ -203,7 +201,7 @@ var statusSchema = new status_schema({
     }
 }, {collection: 'Status'});
 
-// Status Schema
+// requirement Schema
 var requirementSchema = new requirements_schema({
 
     combination:[{
@@ -226,18 +224,79 @@ var requirementSchema = new requirements_schema({
     }]
 }, {collection: 'Requirements'});
 
+// originalTextSchema Schema
+var originalTextSchema = new original_text_schema({
+    title: String,
+    description: String,
+    requirements: String,
+    history_timeline: [{
+        text: String,
+        start_year: Number,
+        end_year: Number,
+        type: String
+    }]
+}, {collection: 'OriginalText'});
+
+// personalPropertiesSchema Schema
+var personalPropertiesSchema = new personal_properties_schema({
+
+    university_degree:{
+        type : Boolean,
+        required : true
+    },
+    degree_graduation_with_honors: {
+        type : Boolean,
+        required : true
+    },
+    above_two_years_experience: {
+        type : Boolean,
+        required : true
+    },
+    psychometric_above_680: {
+        type : Boolean,
+        required : true
+    },
+    multilingual: {
+        type : Boolean,
+        required : true
+    },
+    volunteering: {
+        type : Boolean,
+        required : true
+    },
+    full_army_service: {
+        type : Boolean,
+        required : true
+    },
+    officer: {
+        type : Boolean,
+        required : true
+    },
+    high_school_graduation_with_honors: {
+        type : Boolean,
+        required : true
+    },
+    youth_movements: {
+        type : Boolean,
+        required : true
+    }
+}, {collection: 'Personal_Properties '});
 
 
-var UserModel = mongoose.model('UserModel', usersSchema);
-var StatusModel = mongoose.model('StatusModel',statusSchema);
-var RequirementsModel = mongoose.model('RequirementsModel',requirementSchema);
-var CompanyModel = mongoose.model('CompanyModel', companiesSchema);
-var FormulaModel = mongoose.model('FormulaModel', formulasSchema);
-var MatchingObjectsModel = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
+var UserModel               = mongoose.model('UserModel', usersSchema);
+var StatusModel             = mongoose.model('StatusModel',statusSchema);
+var RequirementsModel       = mongoose.model('RequirementsModel',requirementSchema);
+var CompanyModel            = mongoose.model('CompanyModel', companiesSchema);
+var FormulaModel            = mongoose.model('FormulaModel', formulasSchema);
+var MatchingObjectsModel    = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
+var OriginalTextModel       = mongoose.model('OriginalTextModel', originalTextSchema);
+var PersonalPropertiesModel = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
 
-exports.CompanyModel = CompanyModel;
-exports.MatchingObjectsModel = MatchingObjectsModel;
-exports.FormulaModel = FormulaModel;
-exports.UserModel = UserModel;
-exports.StatusModel = StatusModel;
-exports.RequirementsModel = RequirementsModel;
+exports.CompanyModel            = CompanyModel;
+exports.MatchingObjectsModel    = MatchingObjectsModel;
+exports.FormulaModel            = FormulaModel;
+exports.UserModel               = UserModel;
+exports.StatusModel             = StatusModel;
+exports.RequirementsModel       = RequirementsModel;
+exports.OriginalTextModel       = OriginalTextModel;
+exports.PersonalPropertiesModel = PersonalPropertiesModel;

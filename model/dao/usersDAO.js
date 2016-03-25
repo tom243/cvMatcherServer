@@ -294,22 +294,14 @@ var getCompany = function getCompany(companyId, callback) {
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
-exports.addUser = addUser;
-exports.deleteUser = deleteUser;
-exports.updateUser = updateUser;
-exports.getUser = getUser;
+exports.addUser     = addUser;
+exports.deleteUser  = deleteUser;
+exports.updateUser  = updateUser;
+exports.getUser     = getUser;
 
-
-exports.addCompany = addCompany;
-exports.deleteCompany = deleteCompany;
-exports.updateCompany = updateCompany;
+exports.addCompany      = addCompany;
+exports.deleteCompany   = deleteCompany;
+exports.updateCompany   = updateCompany;
 exports.getCompany      = getCompany;
 
-
-//////////// example to split data //////// 
-
-// var b = updateUser.split(/[{},:]/); // Delimiter is a regular expression
-// console.log(b);
-
-//////////////////////////////////////////////////
 

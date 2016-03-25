@@ -4,26 +4,26 @@ var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = da
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
 //** Adding a new object **//
-function addObject(addObject, callback) {
+function addMatchingObject(addObject, callback) {
     console.log("im in matchingObjectControllerrrrr");
-    matchingObjectDAO.addObject(addObject, function (result) {
+    matchingObjectDAO.addMatchingObject(addObject, function (result) {
         callback(result);
     });
 }
 
 
 //** Delete an existing object **//
-function deleteObject(deleteObject, callback) {
+function deleteMatchingObject(deleteObject, callback) {
     console.log("im in usersControllerrrr");
-    matchingObjectDAO.deleteObject(deleteObject, function (result) {
+    matchingObjectDAO.deleteMatchingObject(deleteObject, function (result) {
         callback(result);
     });
 }
 
 //** Update an existing object **//
-function updateObject(updateObject, callback) {
+function updateMatchingObject(updateObject, callback) {
     console.log("im in usersControllerrrr");
-    matchingObjectDAO.updateObject(updateObject, function (result) {
+    matchingObjectDAO.updateMatchingObject(updateObject, function (result) {
         callback(result);
     });
 }
@@ -121,10 +121,10 @@ function getMyJobs(userId, callback) {
 
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
-exports.addObject           = addObject;
-exports.deleteObject        = deleteObject;
-exports.updateObject        = updateObject;
-exports.getMatchingObject   = getMatchingObject;
+exports.addMatchingObject       = addMatchingObject;
+exports.deleteMatchingObject    = deleteMatchingObject;
+exports.updateMatchingObject    = updateMatchingObject;
+exports.getMatchingObject       = getMatchingObject;
 
 exports.addFormula      = addFormula;
 exports.deleteFormula   = deleteFormula;

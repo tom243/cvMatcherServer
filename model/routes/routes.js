@@ -67,11 +67,11 @@ module.exports = function (app) {
 // Add Object (Job or CV)
     app.post('/addMatchingObject', function (req, res) {
 
-        console.log("Im in addObject post");
+        console.log("Im in addMatchingObject post");
         if (!req.body) return res.sendStatus(400);
         var object = JSON.stringify(req.body);
 
-        matchingObjectController.addObject(object, function (object) {
+        matchingObjectController.addMatchingObject(object, function (object) {
             res.json(object);
         });
     });
@@ -80,11 +80,11 @@ module.exports = function (app) {
 // Delete Object (Job or CV)
     app.post('/deleteMatchingObject', function (req, res) {
 
-        console.log("Im in deleteObject post");
+        console.log("Im in deleteMatchingObject post");
         if (!req.body) return res.sendStatus(400);
         var object = JSON.stringify(req.body);
 
-        matchingObjectController.deleteObject(object, function (object) {
+        matchingObjectController.deleteMatchingObject(object, function (object) {
             res.json(object);
         });
     });
@@ -93,11 +93,11 @@ module.exports = function (app) {
 // Update Object (Job or CV)
     app.post('/updateMatchingObject', function (req, res) {
 
-        console.log("Im in updateObject post");
+        console.log("Im in updateMatchingObject post");
         if (!req.body) return res.sendStatus(400);
         var object = JSON.stringify(req.body);
 
-        matchingObjectController.updateObject(object, function (object) {
+        matchingObjectController.updateMatchingObject(object, function (object) {
             res.json(object);
         });
     });
