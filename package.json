@@ -12,6 +12,7 @@
     "express": "^4.13.3",
 	"mongoose": "^4.0.7",
     "body-parser": "^1.15.0",
-	"mongoose-deep-populate": "^3.0.0"
+	"mongoose-deep-populate": "^3.0.0",
+    "async": "^2.0.0-rc.2"
   }
 }

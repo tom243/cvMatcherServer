@@ -101,6 +101,13 @@ function getFavoriteCvs(userId, jobId, callback) {
     });
 }
 
+//** add status for specific cv  **//
+function addStatus(matching_object_id, status, callback) {
+    matchingObjectDAO.addStatus(matching_object_id, status, function (result) {
+        callback(result);
+    });
+}
+
 
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
@@ -135,6 +142,8 @@ exports.getJobsBySector     = getJobsBySector;
 exports.getUnreadCvsForJob  = getUnreadCvsForJob;
 exports.getRateCvsForJob    = getRateCvsForJob;
 exports.getFavoriteCvs      = getFavoriteCvs;
+
+exports.addStatus = addStatus;
 
 exports.getAllJobsBySector  = getAllJobsBySector;
 exports.getMyJobs           = getMyJobs;

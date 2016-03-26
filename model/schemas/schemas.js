@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'), Schema = mongoose.Schema;
 var companies_schema = mongoose.Schema;
 var formulas_schema = mongoose.Schema;
 var key_words_schema = mongoose.Schema;
@@ -8,6 +8,9 @@ var status_schema = mongoose.Schema;
 var requirements_schema = mongoose.Schema;
 var original_text_schema = mongoose.Schema;
 var personal_properties_schema = mongoose.Schema;
+var history_timeline_schema = mongoose.Schema;
+var academy_schema = mongoose.Schema;
+var professional_knowledge_schema = mongoose.Schema;
 
 // Users Schema
 var usersSchema = new users_schema({
@@ -98,44 +101,29 @@ var matchingObjectsSchema = new matching_objects_schema({
         index : 1
     },
     date: {
-        type: String,
+        type: Date,
         required: true
     },
-    original_text: { type: Number, ref: 'OriginalTextModel' },
+    original_text: { type: Schema.Types.ObjectId, ref: 'OriginalTextModel' },
     sector: {
         type: String,
         required: true,
         index: 1
     },
-    locations: {
-        type: [String],
-        required: true
-    },
-    candidate_type: {
-        type: [String],
-        required: true
-    },
-    scope_of_position: {
-        type: [String],
-        required: true
-    },
+    locations: [String],
+    candidate_type:[String],
+    scope_of_position:[String],
     academy: [{
         academy_name: String,
         degree_name: String,
         degree_type: [String]
     }],
-    sub_sector: {
-        type: [String],
-        required: true
-    },
+    sub_sector: [String],
     formula: String,
-    requirements: [{ type: Number, ref: 'RequirementsModel' }],
-    compatibility_level: {
-        type: Number,
-        required: true
-    },
+    requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
+    compatibility_level:Number,
     status:{
-        status_id: { type: Number, ref: 'StatusModel' },
+        status_id: { type: Schema.Types.ObjectId, ref: 'StatusModel' },
         favorite: Boolean,
         current_status: String
     },
@@ -152,7 +140,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         type: Boolean,
         required: true
     },
-    user: { type: Number, ref: 'UserModel' }
+    user: { type: Schema.Types.ObjectId, ref: 'UserModel' }
 
 }, {collection: 'Matching_Objects'});
 
@@ -203,39 +191,17 @@ var statusSchema = new status_schema({
 
 // requirement Schema
 var requirementSchema = new requirements_schema({
-
-    combination:[{
-        name: {
-            type : String,
-            required : true
-        },
-        years: {
-            type : Number,
-            required : true
-        },
-        mode: {
-            type : String,
-            required : true
-        },
-        percentage:{
-            type:Number,
-            required:true
-        }
-    }]
+    combination:[{ type: Schema.Types.ObjectId, ref: 'ProfessionalKnowledgeModel' }]
 }, {collection: 'Requirements'});
+
 
 // originalTextSchema Schema
 var originalTextSchema = new original_text_schema({
     title: String,
     description: String,
     requirements: String,
-    history_timeline: [{
-        text: String,
-        start_year: Number,
-        end_year: Number,
-        type: String
-    }]
-}, {collection: 'OriginalText'});
+    history_timeline: [{ type: Schema.Types.ObjectId, ref: 'HistoryTimelineModel' }]
+}, {collection: 'Original_Text'});
 
 // personalPropertiesSchema Schema
 var personalPropertiesSchema = new personal_properties_schema({
@@ -280,23 +246,68 @@ var personalPropertiesSchema = new personal_properties_schema({
         type : Boolean,
         required : true
     }
-}, {collection: 'Personal_Properties '});
+}, {collection: 'Personal_Properties'});
+
+// historyTimeline Schema
+var historyTimelineSchema = new history_timeline_schema({
+    text: String,
+    start_year: Number,
+    end_year: Number,
+    type: String
+
+}, {collection: 'History_Timeline'});
+
+// AcademySchema Schema
+var AcademySchema = new academy_schema({
+    academy_type: String,
+    degree_name: String,
+    degree_type: [String]
+
+}, {collection: 'Academy'});
 
 
-var UserModel               = mongoose.model('UserModel', usersSchema);
-var StatusModel             = mongoose.model('StatusModel',statusSchema);
-var RequirementsModel       = mongoose.model('RequirementsModel',requirementSchema);
-var CompanyModel            = mongoose.model('CompanyModel', companiesSchema);
-var FormulaModel            = mongoose.model('FormulaModel', formulasSchema);
-var MatchingObjectsModel    = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
-var OriginalTextModel       = mongoose.model('OriginalTextModel', originalTextSchema);
-var PersonalPropertiesModel = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
+// ProfessionalKnowledgeSchema Schema
+var ProfessionalKnowledgeSchema = new professional_knowledge_schema({
+    name: {
+        type : String,
+        required : true
+    },
+    years: {
+        type : Number,
+        required : true
+    },
+    mode: {
+        type : String,
+        required : true
+    },
+    percentage:{
+        type:Number,
+        required:true
+    }
+}, {collection: 'Professional_Knowledge'});
 
-exports.CompanyModel            = CompanyModel;
-exports.MatchingObjectsModel    = MatchingObjectsModel;
-exports.FormulaModel            = FormulaModel;
-exports.UserModel               = UserModel;
-exports.StatusModel             = StatusModel;
-exports.RequirementsModel       = RequirementsModel;
-exports.OriginalTextModel       = OriginalTextModel;
-exports.PersonalPropertiesModel = PersonalPropertiesModel;
+
+var UserModel                   = mongoose.model('UserModel', usersSchema);
+var StatusModel                 = mongoose.model('StatusModel',statusSchema);
+var RequirementsModel           = mongoose.model('RequirementsModel',requirementSchema);
+var CompanyModel                = mongoose.model('CompanyModel', companiesSchema);
+var FormulaModel                = mongoose.model('FormulaModel', formulasSchema);
+var MatchingObjectsModel        = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
+var OriginalTextModel           = mongoose.model('OriginalTextModel', originalTextSchema);
+var PersonalPropertiesModel     = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
+var HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', historyTimelineSchema);
+var AcademySchemaModel          = mongoose.model('AcademySchemaModel', AcademySchema);
+var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', ProfessionalKnowledgeSchema);
+
+
+exports.CompanyModel                = CompanyModel;
+exports.MatchingObjectsModel        = MatchingObjectsModel;
+exports.FormulaModel                = FormulaModel;
+exports.UserModel                   = UserModel;
+exports.StatusModel                 = StatusModel;
+exports.RequirementsModel           = RequirementsModel;
+exports.OriginalTextModel           = OriginalTextModel;
+exports.PersonalPropertiesModel     = PersonalPropertiesModel;
+exports.HistoryTimelineModel        = HistoryTimelineModel;
+exports.AcademySchemaModel          = AcademySchemaModel;
+exports.ProfessionalKnowledgeModel  = ProfessionalKnowledgeModel;

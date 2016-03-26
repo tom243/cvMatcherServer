@@ -69,9 +69,9 @@ module.exports = function (app) {
 
         console.log("Im in addMatchingObject post");
         if (!req.body) return res.sendStatus(400);
-        var object = JSON.stringify(req.body);
+        var matchingObject = JSON.stringify(req.body);
 
-        matchingObjectController.addMatchingObject(object, function (object) {
+        matchingObjectController.addMatchingObject(matchingObject, function (object) {
             res.json(object);
         });
     });
@@ -204,6 +204,18 @@ module.exports = function (app) {
         });
     });
 
+    //** add status for specific cv  **//
+    app.post('/employer/addStatusForCV', function (req, res) {
+
+        console.log("Im in addStatusForCV post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("matching_object_id" + req.body.matching_object_id);
+        console.log("status" + req.body.status);
+        var status = JSON.stringify(req.body.status);
+        matchingObjectController.addStatus(req.body.google_user_id, status, function (status) {
+            res.json(status);
+        });
+    });
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
