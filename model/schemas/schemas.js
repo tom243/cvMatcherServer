@@ -115,7 +115,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     scope_of_position:[String],
     academy: [{ type: Schema.Types.ObjectId, ref: 'AcademyModel' }],
     sub_sector: [String],
-    formula: String,
+    formula: { type: Schema.Types.ObjectId, ref: 'FormulaModel' },
     requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
     compatibility_level:Number,
     status:{

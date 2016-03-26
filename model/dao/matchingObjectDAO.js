@@ -257,7 +257,8 @@ function getMatchingObject(userId, matchingObjectId, matchingObjectType, callbac
             .populate({
                 path: 'requirements',
                 populate: {path: 'combination'}
-            });
+            })
+            .populate("formula")
     }
 
     query.exec(function (err, results) {
