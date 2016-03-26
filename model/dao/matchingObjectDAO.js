@@ -797,7 +797,7 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
                 }
             });
         } else {
-            errorMessage = "jobs are empty"
+            errorMessage = "jobs are empty";
             console.log(errorMessage);
             callback(results);
         }
