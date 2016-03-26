@@ -45,7 +45,8 @@ function addMatchingObject(matchingObject, callback) {
                             if (matchingObject.matching_object_type === "cv") {
 
                                 /* Add Personal Properties */
-                                addPersonalProperties(matchingObject.personal_properties, function (personal_properties) {
+                                addPersonalProperties(matchingObject.personal_properties,
+                                    function (personal_properties) {
                                     if (personal_properties !== false) {
                                         matchingObject.personal_properties = personal_properties._id;
                                         buildAndSaveMatchingObject(matchingObject, function (matchingObject) {
@@ -918,6 +919,39 @@ function getMyJobs(userId, callback) {
     });
 }
 
+function getFavoritesJobs(userId, callback) {
+
+    var query = UserModel.find(
+        {google_user_id: userId, active: true}, {favorites: 1}
+    );
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("error");
+            callback(false);
+        } else {
+            var query = MatchingObjectsModel.find(
+                {active: true, matching_object_type: "job", _id: {$in: results[0].favorites}, archive: false}
+            ).populate('status.status_id')
+                .populate('original_text')
+                .populate('academy');
+
+            query.exec(function (err, results) {
+
+                if (err) {
+                    console.log("error");
+                    callback(false);
+                } else {
+                    callback(results);
+                }
+            });
+        }
+    });
+}
+
+
+
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 exports.addMatchingObject = addMatchingObject;
@@ -939,6 +973,7 @@ exports.addStatus = addStatus;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
+exports.getFavoritesJobs    = getFavoritesJobs;
 
 
 

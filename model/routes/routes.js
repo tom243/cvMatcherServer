@@ -145,6 +145,18 @@ module.exports = function (app) {
         });
     });
 
+    // get the jobs that the user sent his cvs to them
+    app.post('/jobSeeker/getFavoritesJobs', function (req, res) {
+
+        console.log("Im in getFavoritesJobs post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("userId " + req.body.google_user_id);
+
+        matchingObjectController.getFavoritesJobs(req.body.google_user_id, function (jobs) {
+            res.json(jobs);
+        });
+    });
+
 //////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
 
 

@@ -118,13 +118,18 @@ function getAllJobsBySector(userId, sector, callback) {
     });
 }
 
-//**  get the jobs that the user sent his cvs to them  **//
+//**  get the jobs that the user has sent his cvs to them  **//
 function getMyJobs(userId, callback) {
     matchingObjectDAO.getMyJobs(userId, function (result) {
         callback(result);
     });
 }
-
+//**  get the  favourites jobs  **//
+function getFavoritesJobs(userId, callback) {
+    matchingObjectDAO.getFavoritesJobs(userId, function (result) {
+        callback(result);
+    });
+}
 
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
@@ -147,3 +152,4 @@ exports.addStatus = addStatus;
 
 exports.getAllJobsBySector  = getAllJobsBySector;
 exports.getMyJobs           = getMyJobs;
+exports.getFavoritesJobs    = getFavoritesJobs;
