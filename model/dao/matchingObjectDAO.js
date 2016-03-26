@@ -10,7 +10,7 @@ var RequirementsModel = require('./../schemas/schemas').RequirementsModel;
 var OriginalTextModel = require('./../schemas/schemas').OriginalTextModel;
 var PersonalPropertiesModel = require('./../schemas/schemas').PersonalPropertiesModel;
 var HistoryTimelineModel = require('./../schemas/schemas').HistoryTimelineModel;
-var AcademySchemaModel = require('./../schemas/schemas').AcademySchemaModel;
+var AcademyModel = require('./../schemas/schemas').AcademyModel;
 var ProfessionalKnowledgeModel = require('./../schemas/schemas').ProfessionalKnowledgeModel;
 
 var errorMessage;
@@ -40,6 +40,7 @@ function addMatchingObject(matchingObject, callback) {
                     addAcademy(matchingObject.academy, function (academy) {
                         if (academy !== false) {
                             matchingObject.academy = academy;
+                            console.log("matchingObject.academy", matchingObject.academy);
                             /* start unique parameters */
                             if (matchingObject.matching_object_type === "cv") {
 
@@ -83,23 +84,26 @@ function addMatchingObject(matchingObject, callback) {
 
 function buildAndSaveMatchingObject(matchingObject, callback) {
 
-    console.log("matchingObject" , matchingObject);
+    console.log("matchingObject", matchingObject);
+
 
     //var class_data = JSON.parse(matchingObject);
     class_data = matchingObject;
+
+    console.log("matchingObject.academy", class_data['academy']);
     var matchingObjectToAdd = new MatchingObjectsModel({
         matching_object_type: class_data['matching_object_type'],
         google_user_id: class_data['google_user_id'],
-        date: class_data['date'],
+        date: new Date(),
         original_text: class_data['original_text'],
         sector: class_data['sector'],
-        locations: [],
-        candidate_type: [],
-        scope_of_position: [],
-        academy: [],
-        sub_sector: [],
+        locations: class_data.locations,
+        candidate_type: class_data.candidate_type,
+        scope_of_position: class_data.scope_of_position,
+        academy: class_data['academy'],
+        sub_sector: class_data.sub_sector,
         formula: class_data['formula'],
-        requirements: [],
+        requirements: class_data.requirements,
         compatibility_level: class_data['compatibility_level'],
         status: null,
         personal_properties: class_data['personal_properties'],
@@ -118,32 +122,7 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
             callback(false);
         } else {
             console.log("Matching Object saved to DB: " + doc);
-
-            MatchingObjectsModel.findByIdAndUpdate(
-                doc._id,
-                {$push:
-                    {
-                        "locations": {$each: matchingObject.locations},
-                        "candidate_type": {$each: matchingObject.candidate_type},
-                        "scope_of_position": {$each: matchingObject.scope_of_position},
-                        "academy": {$each: matchingObject.academy},
-                        "sub_sector": {$each: matchingObject.sub_sector},
-                        "requirements": {$each: matchingObject.requirements},
-                    }
-
-
-                },
-                {upsert: true, new: true},
-                function (err, doc) {
-                    if (err) {
-                        console.log("error in save originalText to db ");
-                        console.log(err);
-                        callback(false);
-                    } else {
-                        callback(doc);
-                    }
-                }
-            );
+            callback(doc);
         }
     });
 }
@@ -256,20 +235,28 @@ function getMatchingObject(userId, matchingObjectId, matchingObjectType, callbac
 
         var query = MatchingObjectsModel.find(
             {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
-        ).populate('user').populate({
+        ).populate('user')
+            .populate('academy')
+            .populate('personal_properties')
+            .populate({
                 path: 'original_text',
-                populate: {'path.history_timeline': 'History_Timeline'}
-            }).populate('Academy');
+                populate: {path: 'history_timeline', options: {sort: {'start_year': 1}}}
+            })
+            .populate({
+                path: 'requirements',
+                populate: {path: 'combination'}
+            });
 
 
     } else {//job
         var query = MatchingObjectsModel.find(
             {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
-        ).populate('requirements').populate({
-                path: 'original_text',
-                populate: {'path.history_timeline': 'History_Timeline'}
-            }).populate('Academy');
-
+        ).populate('original_text')
+            .populate('academy')
+            .populate({
+                path: 'requirements',
+                populate: {path: 'combination'}
+            });
     }
 
     query.exec(function (err, results) {
@@ -292,16 +279,37 @@ function addOriginalText(originalText, callback) {
     console.log("im in OriginalText function");
     var history_data = originalText.history_timeline;
 
-    buildTimelineHistory(history_data, function (err, historyTimeline) {
+    if (originalText.history_timeline.length > 0) { //cv
+        buildTimelineHistory(history_data, function (err, historyTimeline) {
 
-        if (err) {
-            console.log("error in save originalText to db ");
-            console.log(err);
-            callback(false);
-        } else {
+            if (err) {
+                console.log("error in save originalText to db ");
+                console.log(err);
+                callback(false);
+            } else {
 
-            console.log("historyTimeline", historyTimeline);
+                console.log("historyTimeline", historyTimeline);
 
+                var originalTextToAdd = new OriginalTextModel({
+                    title: null,
+                    description: null,
+                    requirements: null,
+                    history_timeline: historyTimeline
+                });
+
+                /* save the OriginalText to db*/
+                originalTextToAdd.save(function (err, doc) {
+                    if (err) {
+                        console.log("error in save originalText to db ");
+                        console.log(err);
+                        callback(false);
+                    } else {
+                        callback(doc);
+                    }
+                })
+            }
+        })
+    } else { // job
         var originalTextToAdd = new OriginalTextModel({
             title: originalText['title'],
             description: originalText['description'],
@@ -316,24 +324,10 @@ function addOriginalText(originalText, callback) {
                 console.log(err);
                 callback(false);
             } else {
-                OriginalTextModel.findByIdAndUpdate(
-                    doc._id,
-                    {$push: {"history_timeline": {$each: historyTimeline}}},
-                    {upsert: true, new: true},
-                    function (err, doc) {
-                        if (err) {
-                            console.log("error in save originalText to db ");
-                            console.log(err);
-                            callback(false);
-                        } else {
-                            callback(doc);
-                        }
-                    }
-                );
+                callback(doc);
             }
         })
-        }
-    })
+    }
 }
 
 function buildTimelineHistory(timeline, callback) {
@@ -367,7 +361,7 @@ function buildTimelineHistory(timeline, callback) {
         // 3rd param is the function to call when everything's done
         function (err) {
             // All tasks are done now
-            callback(err,historyTimeLineArray);
+            callback(err, historyTimeLineArray);
         }
     );
 }
@@ -383,7 +377,7 @@ function addAcademy(academy, callback) {
         function (item, callback) {
             // Call an asynchronous function, often a save() to DB
 
-            var academyToadd = new AcademySchemaModel({
+            var academyToadd = new AcademyModel({
                 academy_type: item.academy_type,
                 degree_name: item.degree_name,
                 degree_type: item.degree_type
@@ -409,6 +403,7 @@ function addAcademy(academy, callback) {
                 console.log(err);
                 callback(false);
             } else {
+                console.log("academyArray", academyArray);
                 callback(academyArray);
             }
 
@@ -438,7 +433,7 @@ function addRequirements(requirements, callback) {
                     callback(false);
                 } else {
                     var combinationToadd = new RequirementsModel({
-                        combination: []
+                        combination: professionalKnowledgeArr
                     });
 
                     /* save the  the requirements combination to db*/
@@ -449,20 +444,7 @@ function addRequirements(requirements, callback) {
                             callback(false);
                         } else {
                             requirementsArr.push(doc._id);
-                            RequirementsModel.findByIdAndUpdate(
-                                doc._id,
-                                {$push: {"combination": {$each: professionalKnowledgeArr}}},
-                                {upsert: true, new: true},
-                                function (err, doc) {
-                                    if (err) {
-                                        console.log("error in save requirements combination to db ");
-                                        console.log(err);
-                                        callback(false);
-                                    } else {
-                                        callback();
-                                    }
-                                }
-                            );
+                            callback();
                         }
                     })
                 }
@@ -482,11 +464,9 @@ function addRequirements(requirements, callback) {
     );
 }
 
-function buildProfessionalKnowledge(professionalKnowledges,callback) {
+function buildProfessionalKnowledge(professionalKnowledges, callback) {
 
     var professionalKnowledgeArr = [];
-
-    console.log("professionalKnowledges" , professionalKnowledges);
 
     // 1st para in async.each() is the array of items
     async.each(professionalKnowledges,
@@ -505,7 +485,6 @@ function buildProfessionalKnowledge(professionalKnowledges,callback) {
             professionalKnowledgeToadd.save(function (err, doc) {
                 if (err) {
                     console.log("error in save professionalKnowledge to db ");
-                    console.log(err);
                     callback(false);
                 } else {
                     professionalKnowledgeArr.push(doc._id);
@@ -516,7 +495,7 @@ function buildProfessionalKnowledge(professionalKnowledges,callback) {
         // 3rd param is the function to call when everything's done
         function (err) {
             // All tasks are done now
-            callback(err,professionalKnowledgeArr);
+            callback(err, professionalKnowledgeArr);
         }
     );
 }
@@ -541,7 +520,6 @@ function addStatus(matching_object_id, status, callback) {
             console.log("error in save Status to db ");
             callback(false);
         }
-        console.log("Status saved to DB: " + doc);
 
         var query = {"_id": matching_object_id};
         var update = {status: {status_id: doc._id}};
@@ -584,7 +562,7 @@ function addPersonalProperties(personalProperties, callback) {
             console.log("error in save Personal Properties to db ");
             callback(false);
         } else {
-            console.log("Personal Properties saved to DB: " + doc);
+            console.log("Personal Properties saved to DB");
             callback(doc);
         }
     });
@@ -611,12 +589,12 @@ function addFormula(formula, callback) {
 
 
     /*save the Formula in db*/
-    formula.save(function (err, doc) {
+    formulaToAdd.save(function (err, doc) {
         if (err) {
             console.log("error insert formula to DB");
             callback(false);
         } else {
-            console.log("formula saved to DB: " + doc);
+            console.log("formula saved to DB");
             callback(doc);
         }
     });
@@ -706,14 +684,12 @@ function getFormula(jobId, callback) {
 
         if (typeof(results[0].formula) !== "undefined" && results[0].formula !== null) {
 
-            console.log(results[0].formula);
             var query = FormulaModel.findById(results[0].formula);
             query.exec(function (err, results) {
                 if (err) {
                     console.log("error");
                     callback(false);
                 } else {
-                    console.log(results);
                     callback(results);
                 }
             });
@@ -732,10 +708,9 @@ function getJobsBySector(userId, sector, isArchive, callback) {
 
     var query = MatchingObjectsModel.find(
         {google_user_id: userId, sector: sector, active: true, matching_object_type: "job", archive: isArchive}
-    ).populate({
-            path: 'original_text',
-            populate: {'path.history_timeline': 'History_Timeline'}
-        }).populate('Academy');
+    ).populate('original_text')
+        .populate('academy');
+
 
     query.exec(function (err, results) {
 
@@ -770,16 +745,13 @@ function getUnreadCvsForJob(userId, jobId, callback) {
                     "status.current_status": "unread",
                     matching_object_type: "cv"
                 }
-            ).populate('user').populate({
-                    path: 'original_text',
-                    populate: {'path.history_timeline': 'History_Timeline'}
-                }).populate('Academy');
+            ).populate('user').populate('original_text')
+                .populate('academy');
             query.exec(function (err, results) {
                 if (err) {
                     console.log("error");
                     callback(false);
                 } else {
-                    console.log();
                     callback(results);
                 }
             });
@@ -812,16 +784,15 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
                     _id: {$in: results[0].cvs}, active: true,
                     "status.current_status": current_status, matching_object_type: "cv"
                 }
-            ).populate('user').populate('status.status_id').populate({
-                    path: 'original_text',
-                    populate: {'path.history_timeline': 'History_Timeline'}
-                }).populate('Academy');
+            ).populate('user')
+                .populate('status.status_id')
+                .populate('original_text')
+                .populate('academy');
             query.exec(function (err, results) {
                 if (err) {
                     console.log("error");
                     callback(false);
                 } else {
-                    console.log();
                     callback(results);
                 }
             });
@@ -855,16 +826,15 @@ function getFavoriteCvs(userId, jobId, callback) {
                     _id: {$in: results[0].favorites}, active: true,
                     "status.favorite": true, matching_object_type: "cv"
                 }
-            ).populate('user').populate('status.status_id').populate({
-                    path: 'original_text',
-                    populate: {'path.history_timeline': 'History_Timeline'}
-                }).populate('Academy');
+            ).populate('user')
+                .populate('status.status_id')
+                .populate('original_text')
+                .populate('academy');
             query.exec(function (err, results) {
                 if (err) {
                     console.log("error");
                     callback(false);
                 } else {
-                    console.log();
                     callback(results);
                 }
             });
@@ -893,7 +863,6 @@ function getAllJobsBySector(userId, sector, callback) {
             console.log("error");
             callback(false);
         } else {
-            console.log(results);
             var query = MatchingObjectsModel.find(
                 {
                     sector: sector,
@@ -902,10 +871,8 @@ function getAllJobsBySector(userId, sector, callback) {
                     _id: {$nin: results[0].jobs},
                     archive: false
                 }
-            ).populate({
-                    path: 'original_text',
-                    populate: {'path.history_timeline': 'History_Timeline'}
-                }).populate('Academy');
+            ).populate('original_text')
+                .populate('academy');
 
             query.exec(function (err, results) {
 
@@ -932,13 +899,11 @@ function getMyJobs(userId, callback) {
             console.log("error");
             callback(false);
         } else {
-            console.log(results);
             var query = MatchingObjectsModel.find(
                 {active: true, matching_object_type: "job", _id: {$in: results[0].jobs}, archive: false}
-            ).populate({
-                    path: 'original_text',
-                    populate: {'path.history_timeline': 'History_Timeline'}
-                }).populate('Academy');
+            ).populate('status.status_id')
+                .populate('original_text')
+                .populate('academy');
 
             query.exec(function (err, results) {
 

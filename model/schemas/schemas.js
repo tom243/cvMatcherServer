@@ -113,11 +113,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     locations: [String],
     candidate_type:[String],
     scope_of_position:[String],
-    academy: [{
-        academy_name: String,
-        degree_name: String,
-        degree_type: [String]
-    }],
+    academy: [{ type: Schema.Types.ObjectId, ref: 'AcademyModel' }],
     sub_sector: [String],
     formula: String,
     requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
@@ -127,7 +123,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         favorite: Boolean,
         current_status: String
     },
-    personal_properties: String,
+    personal_properties: { type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' },
     favorites: [String],
     cvs: [String],
     archive:{
@@ -296,7 +292,7 @@ var MatchingObjectsModel        = mongoose.model('MatchingObjectsModel', matchin
 var OriginalTextModel           = mongoose.model('OriginalTextModel', originalTextSchema);
 var PersonalPropertiesModel     = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
 var HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', historyTimelineSchema);
-var AcademySchemaModel          = mongoose.model('AcademySchemaModel', AcademySchema);
+var AcademyModel                = mongoose.model('AcademyModel', AcademySchema);
 var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', ProfessionalKnowledgeSchema);
 
 
@@ -309,5 +305,5 @@ exports.RequirementsModel           = RequirementsModel;
 exports.OriginalTextModel           = OriginalTextModel;
 exports.PersonalPropertiesModel     = PersonalPropertiesModel;
 exports.HistoryTimelineModel        = HistoryTimelineModel;
-exports.AcademySchemaModel          = AcademySchemaModel;
+exports.AcademyModel                = AcademyModel;
 exports.ProfessionalKnowledgeModel  = ProfessionalKnowledgeModel;
