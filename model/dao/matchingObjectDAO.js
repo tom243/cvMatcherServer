@@ -509,7 +509,7 @@ function addStatus(matching_object_id, status, callback) {
 
     var class_data = JSON.parse(status);
     var statusToAdd = new StatusModel({
-        seen: class_data['combination'],
+        seen: class_data['seen'],
         rate: class_data['rate'],
         received: class_data['received']
     });

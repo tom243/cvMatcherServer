@@ -171,17 +171,17 @@ var statusSchema = new status_schema({
 
     seen: {
         status: Boolean,
-        timestamp: String
+        timestamp: Date
     },
     rate: {
         status: Boolean,
         stars: Number,
         description: String,
-        timestamp: String
+        timestamp: Date
     },
     received: {
         status: Boolean,
-        timestamp: String
+        timestamp: Date
     }
 }, {collection: 'Status'});
 
