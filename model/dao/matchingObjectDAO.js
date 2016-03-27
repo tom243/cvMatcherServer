@@ -47,13 +47,13 @@ function addMatchingObject(matchingObject, callback) {
                                 /* Add Personal Properties */
                                 addPersonalProperties(matchingObject.personal_properties,
                                     function (personal_properties) {
-                                    if (personal_properties !== false) {
-                                        matchingObject.personal_properties = personal_properties._id;
-                                        buildAndSaveMatchingObject(matchingObject, function (matchingObject) {
-                                            callback(matchingObject);
-                                        })
-                                    }
-                                })
+                                        if (personal_properties !== false) {
+                                            matchingObject.personal_properties = personal_properties._id;
+                                            buildAndSaveMatchingObject(matchingObject, function (matchingObject) {
+                                                callback(matchingObject);
+                                            })
+                                        }
+                                    })
                             } else { // Add Job
 
                                 /* Add Formula */
@@ -90,6 +90,7 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
 
     //var class_data = JSON.parse(matchingObject);
     class_data = matchingObject;
+
 
     console.log("matchingObject.academy", class_data['academy']);
     var matchingObjectToAdd = new MatchingObjectsModel({
@@ -951,6 +952,8 @@ function getFavoritesJobs(userId, callback) {
     });
 }
 
+///////////////////////////////////////////// *** Utils *** ///////////////////////
+
 
 
 
@@ -974,7 +977,7 @@ exports.addStatus = addStatus;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
-exports.getFavoritesJobs    = getFavoritesJobs;
+exports.getFavoritesJobs = getFavoritesJobs;
 
 
 

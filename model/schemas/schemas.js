@@ -23,8 +23,6 @@ var usersSchema = new users_schema({
     },
     personal_id: {
         type: String,
-        required: true,
-        index: 1,
         unique: true
     },
     first_name: {
@@ -43,11 +41,8 @@ var usersSchema = new users_schema({
     address: String,
     company: String,
     phone_number: String,
+    linkedin: String,
     favorites: [String],
-    user_type: {
-        type: String,
-        required: true
-    },
     jobs:[String],
     active: {
         index: 1,
@@ -80,11 +75,16 @@ var companiesSchema = new companies_schema({
         type: String,
         required: true
     },
+    phone_number: {
+        type: String,
+        required: true
+    },
     active: {
         index: 1,
         type: Boolean,
         required: true
     }
+
 }, {collection: 'Companies'});
 
 // Matching Objects Schema

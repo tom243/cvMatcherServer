@@ -26,15 +26,13 @@ function updateUser(updateUser, callback) {
 }
 
 //** get an existing user **//
-function getUser(userId, userType, callback) {
-    usersDAO.getUser(userId, userType, function (result) {
+function getUser(userId, callback) {
+    usersDAO.getUser(userId, function (result) {
         callback(result);
     });
 }
 
-
 ///////////////////////////////// ***  Companies  *** //////////////////////////////////////
-
 
 //** Adding a new company **//
 function addCompany(addCompany, callback) {

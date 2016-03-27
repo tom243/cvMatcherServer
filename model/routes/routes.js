@@ -54,8 +54,7 @@ module.exports = function (app) {
         console.log("Im in getUser post");
         if (!req.body) return res.sendStatus(400);
         console.log("userId " + req.body.google_user_id);
-        console.log("user_type " + req.body.user_type);
-        usersController.getUser(req.body.google_user_id, req.body.user_type, function (user) {
+        usersController.getUser(req.body.google_user_id,  function (user) {
             res.json(user);
         });
     });

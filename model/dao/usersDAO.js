@@ -15,22 +15,13 @@ function addUser(newUser, callback) {
     var class_data = JSON.parse(newUser);
     var newTable = new UserModel({
         google_user_id: class_data['google_user_id'],
-        personal_id: class_data['personal_id'],
         first_name: class_data['first_name'],
         last_name: class_data['last_name'],
         email: class_data['email'],
-        birth_date: class_data['birth_date'],
-        address: class_data['address'],
-        personal_properties: class_data['personal_properties'],
-        company: class_data['company'],
-        phone_number: class_data['phone_number'],
-        jobs: class_data['jobs'],
-        favorites: class_data['favorites'],
-        user_type: class_data['user_type'],
-        active: class_data['active']
+        active: true
     });
 
-    var query = UserModel.find().where('personal_id', newTable.personal_id);
+    var query = UserModel.find().where('google_user_id', newTable.google_user_id);
 
     query.exec(function (err, result) {
         console.log("result.length: " + result.length);
@@ -42,6 +33,10 @@ function addUser(newUser, callback) {
             console.log("the user isn't exist");
             /*save the User in db*/
             newTable.save(function (err, doc) {
+                if (err) {
+                    console.log("error insert user to DB" + err);
+                    callback(false);
+                }
                 console.log("person saved to DB: " + doc);
                 callback(doc);
             });
@@ -99,10 +94,10 @@ function updateUser(updateUser, callback) {
         address: class_data['address'],
         personal_properties: class_data['personal_properties'],
         company: class_data['company'],
+        linkedin:class_data['linkedin'],
         phone_number: class_data['phone_number'],
         jobs: class_data['jobs'],
         favorites: class_data['favorites'],
-        user_type: class_data['user_type'],
         active: class_data['active']
     });
 
@@ -121,6 +116,7 @@ function updateUser(updateUser, callback) {
                 address: newTable.address,
                 personal_properties: newTable.personal_properties,
                 company: newTable.company,
+                linkedin: newTable.linkedin,
                 phone_number: newTable.phone_number,
                 jobs: newTable.jobs,
                 favorites: newTable.favorites,
@@ -143,10 +139,10 @@ function updateUser(updateUser, callback) {
     });
 }
 
-var getUser = function getUser(userId, userType, callback) {
+var getUser = function getUser(userId, callback) {
 
     var query = UserModel.find(
-        {google_user_id: userId, user_type: userType, active: true}
+        {google_user_id: userId, active: true}
     );
 
     query.exec(function (err, results) {
