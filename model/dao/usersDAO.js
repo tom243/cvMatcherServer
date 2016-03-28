@@ -6,7 +6,6 @@ var CompanyModel = require('./../schemas/schemas').CompanyModel;
 
 /////////////////////////////////////////////////////////////// *** Users *** ///////////////////////////////////////////////////////////////
 
-
 // Add User
 function addUser(newUser, callback) {
 
@@ -36,13 +35,14 @@ function addUser(newUser, callback) {
                 if (err) {
                     console.log("error insert user to DB" + err);
                     callback(false);
+                } else {
+                    console.log(" the user saved to DB: " + doc);
+                    callback(doc);
                 }
-                console.log("person saved to DB: " + doc);
-                callback(doc);
             });
         }
         else {
-            console.log("exist user with the same id!!!");
+            console.log("user already exists with the same google id!!!");
             callback(false);
         }
     });
@@ -66,7 +66,7 @@ function deleteUser(deleteUser, callback) {
         query.exec(function (err, result) {
 
             if (err) {
-                console.log("error");
+                console.log(err);
                 callback(false);
             }
             else {
@@ -85,20 +85,15 @@ function updateUser(updateUser, callback) {
 
     var class_data = JSON.parse(updateUser);
     var newTable = new UserModel({
-        google_user_id: class_data['google_user_id'],
         personal_id: class_data['personal_id'],
         first_name: class_data['first_name'],
         last_name: class_data['last_name'],
         email: class_data['email'],
         birth_date: class_data['birth_date'],
         address: class_data['address'],
-        personal_properties: class_data['personal_properties'],
         company: class_data['company'],
         linkedin:class_data['linkedin'],
-        phone_number: class_data['phone_number'],
-        jobs: class_data['jobs'],
-        favorites: class_data['favorites'],
-        active: class_data['active']
+        phone_number: class_data['phone_number']
     });
 
     var query = UserModel.findOne().where('google_user_id', newTable.google_user_id);
@@ -107,28 +102,21 @@ function updateUser(updateUser, callback) {
 
         var query = doc.update({
             $set: {
-
                 personal_id: newTable.personal_id,
                 first_name: newTable.first_name,
                 last_name: newTable.last_name,
                 email: newTable.email,
                 birth_date: newTable.birth_date,
                 address: newTable.address,
-                personal_properties: newTable.personal_properties,
-                company: newTable.company,
                 linkedin: newTable.linkedin,
-                phone_number: newTable.phone_number,
-                jobs: newTable.jobs,
-                favorites: newTable.favorites,
-                user_type: newTable.user_type,
-                active: newTable.active
+                phone_number: newTable.phone_number
             }
         });
 
         query.exec(function (err, result) {
 
             if (err) {
-                console.log("error");
+                console.log(err);
                 callback(false);
             }
             else {
@@ -142,16 +130,17 @@ function updateUser(updateUser, callback) {
 var getUser = function getUser(userId, callback) {
 
     var query = UserModel.find(
-        {google_user_id: userId, active: true}
+        {_id: userId, active: true}
     );
 
     query.exec(function (err, results) {
 
         if (err) {
-            console.log("error");
+            console.log(err);
             callback(false);
+        } else {
+            callback(results);
         }
-        callback(results);
     });
 };
 
@@ -165,37 +154,64 @@ function addCompany(addCompany, callback) {
     console.log("im in addCompany function");
 
     var class_data = JSON.parse(addCompany);
+
+    console.log(" addCompany" , class_data);
+
     var newTable = new CompanyModel({
-        company_id: class_data['company_id'],
         name: class_data['name'],
         logo: class_data['logo'],
         p_c: class_data['p_c'],
         address: class_data['address'],
-        active: class_data['active']
+        phone_number: class_data['phone_number'],
+        active:true
     });
 
-    var query = CompanyModel.find().where('company_id', newTable.company_id);
+    var query = UserModel.find().where('_id', class_data['user_id']);
 
     query.exec(function (err, result) {
         console.log("result.length: " + result.length);
         if (err) {
-            console.log("error find company_id from DB");
+            console.log("error insert company id");
             callback(false);
-        }
-        if (result.length == 0) {
-            console.log("the company isn't exist");
-            /*save the User in db*/
-            newTable.save(function (err, doc) {
-                console.log("Company saved to DB: " + doc);
-                callback(doc);
-            });
-        }
-        else {
-            console.log("exist company with the same id!!!");
-            callback(false);
+        } else {
+            if (result.length == 0) {
+                /*save the company to db*/
+                newTable.save(function (err, doc) {
+                    if (err) {
+                        console.log("error insert Company to the DB" + err);
+                        callback(false);
+                    } else {
+                        console.log("Company saved to DB: " + doc);
+
+                        query.exec(doc, function (err, user) {
+                            if (err) {
+                                console.log(err);
+                                callback(false);
+                            } else {
+                                var query = user.update({
+                                    $set: {company: doc._id},
+                                    upsert: true
+                                });
+                                query.exec(function (err, result) {
+                                    if (err) {
+                                        console.log(err);
+                                        callback(false);
+                                    }
+                                    else {
+                                        callback(doc);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                console.log("Company already exists with the same user id!!!");
+                callback(false);
+            }
         }
     });
-
 }
 
 
@@ -227,7 +243,6 @@ function deleteCompany(deleteCompany, callback) {
     });
 }
 
-
 // Update Company
 function updateCompany(updateCompany, callback) {
 
@@ -235,26 +250,25 @@ function updateCompany(updateCompany, callback) {
 
     var class_data = JSON.parse(updateCompany);
     var newTable = new CompanyModel({
-        company_id: class_data['company_id'],
         name: class_data['name'],
         logo: class_data['logo'],
         p_c: class_data['p_c'],
         address: class_data['address'],
-        active: class_data['active']
+        phone_number: class_data['phone_number']
     });
 
 
-    var query = CompanyModel.findOne().where('company_id', newTable.company_id);
+    var query = CompanyModel.findOne().where('_id', newTable.company_id);
 
     query.exec(function (err, doc) {
 
         var query = doc.update({
             $set: {
-                company_id: newTable.company_id,
                 name: newTable.name,
                 logo: newTable.logo,
                 p_c: newTable.p_c,
-                address: newTable.address
+                address: newTable.address,
+                phone_number : newTable.phone_number
             }
         });
 
@@ -270,7 +284,6 @@ function updateCompany(updateCompany, callback) {
 
         });
     });
-
 }
 
 var getCompany = function getCompany(companyId, callback) {
@@ -282,11 +295,11 @@ var getCompany = function getCompany(companyId, callback) {
         if (err) {
             console.log("error");
             callback(false);
+        }else {
+            callback(results);
         }
-        callback(results);
     });
 };
-
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 

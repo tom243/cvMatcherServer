@@ -39,7 +39,7 @@ var usersSchema = new users_schema({
     },
     birth_date: String,
     address: String,
-    company: String,
+    company: Schema.Types.ObjectId,
     phone_number: String,
     linkedin: String,
     favorites: [String],
@@ -76,7 +76,7 @@ var companiesSchema = new companies_schema({
         required: true
     },
     phone_number: {
-        type: String,
+        type: Number,
         required: true
     },
     active: {
@@ -136,7 +136,12 @@ var matchingObjectsSchema = new matching_objects_schema({
         type: Boolean,
         required: true
     },
-    user: { type: Schema.Types.ObjectId, ref: 'UserModel' }
+    user: {
+            type: Schema.Types.ObjectId,
+            required:true,
+            index:1,
+            ref: 'UserModel'
+    }
 
 }, {collection: 'Matching_Objects'});
 
