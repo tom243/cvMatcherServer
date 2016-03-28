@@ -53,8 +53,8 @@ module.exports = function (app) {
 
         console.log("Im in getUser post");
         if (!req.body) return res.sendStatus(400);
-        console.log("userId " + req.body.google_user_id);
-        usersController.getUser(req.body.google_user_id,  function (user) {
+        console.log("userId " + req.body.user_id);
+        usersController.getUser(req.body.user_id,  function (user) {
             res.json(user);
         });
     });
