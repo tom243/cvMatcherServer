@@ -12,6 +12,7 @@ var PersonalPropertiesModel = require('./../schemas/schemas').PersonalProperties
 var HistoryTimelineModel = require('./../schemas/schemas').HistoryTimelineModel;
 var AcademyModel = require('./../schemas/schemas').AcademyModel;
 var ProfessionalKnowledgeModel = require('./../schemas/schemas').ProfessionalKnowledgeModel;
+var MatchingDetailsModel = require('./../schemas/schemas').MatchingDetailsModel;
 
 var errorMessage;
 
@@ -952,7 +953,87 @@ function getFavoritesJobs(userId, callback) {
     });
 }
 
+///////////////////////////////////////////// *** Matcher *** ///////////////////////
+
+function saveMatcherFormula(jsonResponse, callback) {
+
+    console.log("im in saveMatcherFormula function");
+
+    var class_data = jsonResponse;
+
+    buildMatchingDetails(jsonResponse.formula.requirements.details , function(err,matchingDetailsArray) {
+
+        if (err) {
+            console.log("error insert MatcherFormula to DB" + err);
+            callback(false);
+        }else {
+            console.log("matchingDetailsArray ", matchingDetailsArray);
+
+            var formulaToAdd = new FormulaModel({
+                locations: class_data.formula.locations,
+                candidate_type: class_data.formula.candidate_type,
+                scope_of_position: class_data.formula.scope_of_position,
+                academy: class_data.formula.academy,
+                matching_requirements:{
+                    details:matchingDetailsArray,
+                    grade: class_data.formula.requirements.grade
+                }
+            });
+
+            /*save the MatcherFormula in db*/
+            formulaToAdd.save(function (err, doc) {
+                if (err) {
+                    console.log("error insert MatcherFormula to DB" + err);
+                    callback(false);
+                } else {
+                    console.log("MatcherFormula saved to DB");
+                    callback();
+                }
+            });
+        }
+    });
+}
+
+
+function buildMatchingDetails(matchingDetails, callback) {
+
+    console.log(" matchingDetails" , matchingDetails);
+
+    var matchingDetailsArray = [];
+
+    // 1st para in async.each() is the array of items
+    async.each(matchingDetails,
+        // 2nd param is the function that each item is passed to
+        function (item, callback) {
+            // Call an asynchronous function, often a save() to DB
+
+            var matchingDetailsToAdd = new MatchingDetailsModel({
+                name: item.name,
+                grade: item.grade
+            });
+
+            /* save the historyTime to db*/
+            matchingDetailsToAdd.save(function (err, doc) {
+                if (err) {
+                    console.log("error in save matchingDetails to db ");
+                    console.log(err);
+                    callback(false);
+                } else {
+                    matchingDetailsArray.push(doc._id);
+                    callback();
+                }
+            })
+        },
+        // 3rd param is the function to call when everything's done
+        function (err) {
+            // All tasks are done now
+            callback(err, matchingDetailsArray);
+        }
+    );
+}
+
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
+
 
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
@@ -976,6 +1057,8 @@ exports.addStatus = addStatus;
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
+
+exports.saveMatcherFormula = saveMatcherFormula;
 
 
 

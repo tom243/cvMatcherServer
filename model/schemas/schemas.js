@@ -166,24 +166,11 @@ var formulasSchema = new formulas_schema({
         type: Number,
         required: true
     },
-    requirements: {
-        type: Number,
-        required: true
-    },
+    requirements: Number,
     matching_requirements : {
-/*        details: [{
+        details: [{
          type: Schema.Types.ObjectId,
          ref: 'MatchingDetailsModel'
-         }],*/
-        details: [{
-            name: {
-                type : String,
-                required : true
-            },
-            grade: {
-                type : Number,
-                required : true
-            }
          }],
         grade: Number
     }
@@ -343,3 +330,4 @@ exports.PersonalPropertiesModel     = PersonalPropertiesModel;
 exports.HistoryTimelineModel        = HistoryTimelineModel;
 exports.AcademyModel                = AcademyModel;
 exports.ProfessionalKnowledgeModel  = ProfessionalKnowledgeModel;
+exports.MatchingDetailsModel        = MatchingDetailsModel;
