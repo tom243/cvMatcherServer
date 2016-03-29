@@ -31,8 +31,7 @@ function updateMatchingObject(updateObject, callback) {
 
 //** get Matching Object  **//
 function getMatchingObject(matchingObjectId,matchingObjectType, callback) {
-    matchingObjectDAO.getMatchingObject(userId, matchingObjectId,
-        matchingObjectType, function (result) {
+    matchingObjectDAO.getMatchingObject(matchingObjectId, matchingObjectType, function (result) {
         callback(result);
     });
 }
