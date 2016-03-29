@@ -9,10 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.13.3",
-	"mongoose": "^4.4.10",
+    "ajax-request": "^1.2.1",
+    "async": "^2.0.0-rc.2",
     "body-parser": "^1.15.0",
-	"mongoose-deep-populate": "^3.0.0",
-    "async": "^2.0.0-rc.2"
+    "express": "^4.13.3",
+    "mongoose": "^4.4.10",
+    "mongoose-deep-populate": "^3.0.0"
   }
 }

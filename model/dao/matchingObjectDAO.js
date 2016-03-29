@@ -231,12 +231,12 @@ function updateMatchingObject(updateObject, callback) {
 
 }
 
-function getMatchingObject(userId, matchingObjectId, matchingObjectType, callback) {
+function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
 
     if (matchingObjectType === "cv") {
 
         var query = MatchingObjectsModel.find(
-            {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
+            {_id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
         ).populate('user')
             .populate('academy')
             .populate('personal_properties')
@@ -252,7 +252,7 @@ function getMatchingObject(userId, matchingObjectId, matchingObjectType, callbac
 
     } else {//job
         var query = MatchingObjectsModel.find(
-            {google_user_id: userId, _id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
+            {_id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
         ).populate('original_text')
             .populate('academy')
             .populate({
@@ -953,8 +953,6 @@ function getFavoritesJobs(userId, callback) {
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
-
-
 
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////

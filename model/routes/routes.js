@@ -107,11 +107,10 @@ module.exports = function (app) {
         console.log("Im in getMatchingObject post");
         if (!req.body) return res.sendStatus(400);
         console.log("matchingObjectId " + req.body.matching_object_id);
-        console.log("userId " + req.body.google_user_id);
         console.log("type " + req.body.matching_object_type);
 
-        matchingObjectController.getMatchingObject(req.body.google_user_id,
-            req.body.matching_object_id, req.body.matching_object_type, function (matchingObject) {
+        matchingObjectController.getMatchingObject(req.body.matching_object_id,
+                req.body.matching_object_type, function (matchingObject) {
                 res.json(matchingObject);
             });
     });
@@ -155,6 +154,21 @@ module.exports = function (app) {
             res.json(jobs);
         });
     });
+
+    // check cv with matcher
+    app.post('/jobSeeker/checkCV', function (req, res) {
+
+        console.log("Im in checkCV post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("matching_object_id " + req.body.job_id);
+        console.log("matching_object_id " + req.body.cv_id);
+
+        matchingObjectController.checkCV(req.body.job_id, req.body.cv_id, function (results) {
+            res.json(results);
+        });
+    });
+
+
 
 //////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
 

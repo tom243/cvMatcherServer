@@ -1,4 +1,5 @@
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
+var request = require('ajax-request');
 
 
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
@@ -29,7 +30,7 @@ function updateMatchingObject(updateObject, callback) {
 }
 
 //** get Matching Object  **//
-function getMatchingObject(userId, matchingObjectId,matchingObjectType, callback) {
+function getMatchingObject(matchingObjectId,matchingObjectType, callback) {
     matchingObjectDAO.getMatchingObject(userId, matchingObjectId,
         matchingObjectType, function (result) {
         callback(result);
@@ -131,6 +132,51 @@ function getFavoritesJobs(userId, callback) {
     });
 }
 
+//**  check cv with matcher  **//
+function checkCV(jobId, cvId, callback) {
+
+    var matchObjectToSend = {
+        job: null,
+        cv: null
+    };
+    //matchingObjectDAO.checkCV(jobId, cvId,  function (result) {
+
+        matchingObjectDAO.getMatchingObject(jobId,"job",function (job) {
+            matchObjectToSend.job = job;
+            matchObjectToSend.job.requirements = [];
+
+            matchingObjectDAO.getMatchingObject(cvId,"cv",function (cv) {
+                matchObjectToSend.cv = cv;
+
+/*                for(var requirement in job.requirements){
+                    for(var combination in requirement.combination){
+                        console.log("combination", combination)
+                        matchObjectToSend.job.requirements.push(combination)
+                    }
+                }*/
+
+                console.log(" matchObjectToSend" , matchObjectToSend);
+/*                request.post({
+                    url: 'https://matcherlogic.herokuapp.com/addFormula',
+                    data: matchObjectToSend,
+                    headers: {
+                        "Content-Type" : "application/json"
+                    }
+                }, function(err, res, body) {
+                    if (err) {
+                        console.log("error from matcher");
+                        callback(false);
+                    } else {
+                        console.log(JSON.parse(body));
+                        callback(JSON.parse(body));
+                    }
+                });*/
+            })
+        })
+    //});
+}
+
+
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
 exports.addMatchingObject       = addMatchingObject;
@@ -153,3 +199,4 @@ exports.addStatus = addStatus;
 exports.getAllJobsBySector  = getAllJobsBySector;
 exports.getMyJobs           = getMyJobs;
 exports.getFavoritesJobs    = getFavoritesJobs;
+exports.checkCV             = checkCV;

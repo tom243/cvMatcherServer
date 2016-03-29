@@ -11,6 +11,7 @@ var personal_properties_schema = mongoose.Schema;
 var history_timeline_schema = mongoose.Schema;
 var academy_schema = mongoose.Schema;
 var professional_knowledge_schema = mongoose.Schema;
+var matching_details_schema = mongoose.Schema;
 
 // Users Schema
 var usersSchema = new users_schema({
@@ -117,7 +118,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     sub_sector: [String],
     formula: { type: Schema.Types.ObjectId, ref: 'FormulaModel' },
     requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
-    compatibility_level:Number,
+    compatibility_level: Number,
     status:{
         status_id: { type: Schema.Types.ObjectId, ref: 'StatusModel' },
         favorite: Boolean,
@@ -168,7 +169,25 @@ var formulasSchema = new formulas_schema({
     requirements: {
         type: Number,
         required: true
+    },
+    matching_requirements : {
+/*        details: [{
+         type: Schema.Types.ObjectId,
+         ref: 'MatchingDetailsModel'
+         }],*/
+        details: [{
+            name: {
+                type : String,
+                required : true
+            },
+            grade: {
+                type : Number,
+                required : true
+            }
+         }],
+        grade: Number
     }
+
 }, {collection: 'Formulas'});
 
 // Status Schema
@@ -287,6 +306,17 @@ var ProfessionalKnowledgeSchema = new professional_knowledge_schema({
     }
 }, {collection: 'Professional_Knowledge'});
 
+// MatchingDetailsSchema Schema
+var MatchingDetailsSchema = matching_details_schema({
+    name: {
+        type : String,
+        required : true
+    },
+    grade: {
+        type : Number,
+        required : true
+    }
+}, {collection: 'Matching_Details'});
 
 var UserModel                   = mongoose.model('UserModel', usersSchema);
 var StatusModel                 = mongoose.model('StatusModel',statusSchema);
@@ -299,6 +329,7 @@ var PersonalPropertiesModel     = mongoose.model('PersonalPropertiesModel', pers
 var HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', historyTimelineSchema);
 var AcademyModel                = mongoose.model('AcademyModel', AcademySchema);
 var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', ProfessionalKnowledgeSchema);
+var MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', MatchingDetailsSchema);
 
 
 exports.CompanyModel                = CompanyModel;
