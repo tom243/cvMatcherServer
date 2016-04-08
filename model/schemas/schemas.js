@@ -121,7 +121,6 @@ var matchingObjectsSchema = new matching_objects_schema({
     compatibility_level: Number,
     status:{
         status_id: { type: Schema.Types.ObjectId, ref: 'StatusModel' },
-        favorite: Boolean,
         current_status: String
     },
     personal_properties: { type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' },

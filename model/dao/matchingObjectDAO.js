@@ -135,26 +135,25 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
 function deleteMatchingObject(deleteObject, callback) {
 
     console.log("im in deleteMatchingObject function");
-
     var class_data = JSON.parse(deleteObject);
-    var newtable = new MatchingObjectsModel({
-        matching_object_id: class_data['matching_object_id'],
-    });
-
-    var query = MatchingObjectsModel.findOne().where('matching_object_id', newtable.matching_object_id);
+    var query = MatchingObjectsModel.findOne().where('matching_object_id', class_data['_id']);
 
     query.exec(function (err, doc) {
-        var query = doc.update({$set: {active: false}});
-        query.exec(function (err, result) {
+        if (err) {
+            console.log("error:" + err);
+            callback(false);
+        } else {
+            var query = doc.update({$set: {active: false}});
+            query.exec(function (err, result) {
+                if (err) {
+                    console.log("error:" + err);
+                    callback(false);
+                } else {
+                    callback(result);
+                }
 
-            if (err) {
-                console.log("error");
-                callback(false);
-            } else {
-                callback(result);
-            }
-
-        });
+            });
+        }
     });
 }
 
@@ -166,26 +165,12 @@ function updateMatchingObject(updateObject, callback) {
 
     var class_data = JSON.parse(updateObject);
     var matchingObjectToUpdate = new MatchingObjectsModel({
-        matching_object_type: class_data['matching_object_type'],
-        google_user_id: class_data['google_user_id'],
-        date: class_data['date'],
-        original_text: class_data['original_text'],
         sector: class_data['sector'],
         locations: class_data['locations'],
         candidate_type: class_data['candidate_type'],
         scope_of_position: class_data['scope_of_position'],
-        academy: class_data['academy'],
         sub_sector: class_data['sub_sector'],
-        formula: class_data['formula'],
-        requirements: class_data['requirements'],
-        compatibility_level: class_data['compatibility_level'],
-        status: class_data['status'],
-        personal_properties: class_data['personal_properties'],
-        favorites: class_data['favorites'],
-        cvs: class_data['cvs'],
-        archive: class_data['archive'],
-        active: class_data['active'],
-        user: class_data['user']
+        compatibility_level: class_data['compatibility_level']
     });
 
 
@@ -195,33 +180,19 @@ function updateMatchingObject(updateObject, callback) {
 
         var query = doc.update({
             $set: {
-                matching_object_type: matchingObjectToUpdate.matching_object_type,
-                google_user_id: matchingObjectToUpdate.google_user_id,
-                date: matchingObjectToUpdate.date,
-                original_text: matchingObjectToUpdate.original_text,
                 sector: matchingObjectToUpdate.sector,
                 locations: matchingObjectToUpdate.locations,
                 candidate_type: matchingObjectToUpdate.candidate_type,
                 scope_of_position: matchingObjectToUpdate.scope_of_position,
-                academy: matchingObjectToUpdate.academy,
                 sub_sector: matchingObjectToUpdate.sub_sector,
-                formula: matchingObjectToUpdate.formula,
-                requirements: matchingObjectToUpdate.requirements,
-                compatibility_level: matchingObjectToUpdate.compatibility_level,
-                status: matchingObjectToUpdate.status,
-                personal_properties: matchingObjectToUpdate.personal_properties,
-                favorites: matchingObjectToUpdate.favorites,
-                cvs: matchingObjectToUpdate.cvs,
-                archive: matchingObjectToUpdate.archive,
-                active: matchingObjectToUpdate.active,
-                user: matchingObjectToUpdate.user
+                compatibility_level: matchingObjectToUpdate.compatibility_level
             }
         });
 
         query.exec(function (err, result) {
 
             if (err) {
-                console.log("error");
+                console.log("error: " + err);
                 callback(false);
             } else {
                 callback(result);
@@ -291,8 +262,6 @@ function addOriginalText(originalText, callback) {
                 console.log(err);
                 callback(false);
             } else {
-
-                console.log("historyTimeline", historyTimeline);
 
                 var originalTextToAdd = new OriginalTextModel({
                     title: null,
@@ -507,15 +476,19 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
 /////////////////////////////////////// ***  Status  *** /////////////////////////////
 
 // Add Status
-function addStatus(matching_object_id, status, callback) {
+function rateCV(matching_object_id, status, callback) {
 
-    console.log("im in Status function");
-
+    console.log("im in rateCV function");
     var class_data = JSON.parse(status);
     var statusToAdd = new StatusModel({
-        seen: class_data['seen'],
-        rate: class_data['rate'],
-        received: class_data['received']
+        seen: null,
+        rate: {
+            status: true,
+            stars: class_data.stars,
+            description: class_data.description,
+            timestamp: Date.now()
+        },
+        received: null
     });
 
     /* save the Status to db*/
@@ -526,7 +499,12 @@ function addStatus(matching_object_id, status, callback) {
         }
 
         var query = {"_id": matching_object_id};
-        var update = {status: {status_id: doc._id}};
+        var update = {
+            status: {
+                status_id: doc._id,
+                current_status: class_data.current_status
+            }
+        };
         var options = {new: true};
         MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
             if (err) {
@@ -534,8 +512,41 @@ function addStatus(matching_object_id, status, callback) {
             } else {
                 callback(doc);
             }
-            // at this point person is null.
         });
+    });
+}
+
+// Add Status
+function updateRateCV(matching_object_id, status, callback) {
+
+    console.log("im in updateRateCV function");
+    var class_data = JSON.parse(status);
+
+    var query = {"_id": matching_object_id};
+    var update = {
+            "status.current_status": class_data.current_status
+    };
+    var options = {new: true};
+    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
+        if (err) {
+            console.log('error in finding cv ' + err);
+        } else {
+            console.log("doc.status.status_id " + doc);
+            var query = {"_id": doc.status.status_id};
+            var update = {
+                "rate.stars": class_data.stars,
+                "rate.description": class_data.description,
+                "rate.timestamp": Date.now()
+            };
+            var options = {new: true};
+            StatusModel.findOneAndUpdate(query, update, options, function (err, doc) {
+                if (err) {
+                    console.log('error in update rate for cv ' + err);
+                } else {
+                    callback(doc);
+                }
+            });
+        }
     });
 }
 
@@ -1034,6 +1045,10 @@ function buildMatchingDetails(matchingDetails, callback) {
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
+function getKeyWordsBySector(sector,callback) {
+
+
+}
 
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
@@ -1052,7 +1067,8 @@ exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
 exports.getFavoriteCvs = getFavoriteCvs;
 
-exports.addStatus = addStatus;
+exports.rateCV = rateCV;
+exports.updateRateCV = updateRateCV;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
@@ -1060,5 +1076,6 @@ exports.getFavoritesJobs = getFavoritesJobs;
 
 exports.saveMatcherFormula = saveMatcherFormula;
 
+exports.getKeyWordsBySector = exports.getKeyWordsBySector;
 
 

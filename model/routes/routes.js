@@ -54,8 +54,20 @@ module.exports = function (app) {
         console.log("Im in getUser post");
         if (!req.body) return res.sendStatus(400);
         console.log("userId " + req.body.user_id);
-        usersController.getUser(req.body.user_id,  function (user) {
+        usersController.getUser(req.body.user_id, function (user) {
             res.json(user);
+        });
+    });
+
+// get the mongo user id by the user google id
+    app.post('/getUserId', function (req, res) {
+
+        console.log("Im in getUserId post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("userId" + req.body.google_user_id);
+
+        usersController.getUserId(req.body.google_user_id, function (userId) {
+            res.json(userId);
         });
     });
 
@@ -110,7 +122,7 @@ module.exports = function (app) {
         console.log("type " + req.body.matching_object_type);
 
         matchingObjectController.getMatchingObject(req.body.matching_object_id,
-                req.body.matching_object_type, function (matchingObject) {
+            req.body.matching_object_type, function (matchingObject) {
                 res.json(matchingObject);
             });
     });
@@ -167,7 +179,6 @@ module.exports = function (app) {
             res.json(results);
         });
     });
-
 
 
 //////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
@@ -230,14 +241,40 @@ module.exports = function (app) {
     });
 
     //** add status for specific cv  **//
-    app.post('/employer/addStatusForCV', function (req, res) {
+    app.post('/employer/rateCV', function (req, res) {
 
         console.log("Im in addStatusForCV post");
         if (!req.body) return res.sendStatus(400);
         console.log("matching_object_id" + req.body.matching_object_id);
         console.log("status" + req.body.status);
         var status = JSON.stringify(req.body.status);
-        matchingObjectController.addStatus(req.body.google_user_id, status, function (status) {
+        matchingObjectController.rateCV(req.body.matching_object_id, status, function (status) {
+            res.json(status);
+        });
+    });
+
+    //** rate specific cv  **//
+    app.post('/employer/rateCV', function (req, res) {
+
+        console.log("Im in rateCV post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("matching_object_id" + req.body.matching_object_id);
+        console.log("status" + req.body.status);
+        var status = JSON.stringify(req.body.status);
+        matchingObjectController.rateCV(req.body.matching_object_id, status, function (status) {
+            res.json(status);
+        });
+    });
+
+    //** update rate for specific cv  **//
+    app.post('/employer/updateRateCV', function (req, res) {
+
+        console.log("Im in updateRateCV post");
+        if (!req.body) return res.sendStatus(400);
+        console.log("matching_object_id" + req.body.matching_object_id);
+        console.log("status" + req.body.status);
+        var status = JSON.stringify(req.body.status);
+        matchingObjectController.updateRateCV(req.body.matching_object_id, status, function (status) {
             res.json(status);
         });
     });

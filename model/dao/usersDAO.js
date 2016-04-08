@@ -92,7 +92,7 @@ function updateUser(updateUser, callback) {
         birth_date: class_data['birth_date'],
         address: class_data['address'],
         company: class_data['company'],
-        linkedin:class_data['linkedin'],
+        linkedin: class_data['linkedin'],
         phone_number: class_data['phone_number']
     });
 
@@ -144,6 +144,23 @@ var getUser = function getUser(userId, callback) {
     });
 };
 
+var getUserId = function getUserId(googleUserId, callback) {
+
+    var query = UserModel.find(
+        {google_user_id: googleUserId, active: true},
+        {_id: 1}
+    );
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log(err);
+            callback(false);
+        } else {
+            callback(results);
+        }
+    });
+};
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////////////////////////////////
 
@@ -155,7 +172,7 @@ function addCompany(addCompany, callback) {
 
     var class_data = JSON.parse(addCompany);
 
-    console.log(" addCompany" , class_data);
+    console.log(" addCompany", class_data);
 
     var newTable = new CompanyModel({
         name: class_data['name'],
@@ -163,7 +180,7 @@ function addCompany(addCompany, callback) {
         p_c: class_data['p_c'],
         address: class_data['address'],
         phone_number: class_data['phone_number'],
-        active:true
+        active: true
     });
 
     var query = UserModel.find().where('_id', class_data['user_id']);
@@ -268,7 +285,7 @@ function updateCompany(updateCompany, callback) {
                 logo: newTable.logo,
                 p_c: newTable.p_c,
                 address: newTable.address,
-                phone_number : newTable.phone_number
+                phone_number: newTable.phone_number
             }
         });
 
@@ -295,7 +312,7 @@ var getCompany = function getCompany(companyId, callback) {
         if (err) {
             console.log("error");
             callback(false);
-        }else {
+        } else {
             callback(results);
         }
     });
@@ -303,14 +320,15 @@ var getCompany = function getCompany(companyId, callback) {
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
-exports.addUser     = addUser;
-exports.deleteUser  = deleteUser;
-exports.updateUser  = updateUser;
-exports.getUser     = getUser;
+exports.addUser = addUser;
+exports.deleteUser = deleteUser;
+exports.updateUser = updateUser;
+exports.getUser = getUser;
+exports.getUserId = getUserId;
 
-exports.addCompany      = addCompany;
-exports.deleteCompany   = deleteCompany;
-exports.updateCompany   = updateCompany;
-exports.getCompany      = getCompany;
+exports.addCompany = addCompany;
+exports.deleteCompany = deleteCompany;
+exports.updateCompany = updateCompany;
+exports.getCompany = getCompany;
 
 

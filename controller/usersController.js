@@ -32,6 +32,13 @@ function getUser(userId, callback) {
     });
 }
 
+//** get the mongo user id by the user google id **//
+function getUserId(googleUserId, callback) {
+    usersDAO.getUserId(googleUserId, function (result) {
+        callback(result);
+    });
+}
+
 ///////////////////////////////// ***  Companies  *** //////////////////////////////////////
 
 //** Adding a new company **//
@@ -68,6 +75,8 @@ exports.addUser     = addUser;
 exports.deleteUser  = deleteUser;
 exports.updateUser  = updateUser;
 exports.getUser     = getUser;
+exports.getUserId   = getUserId;
+
 
 exports.addCompany      = addCompany;
 exports.deleteCompany   = deleteCompany;
