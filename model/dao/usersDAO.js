@@ -91,12 +91,11 @@ function updateUser(updateUser, callback) {
         email: class_data['email'],
         birth_date: class_data['birth_date'],
         address: class_data['address'],
-        company: class_data['company'],
         linkedin: class_data['linkedin'],
         phone_number: class_data['phone_number']
     });
 
-    var query = UserModel.findOne().where('google_user_id', newTable.google_user_id);
+    var query = UserModel.findOne().where('_id', class_data._id);
 
     query.exec(function (err, doc) {
 

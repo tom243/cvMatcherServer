@@ -342,46 +342,23 @@ function buildTimelineHistory(timeline, callback) {
 /////////////////////////////////////// ***  Academy  *** /////////////////////////////
 
 function addAcademy(academy, callback) {
-    var academyArray = [];
 
-    // 1st para in async.each() is the array of items
-    async.each(academy,
-        // 2nd param is the function that each item is passed to
-        function (item, callback) {
-            // Call an asynchronous function, often a save() to DB
+        var academyToadd = new AcademyModel({
+            academy_type: academy.academy_type,
+            degree_name: academy.degree_name,
+            degree_type: academy.degree_type
+        });
 
-            var academyToadd = new AcademyModel({
-                academy_type: item.academy_type,
-                degree_name: item.degree_name,
-                degree_type: item.degree_type
-            });
-
-            /* save the academy to db*/
-            academyToadd.save(function (err, doc) {
-                if (err) {
-                    console.log("error in save academy to db ");
-                    console.log(err);
-                    callback(false);
-                } else {
-                    academyArray.push(doc._id);
-                    callback();
-                }
-            })
-        },
-        // 3rd param is the function to call when everything's done
-        function (err) {
-            // All tasks are done now
+        /* save the academy to db*/
+        academyToadd.save(function (err, doc) {
             if (err) {
                 console.log("error in save academy to db ");
                 console.log(err);
                 callback(false);
             } else {
-                console.log("academyArray", academyArray);
-                callback(academyArray);
+                callback(doc._id);
             }
-
-        }
-    );
+        })
 }
 
 /////////////////////////////////////// ***  Requirements  *** /////////////////////////////

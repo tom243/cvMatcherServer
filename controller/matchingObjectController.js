@@ -1,12 +1,10 @@
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
 var request = require('ajax-request');
 
-
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
 //** Adding a new object **//
 function addMatchingObject(addObject, callback) {
-    console.log("im in matchingObjectControllerrrrr");
     matchingObjectDAO.addMatchingObject(addObject, function (result) {
         callback(result);
     });
@@ -15,7 +13,6 @@ function addMatchingObject(addObject, callback) {
 
 //** Delete an existing object **//
 function deleteMatchingObject(deleteObject, callback) {
-    console.log("im in usersControllerrrr");
     matchingObjectDAO.deleteMatchingObject(deleteObject, function (result) {
         callback(result);
     });
@@ -23,7 +20,6 @@ function deleteMatchingObject(deleteObject, callback) {
 
 //** Update an existing object **//
 function updateMatchingObject(updateObject, callback) {
-    console.log("im in usersControllerrrr");
     matchingObjectDAO.updateMatchingObject(updateObject, function (result) {
         callback(result);
     });
@@ -148,24 +144,47 @@ function checkCV(jobId, cvId, callback) {
     //matchingObjectDAO.checkCV(jobId, cvId,  function (result) {
 
         matchingObjectDAO.getMatchingObject(jobId,"job",function (job) {
-            matchObjectToSend.job = job;
+            matchObjectToSend.job = job[0];
             //matchObjectToSend.job.requirements = [];
 
             matchingObjectDAO.getMatchingObject(cvId,"cv",function (cv) {
-                matchObjectToSend.cv = cv;
+                matchObjectToSend.cv = cv[0];
+                cv.requirements = [{
+                    "combination": [{
+                        "name": "c++",
+                        "years": 1,
+                        "mode": null,
+                        "percentage": null
+                    }, {
+                        "name": "java",
+                        "years": 0,
+                        "mode": null,
+                        "percentage": null
+                    }, {
+                        "name": "c",
+                        "years": 1,
+                        "mode": null,
+                        "percentage": null
+                    }, {
+                        "name": "angular",
+                        "years": 0.5,
+                        "mode": null,
+                        "percentage": null
+                    }]
+                }];
 
-                console.log(matchObjectToSend);
                 request.post({
-                    url: 'https://matcherlogic.herokuapp.com/addFormula',
-                    data: matchObjectToSend,
+                    url: 'https://localhost:8005/addFormula',
+                    data: JSON.stringify(matchObjectToSend),
                     headers: {
                         "Content-Type" : "application/json"
                     }
                 }, function(err, res, body) {
                     if (err) {
-                        console.log("error from matcher");
+                        console.log("error from matcher" + err);
                         callback(false);
                     } else {
+                        console.log("here");
                         var jsonResponse = JSON.parse(body);
                         console.log(jsonResponse);
                         matchingObjectDAO.saveMatcherFormula(jsonResponse ,function()  {
@@ -174,7 +193,7 @@ function checkCV(jobId, cvId, callback) {
                     }
                 });
             })
-        })
+        });
     //});
 }
 

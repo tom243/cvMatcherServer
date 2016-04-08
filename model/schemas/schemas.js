@@ -114,7 +114,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     locations: [String],
     candidate_type:[String],
     scope_of_position:[String],
-    academy: [{ type: Schema.Types.ObjectId, ref: 'AcademyModel' }],
+    academy: { type: Schema.Types.ObjectId, ref: 'AcademyModel' },
     sub_sector: [String],
     formula: { type: Schema.Types.ObjectId, ref: 'FormulaModel' },
     requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
@@ -265,7 +265,7 @@ var historyTimelineSchema = new history_timeline_schema({
 
 // AcademySchema Schema
 var AcademySchema = new academy_schema({
-    academy_type: String,
+    academy_type: [String],
     degree_name: String,
     degree_type: [String]
 
