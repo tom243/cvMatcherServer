@@ -43,7 +43,7 @@ function addUser(newUser, callback) {
         }
         else {
             console.log("user already exists with the same google id!!!");
-            getUserId(class_data.google_user_id, function (userId) {
+            getUserId(class_data.google_user_id, function(userId){
                 callback(userId);
             })
         }
@@ -184,41 +184,25 @@ function addCompany(addCompany, callback) {
         active: true
     });
 
-    var query = UserModel.find().where('_id', class_data['user_id']);
-
-    query.exec(function (err, user) {
+    /*save the company to db*/
+    newTable.save(function (err, doc) {
         if (err) {
-            console.log("error insert company id");
+            console.log("error insert Company to the DB" + err);
             callback(false);
         } else {
-            /*save the company to db*/
-            newTable.save(function (err, doc) {
+            console.log("Company saved to DB: " + doc);
+
+            var query = {"_id": class_data['user_id']};
+            var update = {
+                company: doc._id
+            };
+            var options = {new: true,upsert:true};
+            UserModel.findOneAndUpdate(query, update, options, function (err, user) {
                 if (err) {
-                    console.log("error insert Company to the DB" + err);
+                    console.log('error updating company ' + err);
                     callback(false);
                 } else {
-                    console.log("Company saved to DB: " + doc);
-
-                   // query.exec(doc, function (err, user) {
-/*                        if (err) {
-                            console.log(err);
-                            callback(false);
-                        } else {*/
-                            var query = user.update({
-                                $set: {company: doc._id},
-                                upsert: true
-                            });
-                            query.exec(function (err, result) {
-                                if (err) {
-                                    console.log(err);
-                                    callback(false);
-                                }
-                                else {
-                                    callback(doc);
-                                }
-                            });
-                        //}
-                   // });
+                    callback(doc);
                 }
             });
         }
