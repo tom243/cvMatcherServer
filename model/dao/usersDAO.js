@@ -43,10 +43,9 @@ function addUser(newUser, callback) {
         }
         else {
             console.log("user already exists with the same google id!!!");
-            getUserId(newTable.google_user_id, function(userId){
+            getUserId(class_data.google_user_id, function(userId){
                 callback(userId);
             })
-
         }
     });
 }
