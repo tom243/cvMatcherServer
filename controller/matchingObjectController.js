@@ -1,6 +1,4 @@
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
-var request = require('ajax-request');
-var http = require('http');
 var unirest = require('unirest');
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
@@ -149,7 +147,7 @@ function checkCV(jobId, cvId, callback) {
         matchingObjectDAO.getMatchingObject(cvId,"cv",function (cv) {
             matchObjectToSend.cv = cv[0];
 
-            unirest.post('http://localhost:8005/addFormula')
+            unirest.post('https://matcherlogic.herokuapp.com/addFormula')
                 .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
                 .send(matchObjectToSend)
                 .end(function (response) {

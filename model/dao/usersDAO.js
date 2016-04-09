@@ -43,7 +43,7 @@ function addUser(newUser, callback) {
         }
         else {
             console.log("user already exists with the same google id!!!");
-            getUserId(class_data.google_user_id, function(userId){
+            getUserId(class_data.google_user_id, function (userId) {
                 callback(userId);
             })
         }
@@ -165,6 +165,7 @@ var getUserId = function getUserId(googleUserId, callback) {
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////////////////////////////////
 
+
 // Add Company
 function addCompany(addCompany, callback) {
 
@@ -183,31 +184,41 @@ function addCompany(addCompany, callback) {
         active: true
     });
 
-    newTable.save(function (err, doc) {
+    var query = UserModel.find().where('_id', class_data['user_id']);
+
+    query.exec(function (err, user) {
         if (err) {
-            console.log("error insert Company to the DB" + err);
+            console.log("error insert company id");
             callback(false);
         } else {
-            console.log("Company saved to DB: " + doc);
-
-            query.exec(doc, function (err, user) {
+            /*save the company to db*/
+            newTable.save(function (err, doc) {
                 if (err) {
-                    console.log(err);
+                    console.log("error insert Company to the DB" + err);
                     callback(false);
                 } else {
-                    var query = user.update({
-                        $set: {company: doc._id},
-                        upsert: true
-                    });
-                    query.exec(function (err, result) {
-                        if (err) {
+                    console.log("Company saved to DB: " + doc);
+
+                   // query.exec(doc, function (err, user) {
+/*                        if (err) {
                             console.log(err);
                             callback(false);
-                        }
-                        else {
-                            callback(doc);
-                        }
-                    });
+                        } else {*/
+                            var query = user.update({
+                                $set: {company: doc._id},
+                                upsert: true
+                            });
+                            query.exec(function (err, result) {
+                                if (err) {
+                                    console.log(err);
+                                    callback(false);
+                                }
+                                else {
+                                    callback(doc);
+                                }
+                            });
+                        //}
+                   // });
                 }
             });
         }
