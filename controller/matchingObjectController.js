@@ -1,6 +1,7 @@
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
 var request = require('ajax-request');
-
+var http = require('http');
+var unirest = require('unirest');
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
 //** Adding a new object **//
@@ -141,60 +142,24 @@ function checkCV(jobId, cvId, callback) {
         cv: null
     };
 
-    //matchingObjectDAO.checkCV(jobId, cvId,  function (result) {
+    matchingObjectDAO.getMatchingObject(jobId,"job",function (job) {
+        matchObjectToSend.job = job[0];
+        //matchObjectToSend.job.requirements = [];
 
-        matchingObjectDAO.getMatchingObject(jobId,"job",function (job) {
-            matchObjectToSend.job = job[0];
-            //matchObjectToSend.job.requirements = [];
+        matchingObjectDAO.getMatchingObject(cvId,"cv",function (cv) {
+            matchObjectToSend.cv = cv[0];
 
-            matchingObjectDAO.getMatchingObject(cvId,"cv",function (cv) {
-                matchObjectToSend.cv = cv[0];
-                cv.requirements = [{
-                    "combination": [{
-                        "name": "c++",
-                        "years": 1,
-                        "mode": null,
-                        "percentage": null
-                    }, {
-                        "name": "java",
-                        "years": 0,
-                        "mode": null,
-                        "percentage": null
-                    }, {
-                        "name": "c",
-                        "years": 1,
-                        "mode": null,
-                        "percentage": null
-                    }, {
-                        "name": "angular",
-                        "years": 0.5,
-                        "mode": null,
-                        "percentage": null
-                    }]
-                }];
-
-                request.post({
-                    url: 'https://localhost:8005/addFormula',
-                    data: JSON.stringify(matchObjectToSend),
-                    headers: {
-                        "Content-Type" : "application/json"
-                    }
-                }, function(err, res, body) {
-                    if (err) {
-                        console.log("error from matcher" + err);
-                        callback(false);
-                    } else {
-                        console.log("here");
-                        var jsonResponse = JSON.parse(body);
-                        console.log(jsonResponse);
-                        matchingObjectDAO.saveMatcherFormula(jsonResponse ,function()  {
-                            callback(jsonResponse);
-                        });
-                    }
+            unirest.post('http://localhost:8005/addFormula')
+                .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
+                .send(matchObjectToSend)
+                .end(function (response) {
+                    console.log(response.body);
+                    matchingObjectDAO.saveMatcherFormula(response.body ,function()  {
+                        callback(response.body);
+                    });
                 });
-            })
-        });
-    //});
+        })
+    });
 }
 
 

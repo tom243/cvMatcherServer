@@ -43,7 +43,10 @@ function addUser(newUser, callback) {
         }
         else {
             console.log("user already exists with the same google id!!!");
-            callback(false);
+            getUserId(newTable.google_user_id, function(userId){
+                callback(userId);
+            })
+
         }
     });
 }

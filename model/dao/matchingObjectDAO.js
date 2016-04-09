@@ -434,7 +434,7 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
             /* save the professionalKnowledge to db*/
             professionalKnowledgeToadd.save(function (err, doc) {
                 if (err) {
-                    console.log("error in save professionalKnowledge to db ");
+                    console.log("error in save professionalKnowledge to db " + err);
                     callback(false);
                 } else {
                     professionalKnowledgeArr.push(doc._id);
