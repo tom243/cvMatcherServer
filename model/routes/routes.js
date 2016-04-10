@@ -213,6 +213,21 @@ module.exports = function (app) {
 
     });
 
+    // get id of cv
+    app.post('/jobSeeker/getIdOfCV', function (req, res) {
+
+        console.log("Im in getIdOfCV post");
+        if (!req.body) return res.sendStatus(400);
+        if (fieldValidation(req.body.user_id)){
+            console.log("user_id " + req.body.user_id);
+            matchingObjectController.getIdOfCV(req.body.user_id, function (results) {
+                res.json(results);
+            });
+        } else {
+            sendErrorFieldValidation(res);
+        }
+    });
+
     // check cv with matcher
     app.post('/jobSeeker/checkCV', function (req, res) {
 

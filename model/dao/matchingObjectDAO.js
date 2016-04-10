@@ -98,7 +98,7 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
     var matchingObjectToAdd = new MatchingObjectsModel({
         matching_object_type: class_data['matching_object_type'],
         google_user_id: class_data['google_user_id'],
-        date: new Date(),
+        date: class_data['date'],
         original_text: class_data['original_text'],
         sector: class_data['sector'],
         locations: class_data.locations,
@@ -941,6 +941,24 @@ function getFavoritesJobs(userId, callback) {
     });
 }
 
+function getIdOfCV(userId, callback) {
+
+    var query = MatchingObjectsModel.find(
+        {user: userId, active: true}, {_id: 1}
+    );
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("error");
+            callback(false);
+        } else {
+            callback(results);
+        }
+    })
+}
+
+
 ///////////////////////////////////////////// *** Matcher *** ///////////////////////
 
 function saveMatcherFormula(jsonResponse, callback) {
@@ -1061,6 +1079,7 @@ exports.updateRateCV = updateRateCV;
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
+exports.getIdOfCV = getIdOfCV;
 
 exports.saveMatcherFormula = saveMatcherFormula;
 

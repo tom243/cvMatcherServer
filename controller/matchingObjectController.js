@@ -160,6 +160,14 @@ function checkCV(jobId, cvId, callback) {
     });
 }
 
+//**  get id of cv **//
+function getIdOfCV(userId, callback) {
+    matchingObjectDAO.getIdOfCV(userId, function (result) {
+        callback(result);
+    });
+}
+
+
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
 //**  get key words  **//
@@ -193,5 +201,6 @@ exports.getAllJobsBySector  = getAllJobsBySector;
 exports.getMyJobs           = getMyJobs;
 exports.getFavoritesJobs    = getFavoritesJobs;
 exports.checkCV             = checkCV;
+exports.getIdOfCV           = getIdOfCV;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
