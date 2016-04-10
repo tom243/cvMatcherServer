@@ -119,11 +119,15 @@ module.exports = function (app) {
 
         console.log("Im in deleteMatchingObject post");
         if (!req.body) return res.sendStatus(400);
-        var object = JSON.stringify(req.body);
 
-        matchingObjectController.deleteMatchingObject(object, function (object) {
-            res.json(object);
-        });
+        if (fieldValidation(req.body.matching_object_id)) {
+            matchingObjectController.deleteMatchingObject(req.body.matching_object_id, function (object) {
+                res.json(object);
+            });
+        } else {
+            sendErrorFieldValidation(res);
+        }
+
     });
 
 

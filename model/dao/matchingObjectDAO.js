@@ -133,18 +133,17 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
 
 
 // Delete Object
-function deleteMatchingObject(deleteObject, callback) {
+function deleteMatchingObject(matching_object_id, callback) {
 
     console.log("im in deleteMatchingObject function");
-    var class_data = JSON.parse(deleteObject);
-    var query = MatchingObjectsModel.findOne().where('matching_object_id', class_data['_id']);
+    var query = MatchingObjectsModel.findOne().where('_id', matching_object_id);
 
     query.exec(function (err, doc) {
         if (err) {
             console.log("error:" + err);
             callback(false);
         } else {
-            var query = doc.update({$set: {active: false}});
+            var query = doc.update({$set: {archive: true}});
             query.exec(function (err, result) {
                 if (err) {
                     console.log("error:" + err);

@@ -11,8 +11,8 @@ function addMatchingObject(addObject, callback) {
 
 
 //** Delete an existing object **//
-function deleteMatchingObject(deleteObject, callback) {
-    matchingObjectDAO.deleteMatchingObject(deleteObject, function (result) {
+function deleteMatchingObject(matching_object_id, callback) {
+    matchingObjectDAO.deleteMatchingObject(matching_object_id, function (result) {
         callback(result);
     });
 }
