@@ -462,4 +462,23 @@ module.exports = function (app) {
             sendErrorFieldValidation(res);
         }
     });
+
+    ////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////////
+
+// get getKeyWordsBySector
+    app.post('/getKeyWordsBySector', function (req, res) {
+
+        console.log("in getKeyWordsBySector post");
+        if (!req.body) return res.sendStatus(400);
+        if (fieldValidation(req.body.sector) ) {
+            matchingObjectController.getKeyWordsBySector(req.body.sector,function (keywords) {
+                res.json(keywords);
+            })
+        } else {
+            sendErrorFieldValidation(res);
+        }
+
+    });
+
 };
+

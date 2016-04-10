@@ -13,6 +13,7 @@ var HistoryTimelineModel = require('./../schemas/schemas').HistoryTimelineModel;
 var AcademyModel = require('./../schemas/schemas').AcademyModel;
 var ProfessionalKnowledgeModel = require('./../schemas/schemas').ProfessionalKnowledgeModel;
 var MatchingDetailsModel = require('./../schemas/schemas').MatchingDetailsModel;
+var KeyWordsModel = require('./../schemas/schemas').KeyWordsModel;
 
 var errorMessage;
 
@@ -1024,6 +1025,17 @@ function buildMatchingDetails(matchingDetails, callback) {
 
 function getKeyWordsBySector(sector,callback) {
 
+    var query = KeyWordsModel.find({sector: sector});
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("error: " + err);
+            callback(false);
+        } else {
+            callback(results[0].key_words);
+        }
+    });
 
 }
 
@@ -1053,6 +1065,6 @@ exports.getFavoritesJobs = getFavoritesJobs;
 
 exports.saveMatcherFormula = saveMatcherFormula;
 
-exports.getKeyWordsBySector = exports.getKeyWordsBySector;
+exports.getKeyWordsBySector = getKeyWordsBySector;
 
 

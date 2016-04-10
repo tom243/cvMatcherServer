@@ -298,6 +298,13 @@ var MatchingDetailsSchema = matching_details_schema({
     }
 }, {collection: 'Matching_Details'});
 
+// keyWords Schema
+var KeyWordsSchema = key_words_schema({
+    sector: String,
+    key_words: [String]
+}, {collection: 'Key_Words'});
+
+
 var UserModel                   = mongoose.model('UserModel', usersSchema);
 var StatusModel                 = mongoose.model('StatusModel',statusSchema);
 var RequirementsModel           = mongoose.model('RequirementsModel',requirementSchema);
@@ -310,6 +317,7 @@ var HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', history
 var AcademyModel                = mongoose.model('AcademyModel', AcademySchema);
 var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', ProfessionalKnowledgeSchema);
 var MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', MatchingDetailsSchema);
+var KeyWordsModel               = mongoose.model('KeyWordsModel', KeyWordsSchema);
 
 
 exports.CompanyModel                = CompanyModel;
@@ -324,3 +332,4 @@ exports.HistoryTimelineModel        = HistoryTimelineModel;
 exports.AcademyModel                = AcademyModel;
 exports.ProfessionalKnowledgeModel  = ProfessionalKnowledgeModel;
 exports.MatchingDetailsModel        = MatchingDetailsModel;
+exports.KeyWordsModel               = KeyWordsModel;
