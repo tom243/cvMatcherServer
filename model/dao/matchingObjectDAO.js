@@ -944,7 +944,7 @@ function getFavoritesJobs(userId, callback) {
 function getIdOfCV(userId, callback) {
 
     var query = MatchingObjectsModel.find(
-        {user: userId, active: true}, {_id: 1}
+        {user: userId, active: true, matching_object_type:"cv"}, {_id: 1}
     );
 
     query.exec(function (err, results) {
