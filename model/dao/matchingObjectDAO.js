@@ -219,7 +219,12 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
             .populate({
                 path: 'requirements',
                 populate: {path: 'combination'}
+            })
+            .populate({
+                path: 'formula',
+                populate: {path: 'matching_requirements.details'}
             });
+
 
 
     } else {//job
@@ -958,10 +963,44 @@ function getIdOfCV(userId, callback) {
     })
 }
 
+function addCvToJob(compatibility_level,jobId, cvId, callback) {
+
+    var query = {"_id": cvId};
+    var update = {
+        "status.current_status": "unread",
+        compatibility_level:compatibility_level
+    };
+    var options = {new: true,upsert:true};
+    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
+        if (err) {
+            console.log('error in updating status unread ' + err);
+        } else {
+            var query = {
+                '_id' : jobId
+            };
+            var doc = {
+                $push : {'cvs' : cvId}
+            };
+            var options = {
+                upsert : true
+            };
+            MatchingObjectsModel.findOneAndUpdate(query, doc, options, function(err, results) {
+                if (err) {
+                    console.log("error in add cv to job" + err);
+                    callback(false);
+                } else {
+                    console.log("results ", results);
+                    callback(results);
+                }
+            });
+        }
+    });
+}
+
 
 ///////////////////////////////////////////// *** Matcher *** ///////////////////////
 
-function saveMatcherFormula(jsonResponse, callback) {
+function saveMatcherFormula(cvId,jsonResponse, callback) {
 
     console.log("im in saveMatcherFormula function");
 
@@ -992,8 +1031,18 @@ function saveMatcherFormula(jsonResponse, callback) {
                     console.log("error insert MatcherFormula to DB" + err);
                     callback(false);
                 } else {
-                    console.log("MatcherFormula saved to DB");
-                    callback();
+                    var query = {"_id": cvId};
+                    var update = {
+                        "formula": doc._id
+                    };
+                    var options = {new: true,upsert:true};
+                    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
+                        if (err) {
+                            console.log('error in updating formula id ' + err);
+                        } else {
+                            callback(jsonResponse);
+                        }
+                    });
                 }
             });
         }
@@ -1080,9 +1129,8 @@ exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
 exports.getIdOfCV = getIdOfCV;
+exports.addCvToJob = addCvToJob;
 
 exports.saveMatcherFormula = saveMatcherFormula;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
-
-

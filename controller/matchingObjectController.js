@@ -147,12 +147,12 @@ function checkCV(jobId, cvId, callback) {
         matchingObjectDAO.getMatchingObject(cvId,"cv",function (cv) {
             matchObjectToSend.cv = cv[0];
 
-            unirest.post('http://localhost:8005/addFormula')
+            unirest.post('https://matcherlogic.herokuapp.com/addFormula')
                 .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
                 .send(matchObjectToSend)
                 .end(function (response) {
                     console.log(response.body);
-                    matchingObjectDAO.saveMatcherFormula(response.body ,function()  {
+                    matchingObjectDAO.saveMatcherFormula(cvId,response.body ,function()  {
                         callback(response.body);
                     });
                 });
@@ -163,6 +163,13 @@ function checkCV(jobId, cvId, callback) {
 //**  get id of cv **//
 function getIdOfCV(userId, callback) {
     matchingObjectDAO.getIdOfCV(userId, function (result) {
+        callback(result);
+    });
+}
+
+//** add the current cv to job **//
+function addCvToJob(compatibility_level,jobId, cvId, callback) {
+    matchingObjectDAO.addCvToJob(compatibility_level,jobId, cvId, function (result) {
         callback(result);
     });
 }
@@ -202,5 +209,6 @@ exports.getMyJobs           = getMyJobs;
 exports.getFavoritesJobs    = getFavoritesJobs;
 exports.checkCV             = checkCV;
 exports.getIdOfCV           = getIdOfCV;
+exports.addCvToJob          = addCvToJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;

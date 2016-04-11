@@ -218,7 +218,7 @@ module.exports = function (app) {
 
         console.log("Im in getIdOfCV post");
         if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.user_id)){
+        if (fieldValidation(req.body.user_id)) {
             console.log("user_id " + req.body.user_id);
             matchingObjectController.getIdOfCV(req.body.user_id, function (results) {
                 res.json(results);
@@ -239,6 +239,25 @@ module.exports = function (app) {
             matchingObjectController.checkCV(req.body.job_id, req.body.cv_id, function (results) {
                 res.json(results);
             });
+        } else {
+            sendErrorFieldValidation(res);
+        }
+    });
+
+    // add the current cv to job
+    app.post('/jobSeeker/addCvToJob', function (req, res) {
+
+        console.log("Im in addCvToJob post");
+        if (!req.body) return res.sendStatus(400);
+        if (fieldValidation(req.body.job_id) && fieldValidation(req.body.cv_id) &&
+            fieldValidation(req.body.compatibility_level)) {
+            console.log("matching_object_id " + req.body.job_id);
+            console.log("matching_object_id " + req.body.cv_id);
+            console.log("compatibility_level " + req.body.compatibility_level);
+            matchingObjectController.addCvToJob(req.body.compatibility_level,
+                req.body.job_id, req.body.cv_id, function (results) {
+                    res.json(results);
+                });
         } else {
             sendErrorFieldValidation(res);
         }
@@ -340,7 +359,7 @@ module.exports = function (app) {
 
         console.log("Im in rateCV post");
         if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.status) ) {
+        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.status)) {
             console.log("matching_object_id" + req.body.matching_object_id);
             console.log("status" + req.body.status);
             var status = JSON.stringify(req.body.status);
@@ -358,7 +377,7 @@ module.exports = function (app) {
 
         console.log("Im in updateRateCV post");
         if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.status) ) {
+        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.status)) {
             console.log("matching_object_id" + req.body.matching_object_id);
             console.log("status" + req.body.status);
             var status = JSON.stringify(req.body.status);
@@ -471,7 +490,7 @@ module.exports = function (app) {
 
         console.log("in getFormula post");
         if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.job_id) ) {
+        if (fieldValidation(req.body.job_id)) {
             console.log(req.body.job_id);
 
             matchingObjectController.getFormula(req.body.job_id, function (formula) {
@@ -489,8 +508,8 @@ module.exports = function (app) {
 
         console.log("in getKeyWordsBySector post");
         if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.sector) ) {
-            matchingObjectController.getKeyWordsBySector(req.body.sector,function (keywords) {
+        if (fieldValidation(req.body.sector)) {
+            matchingObjectController.getKeyWordsBySector(req.body.sector, function (keywords) {
                 res.json(keywords);
             })
         } else {
