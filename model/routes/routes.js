@@ -28,16 +28,7 @@ module.exports = function (app) {
 /////////////////////////////////////////////////////////////// *** Users *** //////////////////////////////////////////
 
 // Add User
-    app.post('/addUser', function (req, res) {
-
-        console.log("Im in addUser post");
-        if (!req.body) return res.sendStatus(400);
-        var user = JSON.stringify(req.body);
-
-        usersController.addUser(user, function (user) {
-            res.json(user);
-        });
-    });
+    app.post('/addUser',  usersController.addUser);
 
 // Delete User
     app.post('/deleteUser', function (req, res) {
@@ -53,50 +44,13 @@ module.exports = function (app) {
 
 
 // Update User
-    app.post('/updateUser', function (req, res) {
+    app.post('/updateUser',  usersController.updateUser);
 
-        console.log("Im in updateUser post");
-        if (!req.body) return res.sendStatus(400);
-        var user = JSON.stringify(req.body);
+    // get User object
+    app.post('/getUser',  usersController.getUser);
 
-        usersController.updateUser(user, function (user) {
-            res.json(user);
-        });
-    });
-
-// get User
-    app.post('/getUser', function (req, res) {
-
-        console.log("Im in getUser post");
-        if (!req.body) return res.sendStatus(400);
-
-        if (fieldValidation(req.body.user_id)) {
-            console.log("userId " + req.body.user_id);
-            usersController.getUser(req.body.user_id, function (user) {
-                res.json(user);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-// get the mongo user id by the user google id
-    app.post('/getUserId', function (req, res) {
-
-        console.log("Im in getUserId post");
-        if (!req.body) return res.sendStatus(400);
-
-        if (fieldValidation(req.body.google_user_id)) {
-            console.log("userId" + req.body.google_user_id);
-
-            usersController.getUserId(req.body.google_user_id, function (userId) {
-                res.json(userId);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
+    // get the mongo user id by the user google id
+    app.post('/getUserId',usersController.getUserId);
 
 /////////////////////////////////////////////////////////////// *** Matching Objects *** //////////////////////
 

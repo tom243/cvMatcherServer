@@ -755,7 +755,7 @@ function getUnreadCvsForJob(userId, jobId, callback) {
         } else {
             errorMessage = "jobs are empty";
             console.log(errorMessage);
-            callback(results);
+            callback(results[0].cvs);
         }
 
     });
@@ -796,7 +796,7 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
         } else {
             errorMessage = "jobs are empty";
             console.log(errorMessage);
-            callback(results);
+            callback(results[0].cvs);
         }
 
     });

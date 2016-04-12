@@ -1,13 +1,22 @@
 var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object = model
+var utils = require("./../model/utils/utils");
+var validation = require("./../model/utils/validation");
 
 //////////////////////////////////// *** Users *** /////////////////////////////////////
 
 
 //** Adding a new user **//
-function addUser(newUser, callback) {
-    usersDAO.addUser(newUser, function (result) {
-        callback(result);
-    });
+function addUser(req, res) {
+
+    console.log("Im in addUser");
+
+    if (validation.addUser(req) ){
+        usersDAO.addUser(req.body, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
 }
 
 
@@ -19,24 +28,48 @@ function deleteUser(deleteUser, callback) {
 }
 
 //** Update an existing user **//
-function updateUser(updateUser, callback) {
-    usersDAO.updateUser(updateUser, function (result) {
-        callback(result);
-    });
+
+
+
+function updateUser(req, res) {
+
+    console.log("Im in updateUser");
+
+    if (validation.updateUser(req) ){
+        usersDAO.updateUser(req.body, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** get an existing user **//
-function getUser(userId, callback) {
-    usersDAO.getUser(userId, function (result) {
-        callback(result);
-    });
+function getUser(req, res) {
+
+    if (validation.getUser(req) ){
+        usersDAO.getUser(req.body.user_id, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
 }
 
 //** get the mongo user id by the user google id **//
-function getUserId(googleUserId, callback) {
-    usersDAO.getUserId(googleUserId, function (result) {
-        callback(result);
-    });
+function getUserId(req, res) {
+
+    console.log(" in getUserId");
+
+    if (validation.getUserId(req)){
+        console.log("userId " + req.body.google_user_id);
+        usersDAO.getUserId(req.body.google_user_id, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
 }
 
 ///////////////////////////////// ***  Companies  *** //////////////////////////////////////
