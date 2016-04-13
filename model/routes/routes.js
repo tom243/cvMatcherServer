@@ -24,31 +24,16 @@ module.exports = function (app) {
         res.send("Welcome");
     });
 
-
 /////////////////////////////////////////////////////////////// *** Users *** //////////////////////////////////////////
 
-// Add User
+    // Add User
     app.post('/addUser',  usersController.addUser);
-
-// Delete User
-    app.post('/deleteUser', function (req, res) {
-
-        console.log("Im in deleteUser post");
-        if (!req.body) return res.sendStatus(400);
-        var user = JSON.stringify(req.body);
-
-        usersController.deleteUser(user, function (user) {
-            res.json(user);
-        });
-    });
-
-
-// Update User
+    // Delete User
+    app.post('/deleteUser', usersController.deleteUser);
+    // Update User
     app.post('/updateUser',  usersController.updateUser);
-
     // get User object
     app.post('/getUser',  usersController.getUser);
-
     // get the mongo user id by the user google id
     app.post('/getUserId',usersController.getUserId);
 
@@ -347,40 +332,11 @@ module.exports = function (app) {
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
     // Add Company
-    app.post('/employer/addCompany', function (req, res) {
-
-        console.log("Im in addCompany post");
-        if (!req.body) return res.sendStatus(400);
-        var company = JSON.stringify(req.body);
-
-        usersController.addCompany(company, function (company) {
-            res.json(company);
-        });
-    });
-
+    app.post('/employer/addCompany',usersController.addCompany);
     // Delete Company
-    app.post('/employer/deleteCompany', function (req, res) {
-
-        console.log("Im in deleteCompany post");
-        if (!req.body) return res.sendStatus(400);
-        var company = JSON.stringify(req.body);
-
-        usersController.deleteCompany(company, function (company) {
-            res.json(company);
-        });
-    });
-
+    app.post('/employer/deleteCompany',usersController.deleteCompany);
     // Update Company
-    app.post('/employer/updateCompany', function (req, res) {
-
-        console.log("Im in updateCompany post");
-        if (!req.body) return res.sendStatus(400);
-        var company = JSON.stringify(req.body);
-
-        usersController.updateCompany(company, function (company) {
-            res.json(company);
-        });
-    });
+    app.post('/employer/updateCompany', usersController.updateCompany);
 
     // get Company
     app.post('/employer/getCompany', function (req, res) {

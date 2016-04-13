@@ -21,10 +21,18 @@ function addUser(req, res) {
 
 
 //** Delete an existing user **//
-function deleteUser(deleteUser, callback) {
-    usersDAO.deleteUser(deleteUser, function (result) {
-        callback(result);
-    });
+function deleteUser(req, res) {
+
+    console.log("Im in deleteUser");
+
+    if (validation.deleteUser(req) ){
+        usersDAO.deleteUser(req.body.user_id, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** Update an existing user **//
@@ -75,24 +83,47 @@ function getUserId(req, res) {
 ///////////////////////////////// ***  Companies  *** //////////////////////////////////////
 
 //** Adding a new company **//
-function addCompany(addCompany, callback) {
-    usersDAO.addCompany(addCompany, function (result) {
-        callback(result);
-    });
+function addCompany(req, res) {
+
+    console.log("Im in addCompany");
+
+    if (validation.addCompany(req) ){
+        usersDAO.addCompany(req.body, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
 }
 
 //** Delete an existing company **//
-function deleteCompany(deleteCompany, callback) {
-    usersDAO.deleteCompany(deleteCompany, function (result) {
-        callback(result);
-    });
+function deleteCompany(req, res) {
+
+    console.log("Im in deleteCompany");
+
+    if (validation.deleteCompany(req) ){
+        usersDAO.deleteCompany(req.body.company_id, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** Update an existing company **//
-function updateCompany(updateCompany, callback) {
-    usersDAO.updateCompany(updateCompany, function (result) {
-        callback(result);
-    });
+function updateCompany(req, res) {
+
+    console.log("Im in updateCompany");
+
+    if (validation.updateCompany(req) ){
+        usersDAO.updateCompany(req.body, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** get an existing company **//

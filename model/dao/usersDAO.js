@@ -22,23 +22,23 @@ function addUser(newUser, callback) {
 
     var query = UserModel.find().where('google_user_id', newTable.google_user_id);
 
-    query.exec(function (err, result) {
+    query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to find if user already exist";
             callback(500,error);
         }
-        if (result.length == 0) {
+        if (results.length == 0) {
             /*save the User in db*/
-            newTable.save(function (err, doc) {
+            newTable.save(function (err, results) {
                 if (err) {
                     console.log("something went wrong " + err);
-                    error.error = "something went wrong while insert user to DB";
+                    error.error = "something went wrong while insert user to the DB";
                     callback(500,error);
 
                 } else {
-                    console.log(" the user saved to DB: " + doc);
-                    callback(200,doc);
+                    console.log(" the user saved successfully to the DB: " , results);
+                    callback(200,results);
                 }
             });
         }
@@ -53,29 +53,30 @@ function addUser(newUser, callback) {
 
 
 // Delete User
-function deleteUser(deleteUser, callback) {
+function deleteUser(userId, callback) {
 
-    var class_data = JSON.parse(deleteUser);
-    var newTable = new UserModel({
-        user_id: class_data['personal_id']
+    var query = {"_id":userId};
+    var update = {
+        active: false
+    };
+    var options = {new: true};
+    UserModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while delete user from the DB";
+            callback(500,error);
+        } else {
+            if (results != null) {
+                console.log("the user deleted successfully from the db " , results );
+                callback(200, results);
+            }else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404,error);
+            }
+        }
     });
 
-    var query = UserModel.findOne().where('personal_id', newTable.personal_id);
-
-    query.exec(function (err, doc) {
-        var query = doc.update({$set: {active: false}});
-        query.exec(function (err, result) {
-
-            if (err) {
-                console.log(err);
-                callback(false);
-            }
-            else {
-                callback(result);
-            }
-
-        });
-    });
 }
 
 
@@ -94,60 +95,24 @@ function updateUser(updateUser, callback) {
         linkedin: updateUser.linkedin,
         phone_number: updateUser.phone_number
     };
-    var options = {new: true,upsert:true};
-    UserModel.findOneAndUpdate(query, update, options, function (err, result) {
+    var options = {new: true};
+    UserModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while update user to DB";
             callback(500,error);
         } else {
-            callback(200,result);
+
+            if (results != null) {
+                console.log("the user updated successfully to the db, user: " , results );
+                callback(200,results);
+            }else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404,error);
+            }
         }
     });
-
-
-
-/*    var newTable = new UserModel({
-        personal_id: updateUser['personal_id'],
-        first_name: updateUser['first_name'],
-        last_name: updateUser['last_name'],
-        email: updateUser['email'],
-        birth_date: updateUser['birth_date'],
-        address: updateUser['address'],
-        linkedin: updateUser['linkedin'],
-        phone_number: updateUser['phone_number']
-    });
-
-    var query = UserModel.findOne().where('_id', updateUser._id);
-
-    query.exec(function (err, doc) {
-
-        var query = doc.update({
-            $set: {
-                personal_id: newTable.personal_id,
-                first_name: newTable.first_name,
-                last_name: newTable.last_name,
-                email: newTable.email,
-                birth_date: newTable.birth_date,
-                address: newTable.address,
-                linkedin: newTable.linkedin,
-                phone_number: newTable.phone_number
-            },new:true,upsert:true
-        });
-
-        query.exec(function (err, result) {
-
-            if (err) {
-                console.log("something went wrong " + err);
-                error.error = "something went wrong while update user to DB";
-                callback(500,error);
-            }
-            else {
-                callback(200,result);
-            }
-
-        });
-    });*/
 }
 
 var getUser = function getUser(userId, callback) {
@@ -159,10 +124,17 @@ var getUser = function getUser(userId, callback) {
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user from db";
+            error.error = "something went wrong while trying to get the user from the db";
             callback(500,error);
         } else {
-            callback(200,results);
+            if (results.length > 0) {
+                console.log("the user pulled successfully from the db ", results);
+                callback(200, results);
+            }else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404,error);
+            }
         }
     });
 };
@@ -178,124 +150,135 @@ var getUserId = function getUserId(googleUserId, callback) {
 
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user id from db";
+            error.error = "something went wrong while trying to get the user id from the db";
             callback(500,error);
         } else {
-            callback(200,results);
+            if (results.length > 0) {
+                console.log("the user id pulled successfully from the db ", results);
+                callback(200, results);
+            }else {
+                console.log("google user id not exists");
+                error.error = "google user id not exists";
+                callback(404,error);
+            }
         }
     });
 };
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////////////////////////////////
 
-
 // Add Company
 function addCompany(addCompany, callback) {
 
-    var class_data = JSON.parse(addCompany);
-
-    console.log(" addCompany", class_data);
-
-    var newTable = new CompanyModel({
-        name: class_data['name'],
-        logo: class_data['logo'],
-        p_c: class_data['p_c'],
-        address: class_data['address'],
-        phone_number: class_data['phone_number'],
-        active: true
-    });
-
-    /*save the company to db*/
-    newTable.save(function (err, doc) {
+    UserModel.count({_id: addCompany.user_id}, function (err, count) {
         if (err) {
-            console.log("error insert Company to the DB" + err);
-            callback(false);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to find if the user exists in db";
+            callback(500, error);
         } else {
-            console.log("Company saved to DB: " + doc);
+            if (count > 0) { // user exists
+                var newTable = new CompanyModel({
+                    name: addCompany.name,
+                    logo: addCompany.logo,
+                    p_c: addCompany.p_c,
+                    address: addCompany.address,
+                    phone_number: addCompany.phone_number,
+                    active: true
+                });
 
-            var query = {"_id": class_data['user_id']};
-            var update = {
-                company: doc._id
-            };
-            var options = {new: true,upsert:true};
-            UserModel.findOneAndUpdate(query, update, options, function (err, user) {
-                if (err) {
-                    console.log('error updating company ' + err);
-                    callback(false);
-                } else {
-                    callback(doc);
-                }
-            });
+                /*save the company to db*/
+                newTable.save(function (err, results) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to insert the company to db";
+                        callback(500, error);
+                    } else {
+                        console.log("Company saved to DB: " + results);
+
+                        var query = {"_id": addCompany.user_id};
+                        var update = {
+                            company: results._id
+                        };
+                        var options = {new: true, upsert: true};
+                        UserModel.findOneAndUpdate(query, update, options, function (err, results) {
+                            if (err) {
+                                console.log("something went wrong " + err);
+                                error.error = "something went wrong while trying to assign the company to the user in db";
+                                callback(500, error);
+                            } else {
+                                console.log("the company added successfully to the db" , results)
+                                callback(200, results);
+                            }
+                        });
+                    }
+                });
+            } else { // user not exists
+                console.log("cannot add company because the user is not exists");
+                error.error = "cannot add company because the user is not exists";
+                callback(404, error);
+            }
         }
     });
 }
 
-
 // Delete Company
-function deleteCompany(deleteCompany, callback) {
+function deleteCompany(companyId, callback) {
 
-    var class_data = JSON.parse(deleteCompany);
-    var newTable = new CompanyModel({
-        company_id: class_data['company_id']
-    });
+    var query = {"_id":companyId};
+    var update = {
+        active: false
+    };
+    var options = {new: true};
+    CompanyModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while delete company from DB";
+            callback(500,error);
+        } else {
 
-    var query = CompanyModel.findOne().where('company_id', newTable.company_id);
-
-    query.exec(function (err, doc) {
-        var query = doc.update({$set: {active: false}});
-        query.exec(function (err, result) {
-
-            if (err) {
-                console.log("error");
-                callback(false);
+            if (results != null) {
+                console.log("the company deleted successfully from the db, company: " , results);
+                callback(200,results);
+            }else {
+                console.log("company not exists");
+                error.error = "company not exists ";
+                callback(404,error);
             }
-            else {
-                callback(result);
-            }
 
-        });
+        }
     });
 }
 
 // Update Company
 function updateCompany(updateCompany, callback) {
 
-    var class_data = JSON.parse(updateCompany);
-    var newTable = new CompanyModel({
-        name: class_data['name'],
-        logo: class_data['logo'],
-        p_c: class_data['p_c'],
-        address: class_data['address'],
-        phone_number: class_data['phone_number']
+    var query = {"_id": updateCompany._id};
+    var update = {
+        name: updateCompany.name,
+        logo: updateCompany.logo,
+        p_c: updateCompany.p_c,
+        address: updateCompany.address,
+        phone_number: updateCompany.phone_number
+    };
+    var options = {new: true};
+    UserModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while update company to DB";
+            callback(500,error);
+        } else {
+
+            if (results != null) {
+                console.log("the company updated successfully to the db, company: " , results );
+                callback(200,results);
+            }else {
+                console.log("company not exists");
+                error.error = "company not exists";
+                callback(404,error);
+            }
+        }
     });
 
-
-    var query = CompanyModel.findOne().where('_id', newTable.company_id);
-
-    query.exec(function (err, doc) {
-
-        var query = doc.update({
-            $set: {
-                name: newTable.name,
-                logo: newTable.logo,
-                p_c: newTable.p_c,
-                address: newTable.address,
-                phone_number: newTable.phone_number
-            }
-        });
-
-        query.exec(function (err, result) {
-
-            if (err) {
-                console.log("error");
-                callback(false);
-            }
-            else {
-                callback(result);
-            }
-
-        });
-    });
 }
 
 var getCompany = function getCompany(companyId, callback) {
