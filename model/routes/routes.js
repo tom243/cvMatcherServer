@@ -337,24 +337,8 @@ module.exports = function (app) {
     app.post('/employer/deleteCompany',usersController.deleteCompany);
     // Update Company
     app.post('/employer/updateCompany', usersController.updateCompany);
-
     // get Company
-    app.post('/employer/getCompany', function (req, res) {
-
-        console.log("Im in getCompany post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.company_id)) {
-            console.log("company_id " + req.body.company_id);
-
-            usersController.getCompany(req.body.company_id, function (company) {
-                res.json(company);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-
-    });
-
+    app.post('/employer/getCompany',usersController.getCompany);
 
 /////////////////////////////////////////////////////////////// ***  Formulas  *** ////////////////////////////////////
 

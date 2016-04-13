@@ -12,6 +12,8 @@ function fieldValidation(field) {
 
 /* Public functions */
 
+/////////////////////////////////////////////////// *** Users *** /////////////////////////////////
+
 function addUser(req){
 
     return req.body
@@ -49,6 +51,8 @@ function getUserId(req){
     return req.body && fieldValidation(req.body.google_user_id) ? true : false
 }
 
+////////////////////////////////////////////// ***  Companies  *** ////////////////////////////////////
+
 function addCompany(req){
 
     return req.body
@@ -77,12 +81,20 @@ function updateCompany(req){
 
 }
 
+function getCompany(req){
+    return req.body && fieldValidation(req.body.company_id) ? true : false
+}
+
+
+///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.getUser = getUser;
 exports.getUserId = getUserId;
 exports.addUser = addUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
+
 exports.addCompany = addCompany;
 exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
+exports.getCompany = getCompany;

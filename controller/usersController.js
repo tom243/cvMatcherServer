@@ -56,6 +56,8 @@ function updateUser(req, res) {
 //** get an existing user **//
 function getUser(req, res) {
 
+    console.log(" in getUser");
+
     if (validation.getUser(req) ){
         usersDAO.getUser(req.body.user_id, function (status,result) {
             res.status(status).json(result);
@@ -71,7 +73,6 @@ function getUserId(req, res) {
     console.log(" in getUserId");
 
     if (validation.getUserId(req)){
-        console.log("userId " + req.body.google_user_id);
         usersDAO.getUserId(req.body.google_user_id, function (status,result) {
             res.status(status).json(result);
         });
@@ -127,10 +128,18 @@ function updateCompany(req, res) {
 }
 
 //** get an existing company **//
-function getCompany(companyId, callback) {
-    usersDAO.getCompany(companyId, function (result) {
-        callback(result);
-    });
+function getCompany(req, res) {
+
+    console.log(" in getCompany");
+
+    if (validation.getCompany(req) ){
+        usersDAO.getCompany(req.body.company_id, function (status,result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
@@ -140,7 +149,6 @@ exports.deleteUser  = deleteUser;
 exports.updateUser  = updateUser;
 exports.getUser     = getUser;
 exports.getUserId   = getUserId;
-
 
 exports.addCompany      = addCompany;
 exports.deleteCompany   = deleteCompany;
