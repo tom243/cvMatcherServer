@@ -11,11 +11,8 @@ function fieldValidation(field) {
 
 function matcherRequirementsValidation(requirements) {
     var valid = true;
-    console.log("fieldValidation(requirements.details) " + fieldValidation(requirements.details));
     if (requirements && fieldValidation(requirements.grade) && fieldValidation(requirements.details)) {
-        console.log("here");
         if (requirements.details.constructor === Array) {
-            console.log("here Array");
             for (var i=0; i < requirements.details; i++) {
                 valid = requirements.details[i].name && requirements.details[i].grade ? true : false
             }

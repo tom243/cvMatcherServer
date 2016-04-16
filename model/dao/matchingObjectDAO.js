@@ -1003,26 +1003,47 @@ function addCvToJob(jobId, cvId, callback) {
                                                 error.error = "error in updating data for cv";
                                                 callback(404, error);
                                             } else {
+
+
                                                 var query = {
-                                                    '_id': jobId
+                                                    '_id':  CvResults[0].user
                                                 };
                                                 var doc = {
-                                                    $addToSet: {'cvs': cvId}
+                                                    $addToSet: {'jobs': jobId}
                                                 };
                                                 var options = {
                                                     upsert: true,new:true
                                                 };
-                                                MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err, results) {
+                                                UserModel.findOneAndUpdate(query, doc, options, function (err, userResults) {
                                                     if (err) {
-                                                        console.log("error in add cv to job " + err);
-                                                        error.error = "error in add cv to job";
+                                                        console.log("error in add job to user " + err);
+                                                        error.error = "error in add job to user";
                                                         callback(404, error);
 
                                                     } else {
-                                                        console.log("cv added to the job successfully");
-                                                        callback(200, results);
+                                                        var query = {
+                                                            '_id': jobId
+                                                        };
+                                                        var doc = {
+                                                            $addToSet: {'cvs': cvId}
+                                                        };
+                                                        var options = {
+                                                            upsert: true,new:true
+                                                        };
+                                                        MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err, results) {
+                                                            if (err) {
+                                                                console.log("error in add cv to job " + err);
+                                                                error.error = "error in add cv to job";
+                                                                callback(404, error);
+
+                                                            } else {
+                                                                console.log("cv added to the job successfully");
+                                                                callback(200, userResults);
+                                                            }
+                                                        });
                                                     }
                                                 });
+
                                             }
                                         });
                                     } else {

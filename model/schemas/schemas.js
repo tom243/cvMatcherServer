@@ -294,7 +294,7 @@ var MatchingDetailsSchema = matching_details_schema({
     },
     grade: {
         type : Number,
-        required : true 
+        required : true
     }
 }, {collection: 'Matching_Details'});
 
