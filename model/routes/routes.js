@@ -26,19 +26,13 @@ module.exports = function (app) {
 
 /////////////////////////////////////////////////////////////// *** Users *** //////////////////////////////////////////
 
-    // Add User
     app.post('/addUser',  usersController.addUser);
-    // Delete User
     app.post('/deleteUser', usersController.deleteUser);
-    // Update User
     app.post('/updateUser',  usersController.updateUser);
-    // get User object
     app.post('/getUser',  usersController.getUser);
-    // get the mongo user id by the user google id
     app.post('/getUserId',usersController.getUserId);
 
 /////////////////////////////////////////////////////////////// *** Matching Objects *** //////////////////////
-
 
 // Add Object (Job or CV)
     app.post('/addMatchingObject', function (req, res) {
@@ -51,7 +45,6 @@ module.exports = function (app) {
             res.json(object);
         });
     });
-
 
 // Delete Object (Job or CV)
     app.post('/deleteMatchingObject', function (req, res) {
@@ -69,7 +62,6 @@ module.exports = function (app) {
 
     });
 
-
 // Update Object (Job or CV)
     app.post('/updateMatchingObject', function (req, res) {
 
@@ -82,127 +74,18 @@ module.exports = function (app) {
         });
     });
 
-// get MatchingObject
-    app.post('/getMatchingObject', function (req, res) {
+    app.post('/getMatchingObject', matchingObjectController.getMatchingObject);
 
-        console.log("Im in getMatchingObject post");
-        if (!req.body) return res.sendStatus(400);
+    /////////////////////////////////////////////////////////////// *** JobSeeker *** /////////////////////////////////
 
-        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.matching_object_type)) {
-            console.log("matchingObjectId " + req.body.matching_object_id);
-            console.log("type " + req.body.matching_object_type);
+    app.post('/jobSeeker/getJobsBySector', matchingObjectController.getAllJobsBySector);
+    app.post('/jobSeeker/getMyJobs',  matchingObjectController.getMyJobs);
+    app.post('/jobSeeker/getFavoritesJobs',matchingObjectController.getFavoritesJobs);
+    app.post('/jobSeeker/getIdOfCV',  matchingObjectController.getIdOfCV);
+    app.post('/jobSeeker/checkCV',  matchingObjectController.checkCV);
+    app.post('/jobSeeker/addCvToJob',matchingObjectController.addCvToJob);
 
-            matchingObjectController.getMatchingObject(req.body.matching_object_id,
-                req.body.matching_object_type, function (matchingObject) {
-                    res.json(matchingObject);
-                });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-
-    /////////////////////////////////////////////////////////////// *** JobSeeker *** //////////////////////////////////////
-
-    // get Jobs by sector
-    app.post('/jobSeeker/getJobsBySector', function (req, res) {
-
-        console.log("Im in getJobsBySector post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.google_user_id) && fieldValidation(req.body.sector)) {
-            console.log(req.body.google_user_id);
-            console.log(req.body.sector);
-
-            matchingObjectController.getAllJobsBySector(req.body.google_user_id, req.body.sector, function (jobs) {
-                res.json(jobs);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    // get the jobs that the user sent his cvs to them
-    app.post('/jobSeeker/getMyJobs', function (req, res) {
-
-        console.log("Im in getMyJobs post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.google_user_id)) {
-            console.log("userId " + req.body.google_user_id);
-            matchingObjectController.getMyJobs(req.body.google_user_id, function (jobs) {
-                res.json(jobs);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    // get the jobs that the user sent his cvs to them
-    app.post('/jobSeeker/getFavoritesJobs', function (req, res) {
-
-        console.log("Im in getFavoritesJobs post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.google_user_id)) {
-            console.log("userId " + req.body.google_user_id);
-            matchingObjectController.getFavoritesJobs(req.body.google_user_id, function (jobs) {
-                res.json(jobs);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-
-    });
-
-    // get id of cv
-    app.post('/jobSeeker/getIdOfCV', function (req, res) {
-
-        console.log("Im in getIdOfCV post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.user_id)) {
-            console.log("user_id " + req.body.user_id);
-            matchingObjectController.getIdOfCV(req.body.user_id, function (results) {
-                res.json(results);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    // check cv with matcher
-    app.post('/jobSeeker/checkCV', function (req, res) {
-
-        console.log("Im in checkCV post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.job_id) && fieldValidation(req.body.cv_id)) {
-            console.log("matching_object_id " + req.body.job_id);
-            console.log("matching_object_id " + req.body.cv_id);
-            matchingObjectController.checkCV(req.body.job_id, req.body.cv_id, function (results) {
-                res.json(results);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    // add the current cv to job
-    app.post('/jobSeeker/addCvToJob', function (req, res) {
-
-        console.log("Im in addCvToJob post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.job_id) && fieldValidation(req.body.cv_id) &&
-            fieldValidation(req.body.compatibility_level)) {
-            console.log("matching_object_id " + req.body.job_id);
-            console.log("matching_object_id " + req.body.cv_id);
-            console.log("compatibility_level " + req.body.compatibility_level);
-            matchingObjectController.addCvToJob(req.body.compatibility_level,
-                req.body.job_id, req.body.cv_id, function (results) {
-                    res.json(results);
-                });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-//////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
+    ///////////////////////////////////////////////////*** Employer *** ///////////////////////////////////////////////
 
 
     // get Jobs
@@ -331,86 +214,14 @@ module.exports = function (app) {
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
-    // Add Company
     app.post('/employer/addCompany',usersController.addCompany);
-    // Delete Company
     app.post('/employer/deleteCompany',usersController.deleteCompany);
-    // Update Company
     app.post('/employer/updateCompany', usersController.updateCompany);
-    // get Company
     app.post('/employer/getCompany',usersController.getCompany);
 
-/////////////////////////////////////////////////////////////// ***  Formulas  *** ////////////////////////////////////
+////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////////
 
-    // Add Formula
-    app.post('/employer/addFormula', function (req, res) {
-
-        console.log("Im in Formula post");
-        if (!req.body) return res.sendStatus(400);
-        var formula = JSON.stringify(req.body);
-
-        matchingObjectController.addFormula(formula, function (formula) {
-            res.json(formula);
-        });
-    });
-
-
-    // Delete Formula
-    app.post('/employer/deleteFormula', function (req, res) {
-
-        console.log("Im in deleteFormula post");
-        if (!req.body) return res.sendStatus(400);
-        var formula = JSON.stringify(req.body);
-
-        matchingObjectController.deleteFormula(formula, function (formula) {
-            res.json(formula);
-        });
-    });
-
-    // Update Formula
-    app.post('/employer/updateFormula', function (req, res) {
-
-        console.log("Im in updateFormula post");
-        if (!req.body) return res.sendStatus(400);
-        var formula = JSON.stringify(req.body);
-
-        matchingObjectController.updateFormula(formula, function (formula) {
-            res.json(formula);
-        });
-    });
-
-    // get Formula
-    app.post('/employer/getFormula', function (req, res) {
-
-        console.log("in getFormula post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.job_id)) {
-            console.log(req.body.job_id);
-
-            matchingObjectController.getFormula(req.body.job_id, function (formula) {
-                res.json(formula);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    ////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////////
-
-// get getKeyWordsBySector
-    app.post('/getKeyWordsBySector', function (req, res) {
-
-        console.log("in getKeyWordsBySector post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.sector)) {
-            matchingObjectController.getKeyWordsBySector(req.body.sector, function (keywords) {
-                res.json(keywords);
-            })
-        } else {
-            sendErrorFieldValidation(res);
-        }
-
-    });
+    app.post('/getKeyWordsBySector',  matchingObjectController.getKeyWordsBySector);
 
 };
 

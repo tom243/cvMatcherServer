@@ -4,11 +4,10 @@ var validation = require("./../model/utils/validation");
 
 //////////////////////////////////// *** Users *** /////////////////////////////////////
 
-
 //** Adding a new user **//
 function addUser(req, res) {
 
-    console.log("Im in addUser");
+    console.log("in addUser");
 
     if (validation.addUser(req) ){
         usersDAO.addUser(req.body, function (status,result) {
@@ -19,11 +18,10 @@ function addUser(req, res) {
     }
 }
 
-
 //** Delete an existing user **//
 function deleteUser(req, res) {
 
-    console.log("Im in deleteUser");
+    console.log("in deleteUser");
 
     if (validation.deleteUser(req) ){
         usersDAO.deleteUser(req.body.user_id, function (status,result) {
@@ -36,12 +34,9 @@ function deleteUser(req, res) {
 }
 
 //** Update an existing user **//
-
-
-
 function updateUser(req, res) {
 
-    console.log("Im in updateUser");
+    console.log("in updateUser");
 
     if (validation.updateUser(req) ){
         usersDAO.updateUser(req.body, function (status,result) {
@@ -56,7 +51,7 @@ function updateUser(req, res) {
 //** get an existing user **//
 function getUser(req, res) {
 
-    console.log(" in getUser");
+    console.log("in getUser");
 
     if (validation.getUser(req) ){
         usersDAO.getUser(req.body.user_id, function (status,result) {
@@ -70,7 +65,7 @@ function getUser(req, res) {
 //** get the mongo user id by the user google id **//
 function getUserId(req, res) {
 
-    console.log(" in getUserId");
+    console.log("in getUserId");
 
     if (validation.getUserId(req)){
         usersDAO.getUserId(req.body.google_user_id, function (status,result) {
@@ -86,7 +81,7 @@ function getUserId(req, res) {
 //** Adding a new company **//
 function addCompany(req, res) {
 
-    console.log("Im in addCompany");
+    console.log("in addCompany");
 
     if (validation.addCompany(req) ){
         usersDAO.addCompany(req.body, function (status,result) {
@@ -100,7 +95,7 @@ function addCompany(req, res) {
 //** Delete an existing company **//
 function deleteCompany(req, res) {
 
-    console.log("Im in deleteCompany");
+    console.log("in deleteCompany");
 
     if (validation.deleteCompany(req) ){
         usersDAO.deleteCompany(req.body.company_id, function (status,result) {
@@ -115,7 +110,7 @@ function deleteCompany(req, res) {
 //** Update an existing company **//
 function updateCompany(req, res) {
 
-    console.log("Im in updateCompany");
+    console.log("in updateCompany");
 
     if (validation.updateCompany(req) ){
         usersDAO.updateCompany(req.body, function (status,result) {
@@ -130,7 +125,7 @@ function updateCompany(req, res) {
 //** get an existing company **//
 function getCompany(req, res) {
 
-    console.log(" in getCompany");
+    console.log("in getCompany");
 
     if (validation.getCompany(req) ){
         usersDAO.getCompany(req.body.company_id, function (status,result) {

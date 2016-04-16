@@ -1,5 +1,6 @@
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
+var validation = require("./../model/utils/validation");
 var unirest = require('unirest');
 
 
@@ -28,50 +29,27 @@ function updateMatchingObject(updateObject, callback) {
 }
 
 //** get Matching Object  **//
-function getMatchingObject(matchingObjectId,matchingObjectType, callback) {
-    matchingObjectDAO.getMatchingObject(matchingObjectId, matchingObjectType, function (result) {
-        callback(result);
-    });
+function getMatchingObject(req, res) {
+
+    console.log("in getMatchingObject");
+
+    if (validation.getMatchingObject(req)) {
+        matchingObjectDAO.getMatchingObject(req.body.matching_object_id,
+            req.body.matching_object_type, function (status, result) {
+                res.status(status).json(result);
+            });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
-
-
-///////////////////////////////////////// ***  Formulas  *** ///////////////////////////
-
-//** Adding a new formula **//
-function addFormula(addFormula, callback) {
-    matchingObjectDAO.addFormula(addFormula, function (result) {
-        callback(result);
-    });
-}
-
-//** Delete an existing formula **//
-function deleteFormula(deleteFormula, callback) {
-    matchingObjectDAO.deleteFormula(deleteFormula, function (result) {
-        callback(result);
-    });
-}
-
-//** Update an existing formula **//
-function updateFormula(updateFormula, callback) {
-    matchingObjectDAO.updateFormula(updateFormula, function (result) {
-        callback(result);
-    });
-}
-
-//** get an existing formula **//
-function getFormula(jobId, callback) {
-    matchingObjectDAO.getFormula(jobId, function (result) {
-        callback(result);
-    });
-}
-
 
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
 
 
 //** get jobs by sector for specific employer  **//
-function getJobsBySector(userId,sector,isArchive, callback) {
-    matchingObjectDAO.getJobsBySector(userId,sector, isArchive, function (result) {
+function getJobsBySector(userId, sector, isArchive, callback) {
+    matchingObjectDAO.getJobsBySector(userId, sector, isArchive, function (result) {
         callback(result);
     });
 }
@@ -86,7 +64,7 @@ function getUnreadCvsForJob(userId, jobId, callback) {
 
 
 //** get liked or unliked CV'S **//
-function getRateCvsForJob(userId, jobId,current_status, callback) {
+function getRateCvsForJob(userId, jobId, current_status, callback) {
     matchingObjectDAO.getRateCvsForJob(userId, jobId, current_status, function (result) {
         callback(result);
     });
@@ -116,102 +94,158 @@ function updateRateCV(matching_object_id, status, callback) {
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 //** get jobs by sector for jobSeeker  **//
-function getAllJobsBySector(userId, sector, callback) {
-    matchingObjectDAO.getAllJobsBySector(userId,sector, function (result) {
-        callback(result);
-    });
+function getAllJobsBySector(req, res) {
+
+    console.log("in getAllJobsBySector");
+
+    if (validation.getAllJobsBySector(req)) {
+        matchingObjectDAO.getAllJobsBySector(req.body.user_id, req.body.sector, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //**  get the jobs that the user has sent his cvs to them  **//
-function getMyJobs(userId, callback) {
-    matchingObjectDAO.getMyJobs(userId, function (result) {
-        callback(result);
-    });
+function getMyJobs(req, res) {
+
+    console.log("in getMyJobs");
+
+    if (validation.getMyJobs(req)) {
+        matchingObjectDAO.getMyJobs(req.body.user_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 //**  get the  favourites jobs  **//
-function getFavoritesJobs(userId, callback) {
-    matchingObjectDAO.getFavoritesJobs(userId, function (result) {
-        callback(result);
-    });
+function getFavoritesJobs(req, res) {
+
+    console.log("in getFavoritesJobs");
+
+    if (validation.getFavoritesJobs(req)) {
+        matchingObjectDAO.getFavoritesJobs(req.body.user_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //**  check cv with matcher  **//
-function checkCV(jobId, cvId, callback) {
+function checkCV(req, res) {
 
-    var matchObjectToSend = {
-        job: null,
-        cv: null
-    };
+    console.log("in checkCV");
 
-    matchingObjectDAO.getMatchingObject(jobId,"job",function (job) {
-        matchObjectToSend.job = job[0];
-        //matchObjectToSend.job.requirements = [];
+    if (validation.checkCV(req)) {
 
-        matchingObjectDAO.getMatchingObject(cvId,"cv",function (cv) {
-            matchObjectToSend.cv = cv[0];
+        var matchObjectToSend = {
+            job: null,
+            cv: null
+        };
 
-            unirest.post('https://matcherlogic.herokuapp.com/addFormula')
-                .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
-                .send(matchObjectToSend)
-                .end(function (response) {
-                    console.log(response.body);
-                    matchingObjectDAO.saveMatcherFormula(cvId,response.body ,function()  {
-                        callback(response.body);
+        matchingObjectDAO.getMatchingObject(req.body.job_id, "job", function (status,results) {
+            if (status === 200) {
+                matchObjectToSend.job = results[0];
+            }else {
+                return res.status(status).json(results);
+            }
+
+            matchingObjectDAO.getMatchingObject(req.body.cv_id, "cv", function (status,results) {
+                if (status === 200) {
+                    matchObjectToSend.cv = results[0];
+                }else {
+                    return res.status(status).json(results);
+                }
+
+                unirest.post('https://matcherlogic.herokuapp.com/addFormula')
+                    .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
+                    .send(matchObjectToSend)
+                    .end(function (response) {
+                        console.log("response from matcher: "  , response.body);
+                        res.status(response.code).json(response.body);
                     });
-                });
-        })
-    });
+            })
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //**  get id of cv **//
-function getIdOfCV(userId, callback) {
-    matchingObjectDAO.getIdOfCV(userId, function (result) {
-        callback(result);
-    });
+function getIdOfCV(req, res) {
+
+    console.log("in getIdOfCV");
+
+    if (validation.getIdOfCV(req)) {
+        matchingObjectDAO.getIdOfCV(req.body.user_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** add the current cv to job **//
-function addCvToJob(compatibility_level,jobId, cvId, callback) {
-    matchingObjectDAO.addCvToJob(compatibility_level,jobId, cvId, function (result) {
-        callback(result);
-    });
+function addCvToJob(req, res) {
+
+    console.log("in addCvToJob");
+
+    if (validation.addCvToJob(req)) {
+        matchingObjectDAO.addCvToJob(req.body.job_id, req.body.cv_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
 //**  get key words  **//
-function getKeyWordsBySector(sector,callback) {
-    matchingObjectDAO.getKeyWordsBySector(sector,function (result) {
-        callback(result);
-    });
+function getKeyWordsBySector(req, res) {
+
+    console.log("in getKeyWordsBySector");
+
+    if (validation.getKeyWordsBySector(req)) {
+        matchingObjectDAO.getKeyWordsBySector(req.body.sector, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
-exports.addMatchingObject       = addMatchingObject;
-exports.deleteMatchingObject    = deleteMatchingObject;
-exports.updateMatchingObject    = updateMatchingObject;
-exports.getMatchingObject       = getMatchingObject;
+exports.addMatchingObject = addMatchingObject;
+exports.deleteMatchingObject = deleteMatchingObject;
+exports.updateMatchingObject = updateMatchingObject;
+exports.getMatchingObject = getMatchingObject;
 
-exports.addFormula      = addFormula;
-exports.deleteFormula   = deleteFormula;
-exports.updateFormula   = updateFormula;
-exports.getFormula      = getFormula;
-
-exports.getJobsBySector     = getJobsBySector;
-exports.getUnreadCvsForJob  = getUnreadCvsForJob;
-exports.getRateCvsForJob    = getRateCvsForJob;
-exports.getFavoriteCvs      = getFavoriteCvs;
+exports.getJobsBySector = getJobsBySector;
+exports.getUnreadCvsForJob = getUnreadCvsForJob;
+exports.getRateCvsForJob = getRateCvsForJob;
+exports.getFavoriteCvs = getFavoriteCvs;
 
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 
-exports.getAllJobsBySector  = getAllJobsBySector;
-exports.getMyJobs           = getMyJobs;
-exports.getFavoritesJobs    = getFavoritesJobs;
-exports.checkCV             = checkCV;
-exports.getIdOfCV           = getIdOfCV;
-exports.addCvToJob          = addCvToJob;
+exports.getAllJobsBySector = getAllJobsBySector;
+exports.getMyJobs = getMyJobs;
+exports.getFavoritesJobs = getFavoritesJobs;
+exports.checkCV = checkCV;
+exports.getIdOfCV = getIdOfCV;
+exports.addCvToJob = addCvToJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;

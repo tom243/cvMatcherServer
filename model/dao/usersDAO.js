@@ -30,15 +30,15 @@ function addUser(newUser, callback) {
         }
         if (results.length == 0) {
             /*save the User in db*/
-            newTable.save(function (err, results) {
+            newTable.save(function (err, result) {
                 if (err) {
                     console.log("something went wrong " + err);
                     error.error = "something went wrong while insert user to the DB";
                     callback(500,error);
 
                 } else {
-                    console.log(" the user saved successfully to the DB: " , results);
-                    callback(200,results);
+                    console.log(" the user saved successfully to the DB: " , result);
+                    callback(200,result);
                 }
             });
         }
@@ -187,17 +187,17 @@ function addCompany(addCompany, callback) {
                 });
 
                 /*save the company to db*/
-                newTable.save(function (err, results) {
+                newTable.save(function (err, result) {
                     if (err) {
                         console.log("something went wrong " + err);
                         error.error = "something went wrong while trying to insert the company to db";
                         callback(500, error);
                     } else {
-                        console.log("Company saved to DB: " + results);
+                        console.log("Company saved to DB: " + result);
 
                         var query = {"_id": addCompany.user_id};
                         var update = {
-                            company: results._id
+                            company: result._id
                         };
                         var options = {new: true, upsert: true};
                         UserModel.findOneAndUpdate(query, update, options, function (err, user) {
@@ -206,8 +206,8 @@ function addCompany(addCompany, callback) {
                                 error.error = "something went wrong while trying to assign the company to the user in db";
                                 callback(500, error);
                             } else {
-                                console.log("the company added successfully to the db" , results)
-                                callback(200, results);
+                                console.log("the company added successfully to the db" , result)
+                                callback(200, result);
                             }
                         });
                     }
