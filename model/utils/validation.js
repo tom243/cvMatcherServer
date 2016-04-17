@@ -24,14 +24,22 @@ function matcherRequirementsValidation(requirements) {
 }
 
 function matcherFormulaValidation(formula) {
-    return formula
-    && fieldValidation(formula.requirements)
+    return fieldValidation(formula.requirements)
     && matcherRequirementsValidation(formula.requirements)
     && fieldValidation(formula.candidate_type)
     && fieldValidation(formula.locations)
     && fieldValidation(formula.scope_of_position)
     && fieldValidation(formula.academy) ? true : false
 }
+
+function statusValidation(status) {
+    return fieldValidation(status.current_status)
+    && ( status.current_status === "liked" || status.current_status === "unliked" )
+    && ( (status.current_status === "liked"  && fieldValidation(status.stars) )
+    || ( status.current_status === "unliked" && fieldValidation(status.description) ? true : false ) )
+}
+
+var sectorArr = ["software engineering"];
 
 /* Public functions */
 
@@ -110,13 +118,47 @@ function getMatchingObject(req){
         ? true : false
 }
 
+///////////////////////////////////////////// *** Employer *** ///////////////////////
+
+function getJobsBySector(req){
+    return req.body
+    && fieldValidation(req.body.user_id)
+    && fieldValidation(req.body.sector)
+    && sectorArr.indexOf(req.body.sector)!= -1
+    && fieldValidation(req.body.archive)
+    && typeof(req.body.archive) === "boolean" ? true : false
+}
+
+function getUnreadCvsForJob(req){
+    return req.body
+    && fieldValidation(req.body.user_id)
+    && fieldValidation(req.body.job_id) ? true : false
+}
+
+function getRateCvsForJob(req){
+    return req.body
+    && fieldValidation(req.body.user_id)
+    && fieldValidation(req.body.job_id)
+    && fieldValidation(req.body.current_status)
+    && ( req.body.current_status === "liked" || req.body.current_status === "unliked" )
+        ? true : false
+}
+
+function rateCV(req){
+    return req.body
+    && fieldValidation(req.body.cv_id)
+    && fieldValidation(req.body.status)
+    && statusValidation(req.body.status) ? true : false
+}
+
 
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 function getAllJobsBySector(req){
     return req.body
     && fieldValidation(req.body.user_id)
-    && fieldValidation(req.body.sector) ? true : false
+    && fieldValidation(req.body.sector)
+    && sectorArr.indexOf(req.body.sector)!= -1 ? true : false
 }
 
 function getMyJobs(req){
@@ -159,7 +201,9 @@ function matcherResponse(response){
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
 function getKeyWordsBySector(req){
-    return req.body && fieldValidation(req.body.sector) ? true : false
+    return req.body
+    && fieldValidation(req.body.sector)
+    && sectorArr.indexOf(req.body.sector)!= -1 ? true : false
 }
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
@@ -176,6 +220,11 @@ exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 
 exports.getMatchingObject = getMatchingObject;
+
+exports.getJobsBySector = getJobsBySector;
+exports.getUnreadCvsForJob = getUnreadCvsForJob;
+exports.getRateCvsForJob = getRateCvsForJob;
+exports.rateCV = rateCV;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;

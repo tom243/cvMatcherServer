@@ -85,114 +85,13 @@ module.exports = function (app) {
     app.post('/jobSeeker/checkCV',  matchingObjectController.checkCV);
     app.post('/jobSeeker/addCvToJob',matchingObjectController.addCvToJob);
 
-    ///////////////////////////////////////////////////*** Employer *** ///////////////////////////////////////////////
+//////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
 
+    app.post('/employer/getJobsBySector',matchingObjectController.getJobsBySector);
+    app.post('/employer/getUnreadCvsForJob', matchingObjectController.getUnreadCvsForJob);
+    app.post('/employer/getRateCvsForJob',  matchingObjectController.getRateCvsForJob);
+    app.post('/employer/rateCV', matchingObjectController.rateCV);
 
-    // get Jobs
-    app.post('/employer/getJobsBySector', function (req, res) {
-
-        console.log("Im in getJobsBySector post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.google_user_id) && fieldValidation(req.body.sector)
-            && fieldValidation(req.body.archive)) {
-            console.log("google user id : " + req.body.google_user_id);
-            console.log("sector " + req.body.sector);
-            console.log("archive" + req.body.archive);
-            matchingObjectController.getJobsBySector(req.body.google_user_id, req.body.sector,
-                req.body.archive, function (jobs) {
-                    res.json(jobs);
-                });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    // get Unread CV'S
-    app.post('/employer/getUnreadCvsForJob', function (req, res) {
-
-        console.log("Im in getCvsForJob post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.google_user_id) && fieldValidation(req.body.job_id)) {
-            console.log("jobId" + req.body.job_id);
-            console.log("userId" + req.body.google_user_id)
-            matchingObjectController.getUnreadCvsForJob(req.body.google_user_id, req.body.job_id, function (cvs) {
-                res.json(cvs);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-
-    // get liked or unliked CV'S
-    app.post('/employer/getRateCvsForJob', function (req, res) {
-
-        console.log("Im in getRateCvsForJob post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.job_id) && fieldValidation(req.body.google_user_id)
-            && fieldValidation(req.body.current_status)) {
-            console.log("jobId" + req.body.job_id);
-            console.log("userId" + req.body.google_user_id);
-            console.log("status" + req.body.current_status);
-            matchingObjectController.getRateCvsForJob(req.body.google_user_id, req.body.job_id, req.body.current_status, function (cvs) {
-                res.json(cvs);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    // get favorites CV'S
-    app.post('/employer/getFavoriteCvs', function (req, res) {
-
-        console.log("Im in getFavorites post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.job_id) && fieldValidation(req.body.google_user_id)) {
-            console.log("jobId" + req.body.job_id);
-            console.log("userId" + req.body.google_user_id);
-            matchingObjectController.getFavoriteCvs(req.body.google_user_id,
-                req.body.job_id, function (cvs) {
-                    res.json(cvs);
-                });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    //** add status for specific cv  **//
-    app.post('/employer/rateCV', function (req, res) {
-
-        console.log("Im in addStatusForCV post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.status)) {
-            console.log("matching_object_id" + req.body.matching_object_id);
-            console.log("status" + req.body.status);
-            var status = JSON.stringify(req.body.status);
-            matchingObjectController.rateCV(req.body.matching_object_id, status, function (status) {
-                res.json(status);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-    });
-
-    //** rate specific cv  **//
-    app.post('/employer/rateCV', function (req, res) {
-
-        console.log("Im in rateCV post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.status)) {
-            console.log("matching_object_id" + req.body.matching_object_id);
-            console.log("status" + req.body.status);
-            var status = JSON.stringify(req.body.status);
-            matchingObjectController.rateCV(req.body.matching_object_id, status, function (status) {
-                res.json(status);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-
-    });
 
     //** update rate for specific cv  **//
     app.post('/employer/updateRateCV', function (req, res) {

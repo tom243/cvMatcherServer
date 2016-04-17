@@ -3,6 +3,9 @@ var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var unirest = require('unirest');
 
+var error = {
+    error: null
+};
 
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
@@ -46,42 +49,67 @@ function getMatchingObject(req, res) {
 
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
 
-
 //** get jobs by sector for specific employer  **//
-function getJobsBySector(userId, sector, isArchive, callback) {
-    matchingObjectDAO.getJobsBySector(userId, sector, isArchive, function (result) {
-        callback(result);
-    });
+function getJobsBySector(req, res) {
+
+    console.log("in getJobsBySector");
+
+    if (validation.getJobsBySector(req)) {
+        matchingObjectDAO.getJobsBySector(req.body.user_id, req.body.sector,
+            req.body.archive, function (status, result) {
+                res.status(status).json(result);
+            });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
-
 //** get Unread for specific job  **//
-function getUnreadCvsForJob(userId, jobId, callback) {
-    matchingObjectDAO.getUnreadCvsForJob(userId, jobId, function (result) {
-        callback(result);
-    });
+function getUnreadCvsForJob(req, res) {
+
+    console.log("in getUnreadCvsForJob");
+
+    if (validation.getUnreadCvsForJob(req)) {
+        matchingObjectDAO.getUnreadCvsForJob(req.body.user_id, req.body.job_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 
 //** get liked or unliked CV'S **//
-function getRateCvsForJob(userId, jobId, current_status, callback) {
-    matchingObjectDAO.getRateCvsForJob(userId, jobId, current_status, function (result) {
-        callback(result);
-    });
-}
+function getRateCvsForJob(req, res) {
 
-//** get Unread for specific job  **//
-function getFavoriteCvs(userId, jobId, callback) {
-    matchingObjectDAO.getFavoriteCvs(userId, jobId, function (result) {
-        callback(result);
-    });
+    console.log("in getRateCvsForJob");
+
+    if (validation.getRateCvsForJob(req)) {
+        matchingObjectDAO.getRateCvsForJob(req.body.user_id, req.body.job_id,
+            req.body.current_status, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** rate specific cv  **//
-function rateCV(matching_object_id, status, callback) {
-    matchingObjectDAO.rateCV(matching_object_id, status, function (result) {
-        callback(result);
-    });
+function rateCV(req, res) {
+
+    console.log("in rateCV");
+
+    if (validation.rateCV(req)) {
+        matchingObjectDAO.rateCV(req.body.cv_id, req.body.status ,function (status, result) {
+                res.status(status).json(result);
+            });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** update rate for specific cv  **//
@@ -149,17 +177,17 @@ function checkCV(req, res) {
             cv: null
         };
 
-        matchingObjectDAO.getMatchingObject(req.body.job_id, "job", function (status,results) {
+        matchingObjectDAO.getMatchingObject(req.body.job_id, "job", function (status, results) {
             if (status === 200) {
                 matchObjectToSend.job = results[0];
-            }else {
+            } else {
                 return res.status(status).json(results);
             }
 
-            matchingObjectDAO.getMatchingObject(req.body.cv_id, "cv", function (status,results) {
+            matchingObjectDAO.getMatchingObject(req.body.cv_id, "cv", function (status, results) {
                 if (status === 200) {
                     matchObjectToSend.cv = results[0];
-                }else {
+                } else {
                     return res.status(status).json(results);
                 }
 
@@ -167,8 +195,14 @@ function checkCV(req, res) {
                     .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
                     .send(matchObjectToSend)
                     .end(function (response) {
-                        console.log("response from matcher: "  , response.body);
-                        res.status(response.code).json(response.body);
+                        if (validation.matcherResponse(response.body)) {
+                            console.log("response from matcher: ", response.body);
+                            res.status(response.code).json(response.body);
+                        }else {
+                            error.error = "error occurred during matcher process";
+                            res.status(response.code).json(error);
+                        }
+
                     });
             })
         });
@@ -236,7 +270,6 @@ exports.getMatchingObject = getMatchingObject;
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
-exports.getFavoriteCvs = getFavoriteCvs;
 
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;

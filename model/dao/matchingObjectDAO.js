@@ -231,7 +231,6 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
             });
 
 
-
     } else {//job
         var query = MatchingObjectsModel.find(
             {_id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
@@ -255,10 +254,10 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
             if (results.length > 0) {
                 console.log(matchingObjectType + " extracted successfully from the db")
                 callback(200, results);
-            }else {
+            } else {
                 console.log(matchingObjectType + " not exists");
                 error.error = matchingObjectType + " not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -362,22 +361,22 @@ function buildTimelineHistory(timeline, callback) {
 
 function addAcademy(academy, callback) {
 
-        var academyToadd = new AcademyModel({
-            academy_type: academy.academy_type,
-            degree_name: academy.degree_name,
-            degree_type: academy.degree_type
-        });
+    var academyToadd = new AcademyModel({
+        academy_type: academy.academy_type,
+        degree_name: academy.degree_name,
+        degree_type: academy.degree_type
+    });
 
-        /* save the academy to db*/
-        academyToadd.save(function (err, doc) {
-            if (err) {
-                console.log("error in save academy to db ");
-                console.log(err);
-                callback(false);
-            } else {
-                callback(doc._id);
-            }
-        })
+    /* save the academy to db*/
+    academyToadd.save(function (err, doc) {
+        if (err) {
+            console.log("error in save academy to db ");
+            console.log(err);
+            callback(false);
+        } else {
+            callback(doc._id);
+        }
+    })
 }
 
 /////////////////////////////////////// ***  Requirements  *** /////////////////////////////
@@ -472,43 +471,52 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
 /////////////////////////////////////// ***  Status  *** /////////////////////////////
 
 // Add Status
-function rateCV(matching_object_id, status, callback) {
+function rateCV(cvId, status, callback) {
 
-    console.log("im in rateCV function");
-    var class_data = JSON.parse(status);
     var statusToAdd = new StatusModel({
         seen: null,
         rate: {
             status: true,
-            stars: class_data.stars,
-            description: class_data.description,
-            timestamp: Date.now()
+            stars: status.stars,
+            description: status.description,
+            timestamp: status.timestamp
         },
         received: null
     });
 
     /* save the Status to db*/
-    statusToAdd.save(function (err, doc) {
+    statusToAdd.save(function (err, result) {
         if (err) {
-            console.log("error in save Status to db ");
-            callback(false);
-        }
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to save the status to the db";
+            callback(500, error);
+        } else {
 
-        var query = {"_id": matching_object_id};
-        var update = {
-            status: {
-                status_id: doc._id,
-                current_status: class_data.current_status
-            }
-        };
-        var options = {new: true};
-        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
-            if (err) {
-                console.log('error in save Status id to matching object');
-            } else {
-                callback(doc);
-            }
-        });
+            var query = {"_id": cvId};
+            var update = {
+                status: {
+                    status_id: result._id,
+                    current_status: status.current_status
+                }
+            };
+            var options = {new: true,upsert:true};
+            MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to save the Status id to cv";
+                    callback(500, error);
+                } else {
+                    if (results != null) {
+                        console.log("cv rated successfully");
+                        callback(200, results);
+                    } else {
+                        console.log("cv not exists");
+                        error.error = "cv not exists";
+                        callback(404, error);
+                    }
+                }
+            });
+        }
     });
 }
 
@@ -520,7 +528,7 @@ function updateRateCV(matching_object_id, status, callback) {
 
     var query = {"_id": matching_object_id};
     var update = {
-            "status.current_status": class_data.current_status
+        "status.current_status": class_data.current_status
     };
     var options = {new: true};
     MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
@@ -654,13 +662,12 @@ function updateFormula(updateFormula, callback) {
 }
 
 
-
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
 
 function getJobsBySector(userId, sector, isArchive, callback) {
 
     var query = MatchingObjectsModel.find(
-        {google_user_id: userId, sector: sector, active: true, matching_object_type: "job", archive: isArchive}
+        {user: userId, sector: sector, active: true, matching_object_type: "job", archive: isArchive}
     ).populate('original_text')
         .populate('academy');
 
@@ -668,10 +675,12 @@ function getJobsBySector(userId, sector, isArchive, callback) {
     query.exec(function (err, results) {
 
         if (err) {
-            console.log("error");
-            callback(false);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the jobs from the db";
+            callback(500, error);
         } else {
-            callback(results);
+            console.log("the jobs extracted successfully from the db");
+            callback(200, results);
         }
     });
 }
@@ -679,39 +688,49 @@ function getJobsBySector(userId, sector, isArchive, callback) {
 function getUnreadCvsForJob(userId, jobId, callback) {
 
     var query = MatchingObjectsModel.find(
-        {_id: jobId, google_user_id: userId, active: true, matching_object_type: "job"},
+        {_id: jobId, user: userId, active: true, matching_object_type: "job"},
         {cvs: 1}
     );
 
     query.exec(function (err, results) {
 
         if (err) {
-            console.log("error");
-            callback(false);
-        }
-        if (results[0].cvs.length > 0) {
-
-            var query = MatchingObjectsModel.find(
-                {
-                    _id: {$in: results[0].cvs},
-                    active: true,
-                    "status.current_status": "unread",
-                    matching_object_type: "cv"
-                }
-            ).populate('user').populate('original_text')
-                .populate('academy');
-            query.exec(function (err, results) {
-                if (err) {
-                    console.log("error");
-                    callback(false);
-                } else {
-                    callback(results);
-                }
-            });
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the job from the db";
+            callback(500, error);
         } else {
-            errorMessage = "jobs are empty";
-            console.log(errorMessage);
-            callback(results[0].cvs);
+            if (results.length > 0) {
+                if (results[0].cvs.length > 0) {
+
+                    var query = MatchingObjectsModel.find(
+                        {
+                            _id: {$in: results[0].cvs},
+                            active: true,
+                            "status.current_status": "unread",
+                            matching_object_type: "cv"
+                        }
+                    ).populate('user').populate('original_text')
+                        .populate('academy');
+                    query.exec(function (err, results) {
+                        if (err) {
+                            console.log("something went wrong " + err);
+                            error.error = "something went wrong while trying to get the  unread cvs for job from the db";
+                            callback(500, error);
+                        } else {
+                            console.log("the cvs extracted successfully from the db");
+                            callback(200, results);
+                        }
+                    });
+                } else {
+                    console.log("no cvs for this job");
+                    callback(200, results[0].cvs);
+                }
+            } else {
+                errorMessage = "job not exists"
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
         }
 
     });
@@ -720,86 +739,55 @@ function getUnreadCvsForJob(userId, jobId, callback) {
 function getRateCvsForJob(userId, jobId, current_status, callback) {
 
     var query = MatchingObjectsModel.find(
-        {_id: jobId, google_user_id: userId, active: true, matching_object_type: "job"},
+        {_id: jobId, user: userId, active: true, matching_object_type: "job"},
         {cvs: 1}
     );
 
     query.exec(function (err, results) {
 
         if (err) {
-            console.log("error");
-            callback(false);
-        }
-        if (results[0].cvs.length > 0) {
-
-            var query = MatchingObjectsModel.find(
-                {
-                    _id: {$in: results[0].cvs}, active: true,
-                    "status.current_status": current_status, matching_object_type: "cv"
-                }
-            ).populate('user')
-                .populate('status.status_id')
-                .populate('original_text')
-                .populate('academy');
-            query.exec(function (err, results) {
-                if (err) {
-                    console.log("error");
-                    callback(false);
-                } else {
-                    callback(results);
-                }
-            });
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the job from the db";
+            callback(500, error);
         } else {
-            errorMessage = "jobs are empty";
-            console.log(errorMessage);
-            callback(results[0].cvs);
+            if (results.length > 0) {
+                if (results[0].cvs.length > 0) {
+
+                    var query = MatchingObjectsModel.find(
+                        {
+                            _id: {$in: results[0].cvs}, active: true,
+                            "status.current_status": current_status, matching_object_type: "cv"
+                        }
+                    ).populate('user')
+                        .populate('status.status_id')
+                        .populate('original_text')
+                        .populate('academy');
+                    query.exec(function (err, results) {
+                        if (err) {
+                            console.log("something went wrong " + err);
+                            error.error = "something went wrong while trying to get the "
+                                + current_status + " cvs for job from the db";
+                            callback(500, error);
+                        } else {
+                            console.log("the cvs extracted successfully from the db");
+                            callback(200, results);
+                        }
+                    });
+                } else {
+                    errorMessage = "jobs are empty";
+                    console.log(errorMessage);
+                    callback(200, results[0].cvs);
+                }
+            } else {
+                errorMessage = "job not exists"
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
         }
 
     });
 }
-
-
-function getFavoriteCvs(userId, jobId, callback) {
-
-    var query = MatchingObjectsModel.find(
-        {_id: jobId, google_user_id: userId, active: true, matching_object_type: "job"},
-        {favorites: 1}
-    );
-
-    query.exec(function (err, results) {
-
-        if (err) {
-            console.log("error");
-            callback(false);
-        }
-        if (results[0].favorites.length > 0) {
-
-            var query = MatchingObjectsModel.find(
-                {
-                    _id: {$in: results[0].favorites}, active: true,
-                    "status.favorite": true, matching_object_type: "cv"
-                }
-            ).populate('user')
-                .populate('status.status_id')
-                .populate('original_text')
-                .populate('academy');
-            query.exec(function (err, results) {
-                if (err) {
-                    console.log("error");
-                    callback(false);
-                } else {
-                    callback(results);
-                }
-            });
-        } else {
-            errorMessage = "jobs are empty";
-            console.log(errorMessage);
-            callback(results);
-        }
-
-    });
-}
-
 
 ///////////////////////////////////////////// *** JobSeeker *** ///////////////////////
 
@@ -815,7 +803,7 @@ function getAllJobsBySector(userId, sector, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the user from the db";
-            callback(500,error);
+            callback(500, error);
         } else {
 
             if (results.length > 0) {
@@ -836,16 +824,16 @@ function getAllJobsBySector(userId, sector, callback) {
                     if (err) {
                         console.log("something went wrong " + err);
                         error.error = "something went wrong while trying to get the jobs from the db";
-                        callback(500,error);
+                        callback(500, error);
                     } else {
                         console.log("the jobs extracted successfully from the db");
                         callback(200, results);
                     }
                 });
-            }else {
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -862,7 +850,7 @@ function getMyJobs(userId, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the user from the db";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
                 var query = MatchingObjectsModel.find(
@@ -876,16 +864,16 @@ function getMyJobs(userId, callback) {
                     if (err) {
                         console.log("something went wrong " + err);
                         error.error = "something went wrong while trying to get the jobs from the db";
-                        callback(500,error);
+                        callback(500, error);
                     } else {
                         console.log("the jobs extracted successfully from the db");
                         callback(200, results);
                     }
                 });
-            }else {
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -902,7 +890,7 @@ function getFavoritesJobs(userId, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the user from the db";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
                 var query = MatchingObjectsModel.find(
@@ -922,10 +910,10 @@ function getFavoritesJobs(userId, callback) {
                         callback(200, results);
                     }
                 });
-            }else {
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -934,7 +922,7 @@ function getFavoritesJobs(userId, callback) {
 function getIdOfCV(userId, callback) {
 
     var query = MatchingObjectsModel.find(
-        {user: userId, active: true, matching_object_type:"cv"}, {_id: 1}
+        {user: userId, active: true, matching_object_type: "cv"}, {_id: 1}
     );
 
     query.exec(function (err, results) {
@@ -947,10 +935,10 @@ function getIdOfCV(userId, callback) {
             if (results.length > 0) {
                 console.log("id of the cv extracted successfully from the db");
                 callback(200, results);
-            }else {
+            } else {
                 console.log("cv not exists for this user");
                 error.error = "cv not exists for this user";
-                callback(404,error);
+                callback(404, error);
             }
         }
     })
@@ -963,20 +951,20 @@ function addCvToJob(jobId, cvId, callback) {
         cv: null
     };
 
-    getMatchingObject(jobId, "job", function (status,jobResults) {
+    getMatchingObject(jobId, "job", function (status, jobResults) {
         if (status === 200) {
             matchObjectToSend.job = jobResults[0];
-        }else {
+        } else {
             console.log("cannot extract job from db");
-            return callback(status,jobResults);
+            return callback(status, jobResults);
         }
 
-        getMatchingObject(cvId, "cv", function (status,CvResults) {
+        getMatchingObject(cvId, "cv", function (status, CvResults) {
             if (status === 200) {
                 matchObjectToSend.cv = CvResults[0];
-            }else {
+            } else {
                 console.log("cannot extract cv from db");
-                return callback(status,CvResults);
+                return callback(status, CvResults);
             }
 
             unirest.post('https://matcherlogic.herokuapp.com/addFormula')
@@ -1001,24 +989,24 @@ function addCvToJob(jobId, cvId, callback) {
                                             if (err) {
                                                 console.log('error in updating data for cv ' + err);
                                                 error.error = "error in updating data for cv";
-                                                callback(404, error);
+                                                callback(500, error);
                                             } else {
 
 
                                                 var query = {
-                                                    '_id':  CvResults[0].user
+                                                    '_id': CvResults[0].user
                                                 };
                                                 var doc = {
                                                     $addToSet: {'jobs': jobId}
                                                 };
                                                 var options = {
-                                                    upsert: true,new:true
+                                                    upsert: true, new: true
                                                 };
                                                 UserModel.findOneAndUpdate(query, doc, options, function (err, userResults) {
                                                     if (err) {
                                                         console.log("error in add job to user " + err);
                                                         error.error = "error in add job to user";
-                                                        callback(404, error);
+                                                        callback(500, error);
 
                                                     } else {
                                                         var query = {
@@ -1028,13 +1016,13 @@ function addCvToJob(jobId, cvId, callback) {
                                                             $addToSet: {'cvs': cvId}
                                                         };
                                                         var options = {
-                                                            upsert: true,new:true
+                                                            upsert: true, new: true
                                                         };
                                                         MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err, results) {
                                                             if (err) {
                                                                 console.log("error in add cv to job " + err);
                                                                 error.error = "error in add cv to job";
-                                                                callback(404, error);
+                                                                callback(500, error);
 
                                                             } else {
                                                                 console.log("cv added to the job successfully");
@@ -1062,7 +1050,7 @@ function addCvToJob(jobId, cvId, callback) {
                             console.log("error occurred during matcher process: ", response.body);
                             callback(response.code, response.body);
                         }
-                    }else {
+                    } else {
                         errorMessage = "matcher response format is incorrect";
                         console.log(errorMessage);
                         error.error = errorMessage;
@@ -1073,33 +1061,29 @@ function addCvToJob(jobId, cvId, callback) {
     });
 
 
-
-
-
-
 }
 
 
 ///////////////////////////////////////////// *** Matcher *** ///////////////////////
 
-function saveMatcherFormula(cvId,matcherResponse, callback) {
+function saveMatcherFormula(cvId, matcherResponse, callback) {
 
-    buildMatchingDetails(matcherResponse.formula.requirements.details , function(err,matchingDetailsArray) {
+    buildMatchingDetails(matcherResponse.formula.requirements.details, function (err, matchingDetailsArray) {
 
         if (err) {
             console.log("error insert MatcherFormula to DB");
             error.error = "error insert MatcherFormula to DB";
             callback(500, error);
 
-        }else {
+        } else {
 
             var formulaToAdd = new FormulaModel({
                 locations: matcherResponse.formula.locations,
                 candidate_type: matcherResponse.formula.candidate_type,
                 scope_of_position: matcherResponse.formula.scope_of_position,
                 academy: matcherResponse.formula.academy,
-                matching_requirements:{
-                    details:matchingDetailsArray,
+                matching_requirements: {
+                    details: matchingDetailsArray,
                     grade: matcherResponse.formula.requirements.grade
                 }
             });
@@ -1115,7 +1099,7 @@ function saveMatcherFormula(cvId,matcherResponse, callback) {
                     var update = {
                         "formula": result._id
                     };
-                    var options = {new: true,upsert:true};
+                    var options = {new: true, upsert: true};
                     MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
                         if (err) {
                             console.log('error in updating formula id ' + err);
@@ -1123,7 +1107,7 @@ function saveMatcherFormula(cvId,matcherResponse, callback) {
                             callback(500, error);
                         } else {
                             console.log("matcher formula saved successfully to db")
-                            callback(200,matcherResponse);
+                            callback(200, matcherResponse);
                         }
                     });
                 }
@@ -1166,8 +1150,8 @@ function buildMatchingDetails(matchingDetails, callback) {
                 callback(err, matchingDetailsArray);
             }
         );
-    }else {
-        callback("matching details is empty or undefined",[])
+    } else {
+        callback("matching details is empty or undefined", [])
     }
 
 
@@ -1175,7 +1159,7 @@ function buildMatchingDetails(matchingDetails, callback) {
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
-function getKeyWordsBySector(sector,callback) {
+function getKeyWordsBySector(sector, callback) {
 
     var query = KeyWordsModel.find({sector: sector});
 
@@ -1184,16 +1168,16 @@ function getKeyWordsBySector(sector,callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the keywords from DB";
-            callback(500,error);
+            callback(500, error);
         } else {
 
             if (results.length > 0) {
-                console.log("the keywords extracted successfully from the db ", results);
-                callback(200,results[0].key_words);
-            }else {
+                console.log("the keywords extracted successfully from the db ");
+                callback(200, results[0].key_words);
+            } else {
                 console.log("sector not exists");
                 error.error = "sector not exists";
-                callback(404,error);
+                callback(404, error);
             }
 
 
@@ -1212,7 +1196,6 @@ exports.getMatchingObject = getMatchingObject;
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
-exports.getFavoriteCvs = getFavoriteCvs;
 
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
