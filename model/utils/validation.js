@@ -118,6 +118,14 @@ function getMatchingObject(req){
         ? true : false
 }
 
+function deleteMatchingObject(req){
+    return req.body && fieldValidation(req.body.matching_object_id)  ? true : false
+}
+
+function reviveMatchingObject(req){
+    return req.body && fieldValidation(req.body.matching_object_id)  ? true : false
+}
+
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
 
 function getJobsBySector(req){
@@ -151,6 +159,12 @@ function rateCV(req){
     && statusValidation(req.body.status) ? true : false
 }
 
+function updateRateCV(req){
+    return req.body
+    && fieldValidation(req.body.cv_id)
+    && fieldValidation(req.body.status)
+    && statusValidation(req.body.status) ? true : false
+}
 
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
@@ -197,7 +211,6 @@ function matcherResponse(response){
 
 }
 
-
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
 function getKeyWordsBySector(req){
@@ -216,15 +229,18 @@ exports.deleteUser = deleteUser;
 
 exports.addCompany = addCompany;
 exports.deleteCompany = deleteCompany;
+exports.reviveMatchingObject = reviveMatchingObject;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 
 exports.getMatchingObject = getMatchingObject;
+exports.deleteMatchingObject = deleteMatchingObject;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
 exports.rateCV = rateCV;
+exports.updateRateCV = updateRateCV;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;

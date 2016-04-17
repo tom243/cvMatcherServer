@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+//var mongoose = require('mongoose');
 var async = require("async");
 var unirest = require('unirest');
 var validation = require("./../utils/validation");
@@ -23,7 +23,6 @@ var error = {
 };
 
 ////////////////////////////////// *** Matching Objects *** ////////////////////////
-
 
 // Add Object
 function addMatchingObject(matchingObject, callback) {
@@ -136,32 +135,59 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
     });
 }
 
-
-// Delete Object
+// Delete matching object
 function deleteMatchingObject(matching_object_id, callback) {
 
-    console.log("im in deleteMatchingObject function");
-    var query = MatchingObjectsModel.findOne().where('_id', matching_object_id);
-
-    query.exec(function (err, doc) {
+    var query = {"_id":matching_object_id};
+    var update = {
+        archive: true
+    };
+    var options = {new: true};
+    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
-            console.log("error:" + err);
-            callback(false);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while delete matching object from the DB";
+            callback(500,error);
         } else {
-            var query = doc.update({$set: {archive: true}});
-            query.exec(function (err, result) {
-                if (err) {
-                    console.log("error:" + err);
-                    callback(false);
-                } else {
-                    callback(result);
-                }
-
-            });
+            if (results != null) {
+                console.log("the  matching object deleted successfully from the db " , results );
+                callback(200, results);
+            }else {
+                console.log("matching object not exists");
+                error.error = "matching object not exists";
+                callback(404,error);
+            }
         }
     });
+
 }
 
+// Revive matching object
+function reviveMatchingObject(matching_object_id, callback) {
+
+    var query = {"_id":matching_object_id};
+    var update = {
+        archive: false
+    };
+    var options = {new: true};
+    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while revive matching object";
+            callback(500,error);
+        } else {
+            if (results != null) {
+                console.log("the  matching object revived successfully" , results );
+                callback(200, results);
+            }else {
+                console.log("matching object not exists");
+                error.error = "matching object not exists";
+                callback(404,error);
+            }
+        }
+    });
+
+}
 
 // Update Object
 function updateMatchingObject(updateObject, callback) {
@@ -510,8 +536,9 @@ function rateCV(cvId, status, callback) {
                         console.log("cv rated successfully");
                         callback(200, results);
                     } else {
-                        console.log("cv not exists");
-                        error.error = "cv not exists";
+                        errorMessage = "cv not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
                         callback(404, error);
                     }
                 }
@@ -521,35 +548,51 @@ function rateCV(cvId, status, callback) {
 }
 
 // Add Status
-function updateRateCV(matching_object_id, status, callback) {
+function updateRateCV(cvId, status, callback) {
 
-    console.log("im in updateRateCV function");
-    var class_data = JSON.parse(status);
-
-    var query = {"_id": matching_object_id};
+    var query = {"_id": cvId};
     var update = {
-        "status.current_status": class_data.current_status
+        "status.current_status": status.current_status
     };
     var options = {new: true};
-    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
+    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, result) {
         if (err) {
-            console.log('error in finding cv ' + err);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to update the current status of the cv";
+            callback(500, error);
         } else {
-            console.log("doc.status.status_id " + doc);
-            var query = {"_id": doc.status.status_id};
-            var update = {
-                "rate.stars": class_data.stars,
-                "rate.description": class_data.description,
-                "rate.timestamp": Date.now()
-            };
-            var options = {new: true};
-            StatusModel.findOneAndUpdate(query, update, options, function (err, doc) {
-                if (err) {
-                    console.log('error in update rate for cv ' + err);
-                } else {
-                    callback(doc);
-                }
-            });
+
+            if (result != null) {
+                var query = {"_id": result.status.status_id};
+                var update = {
+                    "rate.stars": status.stars,
+                    "rate.description": status.description,
+                    "rate.timestamp": status.timestamp
+                };
+                var options = {new: true};
+                StatusModel.findOneAndUpdate(query, update, options, function (err, result) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to update the current status of the cv";
+                        callback(500, error);
+                    } else {
+                        if (result != null) {
+                            console.log("status of cv updated successfully");
+                            callback(200, result);
+                        }else {
+                            errorMessage = "status id not exists";
+                            console.log(errorMessage);
+                            error.error = errorMessage;
+                            callback(404, error);
+                        }
+                    }
+                });
+            }else {
+                errorMessage = "cv id not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
         }
     });
 }
@@ -1190,6 +1233,7 @@ function getKeyWordsBySector(sector, callback) {
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 exports.addMatchingObject = addMatchingObject;
 exports.deleteMatchingObject = deleteMatchingObject;
+exports.reviveMatchingObject = reviveMatchingObject;
 exports.updateMatchingObject = updateMatchingObject;
 exports.getMatchingObject = getMatchingObject;
 

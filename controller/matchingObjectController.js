@@ -10,18 +10,48 @@ var error = {
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
 //** Adding a new object **//
-function addMatchingObject(addObject, callback) {
-    matchingObjectDAO.addMatchingObject(addObject, function (result) {
-        callback(result);
-    });
+function addMatchingObject(req, res) {
+
+    console.log("in addMatchingObject");
+
+    if (validation.addMatchingObject(req)) {
+        matchingObjectDAO.addMatchingObject(req.body, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
+//** Delete an existing object **//
+function deleteMatchingObject(req, res) {
+
+    console.log("in deleteMatchingObject");
+
+    if (validation.deleteMatchingObject(req)) {
+        matchingObjectDAO.deleteMatchingObject(req.body.matching_object_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
 
 //** Delete an existing object **//
-function deleteMatchingObject(matching_object_id, callback) {
-    matchingObjectDAO.deleteMatchingObject(matching_object_id, function (result) {
-        callback(result);
-    });
+function reviveMatchingObject(req, res) {
+
+    console.log("in reviveMatchingObject");
+
+    if (validation.reviveMatchingObject(req)) {
+        matchingObjectDAO.reviveMatchingObject(req.body.matching_object_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** Update an existing object **//
@@ -89,8 +119,8 @@ function getRateCvsForJob(req, res) {
     if (validation.getRateCvsForJob(req)) {
         matchingObjectDAO.getRateCvsForJob(req.body.user_id, req.body.job_id,
             req.body.current_status, function (status, result) {
-            res.status(status).json(result);
-        });
+                res.status(status).json(result);
+            });
     } else {
         utils.sendErrorValidation(res);
     }
@@ -103,9 +133,9 @@ function rateCV(req, res) {
     console.log("in rateCV");
 
     if (validation.rateCV(req)) {
-        matchingObjectDAO.rateCV(req.body.cv_id, req.body.status ,function (status, result) {
-                res.status(status).json(result);
-            });
+        matchingObjectDAO.rateCV(req.body.cv_id, req.body.status, function (status, result) {
+            res.status(status).json(result);
+        });
     } else {
         utils.sendErrorValidation(res);
     }
@@ -113,10 +143,18 @@ function rateCV(req, res) {
 }
 
 //** update rate for specific cv  **//
-function updateRateCV(matching_object_id, status, callback) {
-    matchingObjectDAO.updateRateCV(matching_object_id, status, function (result) {
-        callback(result);
-    });
+function updateRateCV(req, res) {
+
+    console.log("in updateRateCV");
+
+    if (validation.updateRateCV(req)) {
+        matchingObjectDAO.updateRateCV(req.body.cv_id, req.body.status, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
@@ -198,7 +236,7 @@ function checkCV(req, res) {
                         if (validation.matcherResponse(response.body)) {
                             console.log("response from matcher: ", response.body);
                             res.status(response.code).json(response.body);
-                        }else {
+                        } else {
                             error.error = "error occurred during matcher process";
                             res.status(response.code).json(error);
                         }
@@ -264,6 +302,7 @@ function getKeyWordsBySector(req, res) {
 
 exports.addMatchingObject = addMatchingObject;
 exports.deleteMatchingObject = deleteMatchingObject;
+exports.reviveMatchingObject = reviveMatchingObject;
 exports.updateMatchingObject = updateMatchingObject;
 exports.getMatchingObject = getMatchingObject;
 

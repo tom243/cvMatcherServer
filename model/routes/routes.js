@@ -34,33 +34,9 @@ module.exports = function (app) {
 
 /////////////////////////////////////////////////////////////// *** Matching Objects *** //////////////////////
 
-// Add Object (Job or CV)
-    app.post('/addMatchingObject', function (req, res) {
-
-        console.log("Im in addMatchingObject post");
-        if (!req.body) return res.sendStatus(400);
-        var matchingObject = JSON.stringify(req.body);
-
-        matchingObjectController.addMatchingObject(matchingObject, function (object) {
-            res.json(object);
-        });
-    });
-
-// Delete Object (Job or CV)
-    app.post('/deleteMatchingObject', function (req, res) {
-
-        console.log("Im in deleteMatchingObject post");
-        if (!req.body) return res.sendStatus(400);
-
-        if (fieldValidation(req.body.matching_object_id)) {
-            matchingObjectController.deleteMatchingObject(req.body.matching_object_id, function (object) {
-                res.json(object);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-
-    });
+    app.post('/addMatchingObject', matchingObjectController.addMatchingObject);
+    app.post('/deleteMatchingObject',matchingObjectController.deleteMatchingObject);
+    app.post('/reviveMatchingObject',matchingObjectController.reviveMatchingObject);
 
 // Update Object (Job or CV)
     app.post('/updateMatchingObject', function (req, res) {
@@ -91,25 +67,7 @@ module.exports = function (app) {
     app.post('/employer/getUnreadCvsForJob', matchingObjectController.getUnreadCvsForJob);
     app.post('/employer/getRateCvsForJob',  matchingObjectController.getRateCvsForJob);
     app.post('/employer/rateCV', matchingObjectController.rateCV);
-
-
-    //** update rate for specific cv  **//
-    app.post('/employer/updateRateCV', function (req, res) {
-
-        console.log("Im in updateRateCV post");
-        if (!req.body) return res.sendStatus(400);
-        if (fieldValidation(req.body.matching_object_id) && fieldValidation(req.body.status)) {
-            console.log("matching_object_id" + req.body.matching_object_id);
-            console.log("status" + req.body.status);
-            var status = JSON.stringify(req.body.status);
-            matchingObjectController.updateRateCV(req.body.matching_object_id, status, function (status) {
-                res.json(status);
-            });
-        } else {
-            sendErrorFieldValidation(res);
-        }
-
-    });
+    app.post('/employer/updateRateCV',matchingObjectController.updateRateCV);
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
