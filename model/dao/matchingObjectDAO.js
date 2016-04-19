@@ -1,4 +1,3 @@
-//var mongoose = require('mongoose');
 var async = require("async");
 var unirest = require('unirest');
 var validation = require("./../utils/validation");
@@ -27,110 +26,93 @@ var error = {
 // Add Object
 function addMatchingObject(matchingObject, callback) {
 
-    console.log("im in addMatchingObject function");
-
     /* First we need to insert all embedded documents and after it insert
      matching object with all id references */
 
-    var matchingObject = JSON.parse(matchingObject);
-
     /* common to job and cv */
-    addOriginalText(matchingObject.original_text, function (original_text) {
-        if (original_text !== false) {
-
-            matchingObject.original_text = original_text._id;
+    addOriginalText(matchingObject.original_text, matchingObject.matching_object_type, function (status,originalTextResults) {
+        if (status === 200) {
+            matchingObject.original_text = originalTextResults._id;
             /* Add Requirements */
-            addRequirements(matchingObject.requirements, function (requirements) {
-                if (requirements !== false) {
-                    matchingObject.requirements = requirements;
-                    addAcademy(matchingObject.academy, function (academy) {
-                        if (academy !== false) {
-                            matchingObject.academy = academy;
-                            console.log("matchingObject.academy", matchingObject.academy);
+            addRequirements(matchingObject.requirements, function (status,requirementsResults) {
+                if (status === 200) {
+                    matchingObject.requirements = requirementsResults;
+                    addAcademy(matchingObject.academy, function (status,academyResult) {
+                        if (status === 200) {
+                            matchingObject.academy = academyResult;
                             /* start unique parameters */
                             if (matchingObject.matching_object_type === "cv") {
-
                                 /* Add Personal Properties */
                                 addPersonalProperties(matchingObject.personal_properties,
-                                    function (personal_properties) {
-                                        if (personal_properties !== false) {
-                                            matchingObject.personal_properties = personal_properties._id;
-                                            buildAndSaveMatchingObject(matchingObject, function (matchingObject) {
-                                                callback(matchingObject);
+                                    function (status,personalPropertiesResult) {
+                                        if (status === 200) {
+                                            matchingObject.personal_properties = personalPropertiesResult._id;
+                                            buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
+                                                callback(status,matchingObjectResult);
                                             })
+                                        }else {
+                                            callback(status,personalPropertiesResult);
                                         }
                                     })
                             } else { // Add Job
-
                                 /* Add Formula */
-                                addFormula(matchingObject.formula, function (formula) {
-                                    if (formula !== false) {
-                                        matchingObject.formula = formula._id;
-
-                                        buildAndSaveMatchingObject(matchingObject, function (matchingObject) {
-                                            callback(matchingObject);
+                                addFormula(matchingObject.formula, function (status, formulaResult) {
+                                    if (status === 200) {
+                                        matchingObject.formula = formulaResult._id;
+                                        buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
+                                            callback(status,matchingObjectResult);
                                         })
                                     } else {
-                                        callback(false);
+                                        callback(status,formulaResult);
                                     }
                                 })
                             }
                         } else {
-                            callback(false)
+                            callback(status,academyResult);
                         }
                     })
                 } else {
-                    callback(false);
+                    callback(status,requirementsResults);
                 }
             })
         } else {
-            callback(false);
+            callback(status,originalTextResults);
         }
     });
 }
 
 function buildAndSaveMatchingObject(matchingObject, callback) {
 
-    console.log("matchingObject", matchingObject);
-
-
-    //var class_data = JSON.parse(matchingObject);
-    class_data = matchingObject;
-
-
-    console.log("matchingObject.academy", class_data['academy']);
     var matchingObjectToAdd = new MatchingObjectsModel({
-        matching_object_type: class_data['matching_object_type'],
-        google_user_id: class_data['google_user_id'],
-        date: class_data['date'],
-        original_text: class_data['original_text'],
-        sector: class_data['sector'],
-        locations: class_data.locations,
-        candidate_type: class_data.candidate_type,
-        scope_of_position: class_data.scope_of_position,
-        academy: class_data['academy'],
-        sub_sector: class_data.sub_sector,
-        formula: class_data['formula'],
-        requirements: class_data.requirements,
-        compatibility_level: class_data['compatibility_level'],
+        matching_object_type: matchingObject['matching_object_type'],
+        date: matchingObject['date'],
+        original_text: matchingObject['original_text'],
+        sector: matchingObject['sector'],
+        locations: matchingObject.locations,
+        candidate_type: matchingObject.candidate_type,
+        scope_of_position: matchingObject.scope_of_position,
+        academy: matchingObject['academy'],
+        formula: matchingObject['formula'],
+        requirements: matchingObject.requirements,
+        compatibility_level: matchingObject['compatibility_level'],
         status: null,
-        personal_properties: class_data['personal_properties'],
+        personal_properties: matchingObject['personal_properties'],
         favorites: [],
         cvs: [],
         archive: false,
         active: true,
-        user: class_data['user']
+        user: matchingObject['user']
     });
 
     /*save the User in db*/
-    matchingObjectToAdd.save(function (err, doc) {
+    matchingObjectToAdd.save(function (err, result) {
         if (err) {
-            console.log("error in insert matching Object to DB");
-            console.log(err);
-            callback(false);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to insert matching object to the DB";
+            callback(500,error);
         } else {
-            console.log("Matching Object saved to DB: " + doc);
-            callback(doc);
+            console.log("the matching object saved successfully to the db " , result );
+            callback(200, result);
         }
     });
 }
@@ -150,7 +132,7 @@ function deleteMatchingObject(matching_object_id, callback) {
             callback(500,error);
         } else {
             if (results != null) {
-                console.log("the  matching object deleted successfully from the db " , results );
+                console.log("the matching object deleted successfully from the db " , results );
                 callback(200, results);
             }else {
                 console.log("matching object not exists");
@@ -177,7 +159,7 @@ function reviveMatchingObject(matching_object_id, callback) {
             callback(500,error);
         } else {
             if (results != null) {
-                console.log("the  matching object revived successfully" , results );
+                console.log("the matching object revived successfully" , results );
                 callback(200, results);
             }else {
                 console.log("matching object not exists");
@@ -236,9 +218,11 @@ function updateMatchingObject(updateObject, callback) {
 
 function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
 
+    var query;
+
     if (matchingObjectType === "cv") {
 
-        var query = MatchingObjectsModel.find(
+        query = MatchingObjectsModel.find(
             {_id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
         ).populate('user')
             .populate('academy')
@@ -258,7 +242,7 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
 
 
     } else {//job
-        var query = MatchingObjectsModel.find(
+        query = MatchingObjectsModel.find(
             {_id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
         ).populate('original_text')
             .populate('academy')
@@ -273,12 +257,11 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
 
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the "
-                + matchingObjectType + " from the db";
+            error.error = "something went wrong while trying to get the " + matchingObjectType + " from the db";
             callback(500, error);
         } else {
             if (results.length > 0) {
-                console.log(matchingObjectType + " extracted successfully from the db")
+                console.log(matchingObjectType + " extracted successfully from the db");
                 callback(200, results);
             } else {
                 console.log(matchingObjectType + " not exists");
@@ -293,18 +276,18 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
 
 
 // Add OriginalText
-function addOriginalText(originalText, callback) {
+function addOriginalText(originalText, type, callback) {
 
-    console.log("im in OriginalText function");
+    console.log("in OriginalText function");
     var history_data = originalText.history_timeline;
 
-    if (originalText.history_timeline.length > 0) { //cv
+    if (type === "cv") { //cv
         buildTimelineHistory(history_data, function (err, historyTimeline) {
 
             if (err) {
-                console.log("error in save originalText to db ");
-                console.log(err);
-                callback(false);
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to save history timeline to db";
+                callback(500, error);
             } else {
 
                 var originalTextToAdd = new OriginalTextModel({
@@ -317,11 +300,13 @@ function addOriginalText(originalText, callback) {
                 /* save the OriginalText to db*/
                 originalTextToAdd.save(function (err, doc) {
                     if (err) {
-                        console.log("error in save originalText to db ");
-                        console.log(err);
-                        callback(false);
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to save originalText to db";
+                        callback(500, error);
+
                     } else {
-                        callback(doc);
+                        console.log("originalText saved successfully to the db");
+                        callback(200, doc);
                     }
                 })
             }
@@ -337,23 +322,25 @@ function addOriginalText(originalText, callback) {
         /* save the OriginalText to db*/
         originalTextToAdd.save(function (err, doc) {
             if (err) {
-                console.log("error in save originalText to db ");
-                console.log(err);
-                callback(false);
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to save originalText to db";
+                callback(500, error);
             } else {
-                callback(doc);
+                console.log("originalText saved successfully to the db");
+                callback(200, doc);
             }
         })
     }
 }
 
 function buildTimelineHistory(timeline, callback) {
+
     var historyTimeLineArray = [];
 
     // 1st para in async.each() is the array of items
     async.each(timeline,
         // 2nd param is the function that each item is passed to
-        function (item, callback) {
+        function (item, callbackAsync) {
             // Call an asynchronous function, often a save() to DB
 
             var historyTimeLineToadd = new HistoryTimelineModel({
@@ -366,16 +353,16 @@ function buildTimelineHistory(timeline, callback) {
             /* save the historyTime to db*/
             historyTimeLineToadd.save(function (err, doc) {
                 if (err) {
-                    console.log("error in save originalText to db ");
-                    console.log(err);
-                    callback(false);
+                    console.log("something went wrong " + err);
+                    errorMessage = "something went wrong while trying to save timeline history to db";
+                    return callbackAsync(new Error(errorMessage));
                 } else {
                     historyTimeLineArray.push(doc._id);
-                    callback();
+                    callbackAsync();
                 }
             })
         },
-        // 3rd param is the function to call when everything's done
+        // 3rd param is the function to call when everything is done
         function (err) {
             // All tasks are done now
             callback(err, historyTimeLineArray);
@@ -387,20 +374,23 @@ function buildTimelineHistory(timeline, callback) {
 
 function addAcademy(academy, callback) {
 
-    var academyToadd = new AcademyModel({
+    console.log("in addAcademy");
+
+    var academyToAdd = new AcademyModel({
         academy_type: academy.academy_type,
         degree_name: academy.degree_name,
         degree_type: academy.degree_type
     });
 
     /* save the academy to db*/
-    academyToadd.save(function (err, doc) {
+    academyToAdd.save(function (err, doc) {
         if (err) {
-            console.log("error in save academy to db ");
-            console.log(err);
-            callback(false);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to save academy";
+            callback(500, error);
         } else {
-            callback(doc._id);
+            console.log("academy saved successfully");
+            callback(200,doc._id);
         }
     })
 }
@@ -410,50 +400,55 @@ function addAcademy(academy, callback) {
 // Add Requirements
 function addRequirements(requirements, callback) {
 
-    console.log("im in Requirements function");
+    console.log("in addRequirements function");
 
     var requirementsArr = [];
 
     // 1st para in async.each() is the array of items
     async.each(requirements,
         // 2nd param is the function that each item is passed to
-        function (item, callback) {
+        function (item, callbackAsync) {
             // Call an asynchronous function, often a save() to DB
 
             buildProfessionalKnowledge(item.combination, function (err, professionalKnowledgeArr) {
                 if (err) {
-                    console.log("error in save requirements combination to db ");
-                    console.log(err);
-                    callback(false);
+                    console.log("something went wrong " + err);
+                    errorMessage = "something went wrong while trying to save professional knowledge to db";
+                    return callbackAsync(new Error(errorMessage));
+
                 } else {
-                    var combinationToadd = new RequirementsModel({
+                    var combinationToAdd = new RequirementsModel({
                         combination: professionalKnowledgeArr
                     });
 
                     /* save the  the requirements combination to db*/
-                    combinationToadd.save(function (err, doc) {
+                    combinationToAdd.save(function (err, doc) {
                         if (err) {
-                            console.log("error in save requirements combination to db ");
-                            console.log(err);
-                            callback(false);
+                            console.log("something went wrong " + err);
+                            errorMessage = "something went wrong while trying to save " +
+                                "combination of requirements to db";
+                            return callbackAsync(new Error(errorMessage));
+
                         } else {
                             requirementsArr.push(doc._id);
-                            callback();
+                            callbackAsync();
                         }
                     })
                 }
             })
         },
-        // 3rd param is the function to call when everything's done
+        // 3rd param is the function to call when everything is done
         function (err) {
             // All tasks are done now
             if (err) {
-                console.log("error in save requirements combination to db ");
-                console.log(err);
-                callback(false);
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to save requirements to db";
+                callback(500, error);
             } else {
-                callback(requirementsArr);
+                console.log("Requirements saved successfully to the db");
+                callback(200, requirementsArr);
             }
+
         }
     );
 }
@@ -465,7 +460,7 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
     // 1st para in async.each() is the array of items
     async.each(professionalKnowledges,
         // 2nd param is the function that each item is passed to
-        function (item, callback) {
+        function (item, callbackAsync) {
             // Call an asynchronous function, often a save() to DB
 
             var professionalKnowledgeToadd = new ProfessionalKnowledgeModel({
@@ -478,15 +473,16 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
             /* save the professionalKnowledge to db*/
             professionalKnowledgeToadd.save(function (err, doc) {
                 if (err) {
-                    console.log("error in save professionalKnowledge to db " + err);
-                    callback(false);
+                    console.log("something went wrong " + err);
+                    errorMessage = "something went wrong while trying to save professionalKnowledge to db to db";
+                    return callbackAsync(new Error(errorMessage));
                 } else {
                     professionalKnowledgeArr.push(doc._id);
-                    callback();
+                    callbackAsync();
                 }
             })
         },
-        // 3rd param is the function to call when everything's done
+        // 3rd param is the function to call when everything is done
         function (err) {
             // All tasks are done now
             callback(err, professionalKnowledgeArr);
@@ -602,30 +598,30 @@ function updateRateCV(cvId, status, callback) {
 // Add Status
 function addPersonalProperties(personalProperties, callback) {
 
-    console.log("im in personalProperties function");
+    console.log("in addPersonalProperties function");
 
-    var class_data = personalProperties;
     var personalPropertiesToAdd = new PersonalPropertiesModel({
-        university_degree: class_data['university_degree'],
-        degree_graduation_with_honors: class_data['degree_graduation_with_honors'],
-        above_two_years_experience: class_data['above_two_years_experience'],
-        psychometric_above_680: class_data['psychometric_above_680'],
-        multilingual: class_data['multilingual'],
-        volunteering: class_data['volunteering'],
-        full_army_service: class_data['full_army_service'],
-        officer: class_data['officer'],
-        high_school_graduation_with_honors: class_data['high_school_graduation_with_honors'],
-        youth_movements: class_data['youth_movements']
+        university_degree: personalProperties.university_degree,
+        degree_graduation_with_honors: personalProperties.degree_graduation_with_honors,
+        above_two_years_experience: personalProperties.above_two_years_experience,
+        psychometric_above_680: personalProperties.psychometric_above_680,
+        multilingual: personalProperties.multilingual,
+        volunteering: personalProperties.volunteering,
+        full_army_service: personalProperties.full_army_service,
+        officer: personalProperties.officer,
+        high_school_graduation_with_honors: personalProperties.high_school_graduation_with_honors,
+        youth_movements: personalProperties.youth_movements
     });
 
     /* save the Personal Properties to db*/
     personalPropertiesToAdd.save(function (err, doc) {
         if (err) {
-            console.log("error in save Personal Properties to db ");
-            callback(false);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to save personal properties";
+            callback(500, error);
         } else {
-            console.log("Personal Properties saved to DB");
-            callback(doc);
+            console.log("personal properties saved successfully to db");
+            callback(200, doc);
         }
     });
 
@@ -637,26 +633,26 @@ function addPersonalProperties(personalProperties, callback) {
 // Add Formula
 function addFormula(formula, callback) {
 
-    console.log("im in addFormula function");
+    console.log("in addFormula function");
 
-    var class_data = formula;
     var formulaToAdd = new FormulaModel({
-        locations: class_data['locations'],
-        candidate_type: class_data['candidate_type'],
-        scope_of_position: class_data['scope_of_position'],
-        academy: class_data['academy'],
-        requirements: class_data['requirements']
+        locations: formula.locations,
+        candidate_type: formula.candidate_type,
+        scope_of_position: formula.scope_of_position,
+        academy: formula.academy,
+        requirements: formula.requirements
     });
 
 
     /*save the Formula in db*/
     formulaToAdd.save(function (err, doc) {
         if (err) {
-            console.log("error insert formula to DB");
-            callback(false);
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to save formula";
+            callback(500, error);
         } else {
-            console.log("formula saved to DB");
-            callback(doc);
+            console.log("formula saved successfully to db");
+            callback(200, doc);
         }
     });
 
@@ -665,15 +661,14 @@ function addFormula(formula, callback) {
 // Update Formula
 function updateFormula(updateFormula, callback) {
 
-    console.log("im in updateFormula function");
+    console.log("in updateFormula function");
 
-    var class_data = JSON.parse(updateFormula);
     var formulaToUpdate = new FormulaModel({
-        locations: class_data['locations'],
-        candidate_type: class_data['candidate_type'],
-        scope_of_position: class_data['scope_of_position'],
-        academy: class_data['academy'],
-        requirements: class_data['requirements']
+        locations: updateFormula.locations,
+        candidate_type: updateFormula.candidate_type,
+        scope_of_position: updateFormula.scope_of_position,
+        academy: updateFormula.academy,
+        requirements: updateFormula.requirements
     });
 
 
@@ -686,7 +681,7 @@ function updateFormula(updateFormula, callback) {
                 locations: formulaToUpdate.locations,
                 candidate_type: formulaToUpdate.candidate_type,
                 scope_of_position: formulaToUpdate.scope_of_position,
-                academy: newtable.formulaToAdd,
+                academy: formulaToUpdate.academy,
                 requirements: formulaToUpdate.requirements
             }
         });
@@ -769,7 +764,7 @@ function getUnreadCvsForJob(userId, jobId, callback) {
                     callback(200, results[0].cvs);
                 }
             } else {
-                errorMessage = "job not exists"
+                errorMessage = "job not exists";
                 console.log(errorMessage);
                 error.error = errorMessage;
                 callback(404, error);
@@ -822,7 +817,7 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
                     callback(200, results[0].cvs);
                 }
             } else {
-                errorMessage = "job not exists"
+                errorMessage = "job not exists";
                 console.log(errorMessage);
                 error.error = errorMessage;
                 callback(404, error);
@@ -1028,13 +1023,12 @@ function addCvToJob(jobId, cvId, callback) {
                                             compatibility_level: response.body.total_grade
                                         };
                                         var options = {new: true, upsert: true};
-                                        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, doc) {
+                                        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err) {
                                             if (err) {
                                                 console.log('error in updating data for cv ' + err);
                                                 error.error = "error in updating data for cv";
                                                 callback(500, error);
                                             } else {
-
 
                                                 var query = {
                                                     '_id': CvResults[0].user
@@ -1061,7 +1055,7 @@ function addCvToJob(jobId, cvId, callback) {
                                                         var options = {
                                                             upsert: true, new: true
                                                         };
-                                                        MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err, results) {
+                                                        MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err) {
                                                             if (err) {
                                                                 console.log("error in add cv to job " + err);
                                                                 error.error = "error in add cv to job";
@@ -1143,13 +1137,13 @@ function saveMatcherFormula(cvId, matcherResponse, callback) {
                         "formula": result._id
                     };
                     var options = {new: true, upsert: true};
-                    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+                    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err) {
                         if (err) {
                             console.log('error in updating formula id ' + err);
                             error.error = "error in updating formula id to the cv";
                             callback(500, error);
                         } else {
-                            console.log("matcher formula saved successfully to db")
+                            console.log("matcher formula saved successfully to db");
                             callback(200, matcherResponse);
                         }
                     });
@@ -1187,7 +1181,7 @@ function buildMatchingDetails(matchingDetails, callback) {
                     }
                 })
             },
-            // 3rd param is the function to call when everything's done
+            // 3rd param is the function to call when everything is done
             function (err) {
                 // All tasks are done now
                 callback(err, matchingDetailsArray);

@@ -1,5 +1,3 @@
-var mongoose = require('mongoose');
-
 var UserModel = require('./../schemas/schemas').UserModel;
 var CompanyModel = require('./../schemas/schemas').CompanyModel;
 
@@ -206,7 +204,7 @@ function addCompany(addCompany, callback) {
                                 error.error = "something went wrong while trying to assign the company to the user in db";
                                 callback(500, error);
                             } else {
-                                console.log("the company added successfully to the db" , result)
+                                console.log("the company added successfully to the db" , result);
                                 callback(200, result);
                             }
                         });

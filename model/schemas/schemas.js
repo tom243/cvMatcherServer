@@ -96,11 +96,6 @@ var matchingObjectsSchema = new matching_objects_schema({
         required: true,
         index: 1
     },
-    google_user_id:{
-        type:String,
-        required:true,
-        index : 1
-    },
     date: {
         type: Date,
         required: true
@@ -115,7 +110,6 @@ var matchingObjectsSchema = new matching_objects_schema({
     candidate_type:[String],
     scope_of_position:[String],
     academy: { type: Schema.Types.ObjectId, ref: 'AcademyModel' },
-    sub_sector: [String],
     formula: { type: Schema.Types.ObjectId, ref: 'FormulaModel' },
     requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
     compatibility_level: Number,
