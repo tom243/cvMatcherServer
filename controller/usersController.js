@@ -142,7 +142,10 @@ function getLogoImages(req, res) {
     var imagesResponse = [];
     Bing.images(req.body.word + " logo" ,
         {
-            top: 10  // Number of results (max 50)
+            top: 10,  // Number of results (max 50)
+            imageFilters: {
+                size: 'small'
+            }
         }
         , function(err, response, body){
             if (err) {
