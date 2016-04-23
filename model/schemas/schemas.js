@@ -265,7 +265,6 @@ var AcademySchema = new academy_schema({
 
 }, {collection: 'Academy'});
 
-
 // ProfessionalKnowledgeSchema Schema
 var ProfessionalKnowledgeSchema = new professional_knowledge_schema({
     name: {
@@ -297,7 +296,6 @@ var KeyWordsSchema = key_words_schema({
     sector: String,
     key_words: [String]
 }, {collection: 'Key_Words'});
-
 
 var UserModel                   = mongoose.model('UserModel', usersSchema);
 var StatusModel                 = mongoose.model('StatusModel',statusSchema);

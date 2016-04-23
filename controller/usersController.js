@@ -1,6 +1,7 @@
 var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
+var Bing = require('node-bing-api')({ accKey: "701evtSNrrgXAfrchGXi6McRJ5U/23ga7WW2qANZgIk" });
 
 //////////////////////////////////// *** Users *** /////////////////////////////////////
 
@@ -137,6 +138,26 @@ function getCompany(req, res) {
 
 }
 
+function getLogoImages(req, res) {
+    var imagesResponse = [];
+    Bing.images(req.body.word + " logo" ,
+        {
+            top: 10  // Number of results (max 50)
+        }
+        , function(err, response, body){
+            if (err) {
+                console.log("something went wrong while trying to search the logo " + err);
+                res.status(500).json("something went wrong while trying to search the logo");
+            }else {
+                for (var i=0; i < body.d.results.length ; i++) {
+                    imagesResponse.push(body.d.results[i].MediaUrl);
+                }
+                res.status(200).json(imagesResponse);
+            }
+
+        });
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addUser     = addUser;
@@ -149,6 +170,7 @@ exports.addCompany      = addCompany;
 exports.deleteCompany   = deleteCompany;
 exports.updateCompany   = updateCompany;
 exports.getCompany      = getCompany;
+exports.getLogoImages = getLogoImages;
 
 
 

@@ -55,10 +55,18 @@ function reviveMatchingObject(req, res) {
 }
 
 //** Update an existing object **//
-function updateMatchingObject(updateObject, callback) {
-    matchingObjectDAO.updateMatchingObject(updateObject, function (result) {
-        callback(result);
-    });
+function updateMatchingObject(req, res) {
+
+    console.log("in updateMatchingObject");
+
+    if (validation.updateMatchingObject(req)) {
+        matchingObjectDAO.updateMatchingObject(req.body, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 //** get Matching Object  **//

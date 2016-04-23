@@ -84,24 +84,24 @@ function addMatchingObject(matchingObject, callback) {
 function buildAndSaveMatchingObject(matchingObject, callback) {
 
     var matchingObjectToAdd = new MatchingObjectsModel({
-        matching_object_type: matchingObject['matching_object_type'],
-        date: matchingObject['date'],
-        original_text: matchingObject['original_text'],
-        sector: matchingObject['sector'],
+        matching_object_type: matchingObject.matching_object_type,
+        date: matchingObject.date,
+        original_text: matchingObject.original_text,
+        sector: matchingObject.sector,
         locations: matchingObject.locations,
         candidate_type: matchingObject.candidate_type,
         scope_of_position: matchingObject.scope_of_position,
-        academy: matchingObject['academy'],
-        formula: matchingObject['formula'],
+        academy: matchingObject.academy,
+        formula: matchingObject.formula,
         requirements: matchingObject.requirements,
-        compatibility_level: matchingObject['compatibility_level'],
+        compatibility_level: matchingObject.compatibility_level,
         status: null,
-        personal_properties: matchingObject['personal_properties'],
+        personal_properties: matchingObject.personal_properties,
         favorites: [],
         cvs: [],
         archive: false,
         active: true,
-        user: matchingObject['user']
+        user: matchingObject.user
     });
 
     /*save the User in db*/
@@ -172,46 +172,59 @@ function reviveMatchingObject(matching_object_id, callback) {
 }
 
 // Update Object
-function updateMatchingObject(updateObject, callback) {
+function updateMatchingObject(matchingObject, callback) {
 
     console.log("im in updateMatchingObject function");
 
-    var class_data = JSON.parse(updateObject);
-    var matchingObjectToUpdate = new MatchingObjectsModel({
-        sector: class_data['sector'],
-        locations: class_data['locations'],
-        candidate_type: class_data['candidate_type'],
-        scope_of_position: class_data['scope_of_position'],
-        sub_sector: class_data['sub_sector'],
-        compatibility_level: class_data['compatibility_level']
-    });
-
-
-    var query = MatchingObjectsModel.findOne().where('_id', matchingObjectToUpdate._id);
-
-    query.exec(function (err, doc) {
-
-        var query = doc.update({
-            $set: {
-                sector: matchingObjectToUpdate.sector,
-                locations: matchingObjectToUpdate.locations,
-                candidate_type: matchingObjectToUpdate.candidate_type,
-                scope_of_position: matchingObjectToUpdate.scope_of_position,
-                sub_sector: matchingObjectToUpdate.sub_sector,
-                compatibility_level: matchingObjectToUpdate.compatibility_level
-            }
-        });
-
-        query.exec(function (err, result) {
-
-            if (err) {
-                console.log("error: " + err);
-                callback(false);
-            } else {
-                callback(result);
-            }
-
-        });
+    /* common to job and cv */
+    updateOriginalText(matchingObject.original_text, matchingObject.matching_object_type, function (status,originalTextResults) {
+        if (status === 200) {
+            matchingObject.original_text = originalTextResults._id;
+            /* Add Requirements */
+            addRequirements(matchingObject.requirements, function (status,requirementsResults) {
+                if (status === 200) {
+                    matchingObject.requirements = requirementsResults;
+                    addAcademy(matchingObject.academy, function (status,academyResult) {
+                        if (status === 200) {
+                            matchingObject.academy = academyResult;
+                            /* start unique parameters */
+                            if (matchingObject.matching_object_type === "cv") {
+                                /* Add Personal Properties */
+                                addPersonalProperties(matchingObject.personal_properties,
+                                    function (status,personalPropertiesResult) {
+                                        if (status === 200) {
+                                            matchingObject.personal_properties = personalPropertiesResult._id;
+                                            buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
+                                                callback(status,matchingObjectResult);
+                                            })
+                                        }else {
+                                            callback(status,personalPropertiesResult);
+                                        }
+                                    })
+                            } else { // Add Job
+                                /* Add Formula */
+                                addFormula(matchingObject.formula, function (status, formulaResult) {
+                                    if (status === 200) {
+                                        matchingObject.formula = formulaResult._id;
+                                        buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
+                                            callback(status,matchingObjectResult);
+                                        })
+                                    } else {
+                                        callback(status,formulaResult);
+                                    }
+                                })
+                            }
+                        } else {
+                            callback(status,academyResult);
+                        }
+                    })
+                } else {
+                    callback(status,requirementsResults);
+                }
+            })
+        } else {
+            callback(status,originalTextResults);
+        }
     });
 
 }
@@ -278,7 +291,7 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
 // Add OriginalText
 function addOriginalText(originalText, type, callback) {
 
-    console.log("in OriginalText function");
+    console.log("in addOriginalText function");
     var history_data = originalText.history_timeline;
 
     if (type === "cv") { //cv
@@ -313,9 +326,9 @@ function addOriginalText(originalText, type, callback) {
         })
     } else { // job
         var originalTextToAdd = new OriginalTextModel({
-            title: originalText['title'],
-            description: originalText['description'],
-            requirements: originalText['requirements'],
+            title: originalText.title,
+            description: originalText.description,
+            requirements: originalText.requirements,
             history_timeline: []
         });
 
@@ -369,6 +382,76 @@ function buildTimelineHistory(timeline, callback) {
         }
     );
 }
+
+/* update original text */
+function  updateOriginalText(originalText, type, callback ) {
+
+    console.log("in updateOriginalText function");
+    //var history_data = originalText.history_timeline;
+    var history_data = [];
+
+    if (type === "cv") { //cv
+
+        for (var i=0; i < originalText.history_timeline.length ; i++ ) {
+            history_data.push(originalText.history_timeline[i]._id)
+        }
+
+
+
+
+
+        buildTimelineHistory(history_data, function (err, historyTimeline) {
+
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to save history timeline to db";
+                callback(500, error);
+            } else {
+
+                var originalTextToAdd = new OriginalTextModel({
+                    title: null,
+                    description: null,
+                    requirements: null,
+                    history_timeline: historyTimeline
+                });
+
+                /* save the OriginalText to db*/
+                originalTextToAdd.save(function (err, doc) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to save originalText to db";
+                        callback(500, error);
+
+                    } else {
+                        console.log("originalText saved successfully to the db");
+                        callback(200, doc);
+                    }
+                })
+            }
+        })
+    } else { // job
+        var originalTextToAdd = new OriginalTextModel({
+            title: originalText['title'],
+            description: originalText['description'],
+            requirements: originalText['requirements'],
+            history_timeline: []
+        });
+
+        /* save the OriginalText to db*/
+        originalTextToAdd.save(function (err, doc) {
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to save originalText to db";
+                callback(500, error);
+            } else {
+                console.log("originalText saved successfully to the db");
+                callback(200, doc);
+            }
+        })
+    }
+
+}
+
 
 /////////////////////////////////////// ***  Academy  *** /////////////////////////////
 

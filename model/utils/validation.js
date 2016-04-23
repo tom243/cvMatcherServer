@@ -16,6 +16,44 @@ function validatePositiveNumber(number) {
     return /^[1-9][0-9]?$|^100$|^0$/.test(number);
 }
 
+function validatePersonalId( id ) {
+    var multiply, digit, sum, numeric;
+
+    // Numeric only
+    if ( !/^\d{1,9}$/g.test( id ) ) {
+        return false;
+    }
+
+    // Save original value and length (without leading 0s)
+    numeric = parseInt( id, 10 );
+
+    if(numeric === 0){
+        return false;
+    }
+
+    // Perform safety digit check
+    for (multiply = false, sum = 0; numeric > 0; multiply = !multiply) {
+        digit = numeric % 10;
+        numeric = parseInt( ( numeric / 10 ), 10 );
+        if ( digit !== 0 ) {
+            if ( multiply ) {
+                digit *= 2;
+                if ( digit > 9 ) {
+                    digit = ( 1 /*The first digit will be 1 at most*/ + ( digit % 10 ) );
+                }
+            }
+            sum += digit;
+        }
+    }
+
+    return ( sum % 10 === 0 );
+}
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
 /* End common */
 
 /* Private functions for matcher */
@@ -268,7 +306,7 @@ function addUser(req) {
     && fieldValidation(req.body.google_user_id)
     && fieldValidation(req.body.first_name)
     && fieldValidation(req.body.last_name)
-    && fieldValidation(req.body.email) ? true : false
+    && (fieldValidation(req.body.email) && validateEmail(req.body.email)) ? true : false
 }
 
 function deleteUser(req) {
@@ -278,12 +316,12 @@ function deleteUser(req) {
 function updateUser(req) {
     return req.body
     && fieldValidation(req.body._id)
-    && fieldValidation(req.body.personal_id)
+    && (fieldValidation(req.body.personal_id) && validatePersonalId(req.body.personal_id))
     && fieldValidation(req.body.first_name)
     && fieldValidation(req.body.last_name)
     && fieldValidation(req.body.birth_date)
     && fieldValidation(req.body.address)
-    && fieldValidation(req.body.email)
+    && (fieldValidation(req.body.email) && validateEmail(req.body.email))
     && fieldValidation(req.body.phone_number)
     && fieldValidation(req.body.linkedin) ? true : false
 }
@@ -374,6 +412,11 @@ function deleteMatchingObject(req) {
 function reviveMatchingObject(req) {
     return req.body && fieldValidation(req.body.matching_object_id) ? true : false
 }
+
+function updateMatchingObject(req) {
+    return true;
+}
+
 
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
 
@@ -485,6 +528,7 @@ exports.addMatchingObject = addMatchingObject;
 exports.getMatchingObject = getMatchingObject;
 exports.deleteMatchingObject = deleteMatchingObject;
 exports.reviveMatchingObject = reviveMatchingObject;
+exports.updateMatchingObject = updateMatchingObject;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
