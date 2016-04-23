@@ -384,7 +384,7 @@ function buildTimelineHistory(timeline, callback) {
 }
 
 /* update original text */
-function  updateOriginalText(originalText, type, callback ) {
+function  updateOriginalText(originalText, type, originalTextCallback ) {
 
     console.log("in updateOriginalText function");
     //var history_data = originalText.history_timeline;
@@ -396,7 +396,44 @@ function  updateOriginalText(originalText, type, callback ) {
             history_data.push(originalText.history_timeline[i]._id)
         }
 
+        async.parallel({
+            historyTimeLineDocsDelete: function(callback) {
+                HistoryTimelineModel.remove({ _id: { $in: history_data } }, function (err) {
+                    if (err) return callback("Error while deleting " + err);
+                    callback(null, "Some useful message here...");
+                });
+            },
+            historyTimeLineDelete: function(callback) {
+                var query = {"_id": originalText._id};
+                var update = {
+                    history_timeline: []
+                };
+                var options = {new: true,upsert:true};
+                OriginalTextModel.findOneAndUpdate(query, update, options, function (err, results) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to update original text";
+                        callback(500, error);
+                    } else {
+                        if (results != null) {
+                            console.log("Original Text updated successfully");
+                            callback(200, results);
+                        } else {
+                            errorMessage = "Original Text id not exists";
+                            console.log(errorMessage);
+                            error.error = errorMessage;
+                            callback(404, error);
+                        }
+                    }
+                });
+            }
+        }, function(status, results) {
+            if (status === 200) {
 
+            }else {
+                originalTextCallback(status, results);
+            }
+        });
 
 
 
@@ -938,7 +975,11 @@ function getAllJobsBySector(userId, sector, callback) {
                         archive: false
                     }
                 ).populate('original_text')
-                    .populate('academy');
+                    .populate('academy')
+                    .populate({
+                        path: 'user',
+                        populate: {path: 'company'}
+                    });
 
                 query.exec(function (err, results) {
 

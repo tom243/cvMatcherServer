@@ -40,7 +40,7 @@ var usersSchema = new users_schema({
     },
     birth_date: String,
     address: String,
-    company: Schema.Types.ObjectId,
+    company: { type: Schema.Types.ObjectId, ref: 'CompanyModel' },
     phone_number: String,
     linkedin: String,
     favorites: [String],
