@@ -30,28 +30,28 @@ function addMatchingObject(matchingObject, callback) {
      matching object with all id references */
 
     /* common to job and cv */
-    addOriginalText(matchingObject.original_text, matchingObject.matching_object_type, function (status,originalTextResults) {
+    addOriginalText(matchingObject.original_text, matchingObject.matching_object_type, function (status, originalTextResults) {
         if (status === 200) {
             matchingObject.original_text = originalTextResults._id;
             /* Add Requirements */
-            addRequirements(matchingObject.requirements, function (status,requirementsResults) {
+            addRequirements(matchingObject.requirements, function (status, requirementsResults) {
                 if (status === 200) {
                     matchingObject.requirements = requirementsResults;
-                    addAcademy(matchingObject.academy, function (status,academyResult) {
+                    addAcademy(matchingObject.academy, function (status, academyResult) {
                         if (status === 200) {
                             matchingObject.academy = academyResult;
                             /* start unique parameters */
                             if (matchingObject.matching_object_type === "cv") {
                                 /* Add Personal Properties */
                                 addPersonalProperties(matchingObject.personal_properties,
-                                    function (status,personalPropertiesResult) {
+                                    function (status, personalPropertiesResult) {
                                         if (status === 200) {
                                             matchingObject.personal_properties = personalPropertiesResult._id;
-                                            buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
-                                                callback(status,matchingObjectResult);
+                                            buildAndSaveMatchingObject(matchingObject, function (status, matchingObjectResult) {
+                                                callback(status, matchingObjectResult);
                                             })
-                                        }else {
-                                            callback(status,personalPropertiesResult);
+                                        } else {
+                                            callback(status, personalPropertiesResult);
                                         }
                                     })
                             } else { // Add Job
@@ -59,24 +59,24 @@ function addMatchingObject(matchingObject, callback) {
                                 addFormula(matchingObject.formula, function (status, formulaResult) {
                                     if (status === 200) {
                                         matchingObject.formula = formulaResult._id;
-                                        buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
-                                            callback(status,matchingObjectResult);
+                                        buildAndSaveMatchingObject(matchingObject, function (status, matchingObjectResult) {
+                                            callback(status, matchingObjectResult);
                                         })
                                     } else {
-                                        callback(status,formulaResult);
+                                        callback(status, formulaResult);
                                     }
                                 })
                             }
                         } else {
-                            callback(status,academyResult);
+                            callback(status, academyResult);
                         }
                     })
                 } else {
-                    callback(status,requirementsResults);
+                    callback(status, requirementsResults);
                 }
             })
         } else {
-            callback(status,originalTextResults);
+            callback(status, originalTextResults);
         }
     });
 }
@@ -109,9 +109,9 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to insert matching object to the DB";
-            callback(500,error);
+            callback(500, error);
         } else {
-            console.log("the matching object saved successfully to the db " , result );
+            console.log("the matching object saved successfully to the db ", result);
             callback(200, result);
         }
     });
@@ -120,7 +120,7 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
 // Delete matching object
 function deleteMatchingObject(matching_object_id, callback) {
 
-    var query = {"_id":matching_object_id};
+    var query = {"_id": matching_object_id};
     var update = {
         archive: true
     };
@@ -129,15 +129,15 @@ function deleteMatchingObject(matching_object_id, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while delete matching object from the DB";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results != null) {
-                console.log("the matching object deleted successfully from the db " , results );
+                console.log("the matching object deleted successfully from the db ", results);
                 callback(200, results);
-            }else {
+            } else {
                 console.log("matching object not exists");
                 error.error = "matching object not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -147,7 +147,7 @@ function deleteMatchingObject(matching_object_id, callback) {
 // Revive matching object
 function reviveMatchingObject(matching_object_id, callback) {
 
-    var query = {"_id":matching_object_id};
+    var query = {"_id": matching_object_id};
     var update = {
         archive: false
     };
@@ -156,15 +156,15 @@ function reviveMatchingObject(matching_object_id, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while revive matching object";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results != null) {
-                console.log("the matching object revived successfully" , results );
+                console.log("the matching object revived successfully", results);
                 callback(200, results);
-            }else {
+            } else {
                 console.log("matching object not exists");
                 error.error = "matching object not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -174,56 +174,74 @@ function reviveMatchingObject(matching_object_id, callback) {
 // Update Object
 function updateMatchingObject(matchingObject, callback) {
 
-    console.log("im in updateMatchingObject function");
+    var parallelArr = [];
 
-    /* common to job and cv */
-    updateOriginalText(matchingObject.original_text, matchingObject.matching_object_type, function (status,originalTextResults) {
-        if (status === 200) {
-            matchingObject.original_text = originalTextResults._id;
-            /* Add Requirements */
-            addRequirements(matchingObject.requirements, function (status,requirementsResults) {
-                if (status === 200) {
-                    matchingObject.requirements = requirementsResults;
-                    addAcademy(matchingObject.academy, function (status,academyResult) {
-                        if (status === 200) {
-                            matchingObject.academy = academyResult;
-                            /* start unique parameters */
-                            if (matchingObject.matching_object_type === "cv") {
-                                /* Add Personal Properties */
-                                addPersonalProperties(matchingObject.personal_properties,
-                                    function (status,personalPropertiesResult) {
-                                        if (status === 200) {
-                                            matchingObject.personal_properties = personalPropertiesResult._id;
-                                            buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
-                                                callback(status,matchingObjectResult);
-                                            })
-                                        }else {
-                                            callback(status,personalPropertiesResult);
-                                        }
-                                    })
-                            } else { // Add Job
-                                /* Add Formula */
-                                addFormula(matchingObject.formula, function (status, formulaResult) {
-                                    if (status === 200) {
-                                        matchingObject.formula = formulaResult._id;
-                                        buildAndSaveMatchingObject(matchingObject, function (status,matchingObjectResult) {
-                                            callback(status,matchingObjectResult);
-                                        })
-                                    } else {
-                                        callback(status,formulaResult);
-                                    }
-                                })
-                            }
-                        } else {
-                            callback(status,academyResult);
-                        }
-                    })
+    if (matchingObject.matching_object_type === "cv") {
+        parallelArr = [
+            async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
+            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
+            async.apply(updateAcademy, matchingObject.academy),
+            async.apply(updatePersonalProperties, matchingObject.personal_properties)
+        ]
+    }else { //job
+        parallelArr = [
+            async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
+            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
+            async.apply(updateAcademy, matchingObject.academy),
+            async.apply(updateFormula, matchingObject.formula)
+        ]
+    }
+
+    async.parallel(parallelArr, function (status, results) {
+
+        console.log("updateMatchingObject results ", results);
+
+        if (status === null) {
+
+            var query = {"_id": matchingObject._id};
+
+            var update;
+
+            if (matchingObject.matching_object_type === "cv") {
+                update = {
+                    requirements: results[1],
+                    sector: matchingObject.sector,
+                    scope_of_position: matchingObject.scope_of_position,
+                    candidate_type: matchingObject.candidate_type,
+                    locations: matchingObject.locations
+                };
+            } else { // job
+                update = {
+                    requirements: results[1],
+                    sector: matchingObject.sector,
+                    compatibility_level: matchingObject.compatibility_level,
+                    scope_of_position: matchingObject.scope_of_position,
+                    candidate_type: matchingObject.candidate_type,
+                    locations: matchingObject.locations
+                };
+            }
+
+            var options = {new: true};
+            MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to update " + matchingObject.matching_object_type;
+                    callback(500, error);
                 } else {
-                    callback(status,requirementsResults);
+                    if (results != null) {
+                        console.log(matchingObject.matching_object_type + " updated successfully");
+                        callback(200, results);
+                    } else {
+                        errorMessage = matchingObject.matching_object_type + " not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(404, error);
+                    }
                 }
-            })
+            });
         } else {
-            callback(status,originalTextResults);
+            error.error = "something went wrong while trying to update " + matchingObject.matching_object_type;
+            callback(status, error);
         }
     });
 
@@ -384,107 +402,133 @@ function buildTimelineHistory(timeline, callback) {
 }
 
 /* update original text */
-function  updateOriginalText(originalText, type, originalTextCallback ) {
+function updateOriginalText(originalText, type, originalTextCallback) {
 
     console.log("in updateOriginalText function");
-    //var history_data = originalText.history_timeline;
-    var history_data = [];
 
     if (type === "cv") { //cv
 
-        for (var i=0; i < originalText.history_timeline.length ; i++ ) {
-            history_data.push(originalText.history_timeline[i]._id)
+        function getHistoryTimeline(callback) {
+
+            console.log("in getHistoryTimeline function");
+
+            var query = OriginalTextModel.find(
+                {_id: originalText._id}, {history_timeline: 1}
+            );
+
+            query.exec(function (err, results) {
+
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to get the user from the db";
+                    callback(500, error);
+                } else {
+                    if (results.length > 0) {
+                        console.log("the history timeline jobs extracted successfully from the db");
+                        callback(null, results[0].history_timeline);
+                    } else {
+                        errorMessage = "original text not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(404, error);
+                    }
+                }
+            });
+
         }
 
-        async.parallel({
-            historyTimeLineDocsDelete: function(callback) {
-                HistoryTimelineModel.remove({ _id: { $in: history_data } }, function (err) {
-                    if (err) return callback("Error while deleting " + err);
-                    callback(null, "Some useful message here...");
-                });
-            },
-            historyTimeLineDelete: function(callback) {
-                var query = {"_id": originalText._id};
-                var update = {
-                    history_timeline: []
-                };
-                var options = {new: true,upsert:true};
-                OriginalTextModel.findOneAndUpdate(query, update, options, function (err, results) {
-                    if (err) {
-                        console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to update original text";
-                        callback(500, error);
-                    } else {
-                        if (results != null) {
-                            console.log("Original Text updated successfully");
-                            callback(200, results);
+        function deleteHistoryTimeLineDocs(history_timeline, callback) {
+
+            console.log("in deleteHistoryTimeLineDocs function");
+
+            HistoryTimelineModel.remove({_id: {$in: history_timeline}}, function (err) {
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to delete history timeline docs from db";
+                    callback(500, error);
+                } else {
+                    console.log("history timeline deleted successfully");
+                    callback();
+                }
+
+            });
+        }
+
+        function updateNewOriginalText(callback) {
+
+            console.log("in updateNewOriginalText function");
+
+            buildTimelineHistory(originalText.history_timeline, function (err, historyTimeline) {
+
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to save history timeline to db";
+                    callback(500, error);
+                } else {
+
+                    var query = {"_id": originalText._id};
+                    var update = {
+                        history_timeline: historyTimeline
+                    };
+                    var options = {new: true};
+                    OriginalTextModel.findOneAndUpdate(query, update, options, function (err, results) {
+                        if (err) {
+                            console.log("something went wrong " + err);
+                            error.error = "something went wrong while trying to update original text";
+                            callback(500, error);
                         } else {
-                            errorMessage = "Original Text id not exists";
-                            console.log(errorMessage);
-                            error.error = errorMessage;
-                            callback(404, error);
+                            if (results != null) {
+                                console.log("Original Text updated successfully");
+                                callback(null, results);
+                            } else {
+                                errorMessage = "Original Text id not exists";
+                                console.log(errorMessage);
+                                error.error = errorMessage;
+                                callback(404, error);
+                            }
                         }
-                    }
-                });
-            }
-        }, function(status, results) {
-            if (status === 200) {
+                    });
+                }
+            })
 
-            }else {
-                originalTextCallback(status, results);
-            }
+        }
+
+        async.waterfall([
+            getHistoryTimeline,
+            deleteHistoryTimeLineDocs,
+            updateNewOriginalText
+        ], function (status, results) {
+            originalTextCallback(null, results);
         });
 
-
-
-        buildTimelineHistory(history_data, function (err, historyTimeline) {
-
-            if (err) {
-                console.log("something went wrong " + err);
-                error.error = "something went wrong while trying to save history timeline to db";
-                callback(500, error);
-            } else {
-
-                var originalTextToAdd = new OriginalTextModel({
-                    title: null,
-                    description: null,
-                    requirements: null,
-                    history_timeline: historyTimeline
-                });
-
-                /* save the OriginalText to db*/
-                originalTextToAdd.save(function (err, doc) {
-                    if (err) {
-                        console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to save originalText to db";
-                        callback(500, error);
-
-                    } else {
-                        console.log("originalText saved successfully to the db");
-                        callback(200, doc);
-                    }
-                })
-            }
-        })
     } else { // job
-        var originalTextToAdd = new OriginalTextModel({
-            title: originalText['title'],
-            description: originalText['description'],
-            requirements: originalText['requirements'],
-            history_timeline: []
-        });
 
-        /* save the OriginalText to db*/
-        originalTextToAdd.save(function (err, doc) {
+        var query = {"_id": originalText._id};
+        var update = {
+            title: originalText.title,
+            description: originalText.description,
+            requirements: originalText.requirements
+        };
+        var options = {new: true};
+        OriginalTextModel.findOneAndUpdate(query, update, options, function (err, results) {
             if (err) {
                 console.log("something went wrong " + err);
-                error.error = "something went wrong while trying to save originalText to db";
-                callback(500, error);
+                error.error = "something went wrong while trying to update original text";
+                originalTextCallback(500, error);
             } else {
-                console.log("originalText saved successfully to the db");
-                callback(200, doc);
+                if (results != null) {
+                    console.log("Original Text updated successfully");
+                    originalTextCallback(null, results);
+                } else {
+                    errorMessage = "Original Text id not exists";
+                    console.log(errorMessage);
+                    error.error = errorMessage;
+                    originalTextCallback(404, error);
+                }
             }
-        })
+        });
+
+
     }
 
 }
@@ -510,9 +554,40 @@ function addAcademy(academy, callback) {
             callback(500, error);
         } else {
             console.log("academy saved successfully");
-            callback(200,doc._id);
+            callback(200, doc._id);
         }
     })
+}
+
+function updateAcademy(academy, callback) {
+
+    console.log("in updateAcademy");
+
+    var query = {"_id": academy._id};
+    var update = {
+        degree_name: academy.degree_name,
+        degree_type: academy.degree_type,
+        academy_type: academy.academy_type
+    };
+    var options = {new: true};
+    AcademyModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to update academy";
+            callback(500, error);
+        } else {
+            if (results != null) {
+                console.log("academy updated successfully");
+                callback(null, results);
+            } else {
+                errorMessage = "academy id not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
+        }
+    });
+
 }
 
 /////////////////////////////////////// ***  Requirements  *** /////////////////////////////
@@ -610,6 +685,113 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
     );
 }
 
+function updateRequirements(matchingObjectId, requirements, requirementsCallback) {
+
+    console.log("in updateRequirements function");
+
+    function getRequirements(callback) {
+
+        var query = MatchingObjectsModel.find(
+            {_id: matchingObjectId}, {requirements: 1}
+        );
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to get the requirements from the db";
+                callback(500, error);
+            } else {
+                if (results.length > 0) {
+                    console.log("the requirements extracted successfully from the db");
+                    callback(null, results[0].requirements);
+                } else {
+                    errorMessage = "matching object not exists";
+                    console.log(errorMessage);
+                    error.error = errorMessage;
+                    callback(404, error);
+                }
+            }
+        });
+
+    }
+
+    function getCombination(requirementsArr, callback) {
+
+        var combinationArr = [];
+
+        var query = RequirementsModel.find(
+            {_id: {$in: requirementsArr}}, {combination: 1}
+        );
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to get the combination of requirements";
+                callback(500, error);
+            } else {
+                if (results.length > 0) {
+
+                    console.log("the combination of requirements extracted successfully");
+                    for (var i = 0; i < results.length; i++) {
+                        combinationArr.push.apply(combinationArr, results[i].combination);
+                    }
+                    callback(null, requirementsArr, combinationArr);
+
+                } else {
+                    errorMessage = "requirements not exists";
+                    console.log(errorMessage);
+                    error.error = errorMessage;
+                    callback(404, error);
+                }
+            }
+        });
+    }
+
+    function removeProfessionalKnowledge(requirementsArr, combinationArr, callback) {
+
+        ProfessionalKnowledgeModel.remove({_id: {$in: combinationArr}}, function (err) {
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to delete professional knowledge";
+                callback(500, error);
+            } else {
+                console.log("professional knowledge deleted successfully");
+                callback(null, requirementsArr);
+            }
+
+        });
+    }
+
+    function deleteCombinationDocs(requirementsArr, callback) {
+
+        RequirementsModel.remove({_id: {$in: requirementsArr}}, function (err) {
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to delete history timeline docs from db";
+                callback(500, error);
+            } else {
+                console.log("combination deleted successfully");
+                callback();
+            }
+
+        });
+    }
+
+    async.waterfall([
+        getRequirements,
+        getCombination,
+        removeProfessionalKnowledge,
+        deleteCombinationDocs,
+        async.apply(addRequirements, requirements)
+    ], function (status, results) {
+        console.log("results waterfall ", results);
+        requirementsCallback(null, results);
+    });
+
+}
+
 /////////////////////////////////////// ***  Status  *** /////////////////////////////
 
 // Add Status
@@ -641,7 +823,7 @@ function rateCV(cvId, status, callback) {
                     current_status: status.current_status
                 }
             };
-            var options = {new: true,upsert:true};
+            var options = {new: true, upsert: true};
             MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
                 if (err) {
                     console.log("something went wrong " + err);
@@ -695,7 +877,7 @@ function updateRateCV(cvId, status, callback) {
                         if (result != null) {
                             console.log("status of cv updated successfully");
                             callback(200, result);
-                        }else {
+                        } else {
                             errorMessage = "status id not exists";
                             console.log(errorMessage);
                             error.error = errorMessage;
@@ -703,7 +885,7 @@ function updateRateCV(cvId, status, callback) {
                         }
                     }
                 });
-            }else {
+            } else {
                 errorMessage = "cv id not exists";
                 console.log(errorMessage);
                 error.error = errorMessage;
@@ -747,6 +929,45 @@ function addPersonalProperties(personalProperties, callback) {
 
 }
 
+function updatePersonalProperties(personalProperties,callback) {
+
+    console.log("in updatePersonalProperties");
+
+    var query = {"_id": personalProperties._id};
+
+    var update = {
+        university_degree: personalProperties.university_degree,
+        degree_graduation_with_honors: personalProperties.degree_graduation_with_honors,
+        above_two_years_experience: personalProperties.above_two_years_experience,
+        psychometric_above_680: personalProperties.psychometric_above_680,
+        multilingual: personalProperties.multilingual,
+        volunteering: personalProperties.volunteering,
+        full_army_service: personalProperties.full_army_service,
+        officer: personalProperties.officer,
+        high_school_graduation_with_honors: personalProperties.high_school_graduation_with_honors,
+        youth_movements: personalProperties.youth_movements
+    };
+
+    var options = {new: true};
+    PersonalPropertiesModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to update personal properties";
+            callback(500, error);
+        } else {
+            if (results != null) {
+                console.log("personal properties updated successfully");
+                callback(null, results);
+            } else {
+                errorMessage = "personal properties id not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
+        }
+    });
+
+}
 
 /////////////////////////////////////// ***  Formulas  *** /////////////////////////////
 
@@ -779,43 +1000,38 @@ function addFormula(formula, callback) {
 }
 
 // Update Formula
-function updateFormula(updateFormula, callback) {
+function updateFormula(formula, callback) {
 
-    console.log("in updateFormula function");
+    console.log("in updateFormula");
 
-    var formulaToUpdate = new FormulaModel({
-        locations: updateFormula.locations,
-        candidate_type: updateFormula.candidate_type,
-        scope_of_position: updateFormula.scope_of_position,
-        academy: updateFormula.academy,
-        requirements: updateFormula.requirements
-    });
+    var query = {"_id": formula._id};
 
+    var update = {
+        locations: formula.locations,
+        candidate_type: formula.candidate_type,
+        scope_of_position: formula.scope_of_position,
+        academy: formula.academy,
+        requirements: formula.requirements
+    };
 
-    var query = FormulaModel.findOne().where('_id', formulaToUpdate._id);
+    var options = {new: true};
 
-    query.exec(function (err, doc) {
-
-        var query = doc.update({
-            $set: {
-                locations: formulaToUpdate.locations,
-                candidate_type: formulaToUpdate.candidate_type,
-                scope_of_position: formulaToUpdate.scope_of_position,
-                academy: formulaToUpdate.academy,
-                requirements: formulaToUpdate.requirements
-            }
-        });
-
-        query.exec(function (err, result) {
-
-            if (err) {
-                console.log("error");
-                callback(false);
+    FormulaModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to update formula";
+            callback(500, error);
+        } else {
+            if (results != null) {
+                console.log("formula updated successfully");
+                callback(null, results);
             } else {
-                callback(result);
+                errorMessage = "formula not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
             }
-
-        });
+        }
     });
 }
 
