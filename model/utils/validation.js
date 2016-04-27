@@ -110,7 +110,8 @@ function personalPropertiesValidation(personalProperties) {
 
     if (valid) {
         for (var property in personalProperties) {
-            if (!(typeof(personalProperties[property]) === "boolean" )) {
+            console.log("property" + property);
+            if (!(typeof(personalProperties[property]) === "boolean" ) && property != "_id" ) {
                 valid = false;
                 break;
             }
@@ -231,11 +232,13 @@ function formulaValidation(formula) {
     var formulaAmount = 0;
     if (valid) {
         for (var property in formula) {
-            if (!(validatePositiveNumber(formula[property]))) { // check for positive number and lower then 100
-                valid = false;
-                break;
+            if ( property != "_id") {
+                if (!(validatePositiveNumber(formula[property]))) { // check for positive number and lower then 100
+                    valid = false;
+                    break;
+                }
+                formulaAmount += formula[property];
             }
-            formulaAmount += formula[property];
         }
         return !!(valid && formulaAmount === 100); // verify formula is not bigger the 100
 
@@ -414,7 +417,37 @@ function reviveMatchingObject(req) {
 }
 
 function updateMatchingObject(req) {
-    return true;
+    var matchingObject = req.body;
+    if (matchingObject
+        && fieldValidation(matchingObject._id)
+        && fieldValidation(matchingObject.sector)
+        && fieldValidation(matchingObject.matching_object_type)
+        && fieldValidation(matchingObject.original_text._id)
+        && originalTextValidation(matchingObject.original_text, matchingObject.matching_object_type)
+        && locationsValidation(matchingObject.locations)
+        && candidateTypeValidation(matchingObject.candidate_type)
+        && scopeOfPositionValidation(matchingObject.scope_of_position)
+        && fieldValidation(matchingObject.academy._id)
+        && academyValidation(matchingObject.academy)
+        && requirementsValidation(matchingObject.requirements, matchingObject.matching_object_type)
+
+    ) {
+
+        if (matchingObject.matching_object_type === "cv") {
+            return fieldValidation(matchingObject.personal_properties._id) &&
+            personalPropertiesValidation(matchingObject.personal_properties)
+        } else if (matchingObject.matching_object_type === "job") {
+            return fieldValidation(matchingObject.compatibility_level)
+            && validatePositiveNumber(matchingObject.compatibility_level) // check number between 1-100
+            && fieldValidation(matchingObject.formula._id)
+            && formulaValidation(matchingObject.formula)
+                ? true : false;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
 
 
