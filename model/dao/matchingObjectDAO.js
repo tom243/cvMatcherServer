@@ -194,8 +194,6 @@ function updateMatchingObject(matchingObject, callback) {
 
     async.parallel(parallelArr, function (status, results) {
 
-        console.log("updateMatchingObject results ", results);
-
         if (status === null) {
 
             var query = {"_id": matchingObject._id};
