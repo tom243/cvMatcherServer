@@ -63,7 +63,7 @@ function matcherRequirementsValidation(requirements) {
     if (requirements && fieldValidation(requirements.grade) && fieldValidation(requirements.details)) {
         if (requirements.details.constructor === Array) {
             for (var i = 0; i < requirements.details.length; i++) {
-                if (!requirements.details[i].name && requirements.details[i].grade) {
+                if (!(fieldValidation(requirements.details[i].name) && fieldValidation(requirements.details[i].grade))) {
                     valid = false;
                     break;
                 }
