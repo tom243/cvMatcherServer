@@ -266,21 +266,6 @@ function checkCV(req, res) {
 
 }
 
-//**  get id of cv **//
-function getIdOfCV(req, res) {
-
-    console.log("in getIdOfCV");
-
-    if (validation.getIdOfCV(req)) {
-        matchingObjectDAO.getIdOfCV(req.body.user_id, function (status, result) {
-            res.status(status).json(result);
-        });
-    } else {
-        utils.sendErrorValidation(res);
-    }
-
-}
-
 //** add the current cv to job **//
 function addCvToJob(req, res) {
 
@@ -296,6 +281,18 @@ function addCvToJob(req, res) {
 
 }
 
+function addJobToFavorites(req, res) {
+
+    console.log("in addJobToFavorites");
+
+    if (validation.addJobToFavorites(req)) {
+        matchingObjectDAO.addJobToFavorites(req.body.user_id, req.body.job_id,  function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+}
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
@@ -343,8 +340,8 @@ exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
 exports.checkCV = checkCV;
-exports.getIdOfCV = getIdOfCV;
 exports.addCvToJob = addCvToJob;
+exports.addJobToFavorites = addJobToFavorites;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
 exports.cleanDB = cleanDB; // TODO: DELETE IT

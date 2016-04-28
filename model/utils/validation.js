@@ -509,11 +509,6 @@ function getFavoritesJobs(req) {
     && fieldValidation(req.body.user_id) ? true : false
 }
 
-function getIdOfCV(req) {
-    return req.body
-    && fieldValidation(req.body.user_id) ? true : false
-}
-
 function checkCV(req) {
     return req.body
     && fieldValidation(req.body.job_id)
@@ -532,7 +527,12 @@ function matcherResponse(response) {
     && fieldValidation(response.total_grade)
     && fieldValidation(response.formula)
     && matcherFormulaValidation(response.formula) ? true : false
+}
 
+function addJobToFavorites(req) {
+    return req.body
+    && fieldValidation(req.body.user_id)
+    && fieldValidation(req.body.job_id) ? true : false
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
@@ -571,9 +571,9 @@ exports.updateRateCV = updateRateCV;
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
-exports.getIdOfCV = getIdOfCV;
 exports.checkCV = checkCV;
 exports.addCvToJob = addCvToJob;
 exports.matcherResponse = matcherResponse;
+exports.addJobToFavorites = addJobToFavorites;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;

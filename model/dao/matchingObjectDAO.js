@@ -1310,32 +1310,6 @@ function getFavoritesJobs(userId, callback) {
     });
 }
 
-function getIdOfCV(userId, callback) {
-
-    var query = MatchingObjectsModel.find(
-        {user: userId, active: true, matching_object_type: "cv"}, {_id: 1}
-    );
-
-    query.exec(function (err, results) {
-
-        if (err) {
-            console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the id of cv from the db";
-            callback(500, error);
-        } else {
-            if (results.length > 0) {
-                console.log("id of the cv extracted successfully from the db");
-                callback(200, results);
-            } else {
-                console.log("cv not exists for this user");
-                error.error = "cv not exists for this user";
-                callback(404, error);
-            }
-        }
-    })
-}
-
-
 var addCvToJobFunctions = (function () {
 
     return {
@@ -1556,6 +1530,40 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 
 }
 
+function addJobToFavorites(userId, jobId, callback) {
+
+    var query = {
+        '_id': userId
+    };
+    var doc = {
+        $addToSet: {
+            'favorites': jobId
+        }
+    };
+    var options = {
+        new: true
+    };
+    UserModel.findOneAndUpdate(query, doc, options, function (err, results) {
+        if (err) {
+            console.log("error in add job to favorites " + err);
+            error.error = "error in add job to favorites";
+            callback(500, error);
+
+        } else {
+            if (results != null) {
+                console.log("job added to favorites successfully");
+                callback(200, results);
+            } else {
+                errorMessage = "user not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(500, error);
+            }
+        }
+    })
+
+}
+
 ///////////////////////////////////////////// *** Matcher *** ///////////////////////
 
 function saveMatcherFormula(cvId, matcherResponse, callback) {
@@ -1714,8 +1722,8 @@ exports.updateRateCV = updateRateCV;
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
-exports.getIdOfCV = getIdOfCV;
 exports.addCvToJob = addCvToJob;
+exports.addJobToFavorites = addJobToFavorites;
 
 exports.saveMatcherFormula = saveMatcherFormula;
 
