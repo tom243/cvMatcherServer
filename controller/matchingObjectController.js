@@ -1,4 +1,5 @@
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
+var usersDAO = require("./../model/dao/UsersDao"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var unirest = require('unirest');
@@ -16,7 +17,12 @@ function addMatchingObject(req, res) {
 
     if (validation.addMatchingObject(req)) {
         matchingObjectDAO.addMatchingObject(req.body, function (status, result) {
-            res.status(status).json(result);
+
+            if(status === 200 && result.matching_object_type === "cv") {
+                usersDAO.saveCurrentCV(result.user, result._id)
+            }else {
+                res.status(status).json(result);
+            }
         });
     } else {
         utils.sendErrorValidation(res);
@@ -306,6 +312,16 @@ function getKeyWordsBySector(req, res) {
 
 }
 
+function cleanDB(req, res) { // TODO: DELETE IT
+    matchingObjectDAO.cleanDB(function(err) {
+        if (err === null) {
+            res.status(200).json();
+        }else {
+            res.status(500).json();
+        }
+    });
+}
+
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
 exports.addMatchingObject = addMatchingObject;
@@ -329,3 +345,4 @@ exports.getIdOfCV = getIdOfCV;
 exports.addCvToJob = addCvToJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
+exports.cleanDB = cleanDB; // TODO: DELETE IT

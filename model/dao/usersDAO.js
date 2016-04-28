@@ -163,6 +163,36 @@ var getUserId = function getUserId(googleUserId, callback) {
     });
 };
 
+
+function saveCurrentCV(userId, cvId) {
+
+    var query = {"_id": userId};
+    var update = {
+        $setOnInsert: {
+            current_cv: cvId
+        }
+    };
+    var options = {new: true, upsert:true};
+    UserModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while update current cv";
+            callback(500,error);
+        } else {
+
+            if (results != null) {
+                console.log("the current cv updated successfully");
+                callback(200,results);
+            }else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404,error);
+            }
+        }
+    });
+
+}
+
 ////////////////////////////////////////////// ***  Companies  *** ////////////////////////////////////
 
 // Add Company
@@ -276,7 +306,6 @@ function updateCompany(updateCompany, callback) {
             }
         }
     });
-
 }
 
 var getCompany = function getCompany(companyId, callback) {
@@ -311,6 +340,7 @@ exports.deleteUser = deleteUser;
 exports.updateUser = updateUser;
 exports.getUser = getUser;
 exports.getUserId = getUserId;
+exports.saveCurrentCV = saveCurrentCV;
 
 exports.addCompany = addCompany;
 exports.deleteCompany = deleteCompany;

@@ -110,7 +110,6 @@ function personalPropertiesValidation(personalProperties) {
 
     if (valid) {
         for (var property in personalProperties) {
-            console.log("property" + property);
             if (!(typeof(personalProperties[property]) === "boolean" ) && property != "_id" ) {
                 valid = false;
                 break;

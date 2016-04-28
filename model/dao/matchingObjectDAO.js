@@ -183,7 +183,7 @@ function updateMatchingObject(matchingObject, callback) {
             async.apply(updateAcademy, matchingObject.academy),
             async.apply(updatePersonalProperties, matchingObject.personal_properties)
         ]
-    }else { //job
+    } else { //job
         parallelArr = [
             async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
             async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
@@ -197,7 +197,6 @@ function updateMatchingObject(matchingObject, callback) {
         if (status === null) {
 
             var query = {"_id": matchingObject._id};
-
             var update;
 
             if (matchingObject.matching_object_type === "cv") {
@@ -399,19 +398,16 @@ function buildTimelineHistory(timeline, callback) {
     );
 }
 
-/* update original text */
-function updateOriginalText(originalText, type, originalTextCallback) {
+var updateOriginalTextFunctions = (function () {
 
-    console.log("in updateOriginalText function");
+    return {
 
-    if (type === "cv") { //cv
-
-        function getHistoryTimeline(callback) {
+        getHistoryTimeline: function (originalTextId, callback) {
 
             console.log("in getHistoryTimeline function");
 
             var query = OriginalTextModel.find(
-                {_id: originalText._id}, {history_timeline: 1}
+                {_id: originalTextId}, {history_timeline: 1}
             );
 
             query.exec(function (err, results) {
@@ -433,9 +429,9 @@ function updateOriginalText(originalText, type, originalTextCallback) {
                 }
             });
 
-        }
+        },
 
-        function deleteHistoryTimeLineDocs(history_timeline, callback) {
+        deleteHistoryTimeLineDocs: function (history_timeline, callback) {
 
             console.log("in deleteHistoryTimeLineDocs function");
 
@@ -450,13 +446,13 @@ function updateOriginalText(originalText, type, originalTextCallback) {
                 }
 
             });
-        }
+        },
 
-        function updateNewOriginalText(callback) {
+        updateNewOriginalText: function (originalTextId, historyTimeline, callback) {
 
             console.log("in updateNewOriginalText function");
 
-            buildTimelineHistory(originalText.history_timeline, function (err, historyTimeline) {
+            buildTimelineHistory(historyTimeline, function (err, historyTimeline) {
 
                 if (err) {
                     console.log("something went wrong " + err);
@@ -464,7 +460,7 @@ function updateOriginalText(originalText, type, originalTextCallback) {
                     callback(500, error);
                 } else {
 
-                    var query = {"_id": originalText._id};
+                    var query = {"_id": originalTextId};
                     var update = {
                         history_timeline: historyTimeline
                     };
@@ -491,10 +487,23 @@ function updateOriginalText(originalText, type, originalTextCallback) {
 
         }
 
+    }
+
+})();
+
+
+/* update original text */
+function updateOriginalText(originalText, type, originalTextCallback) {
+
+    console.log("in updateOriginalText function");
+
+    if (type === "cv") { //cv
+
         async.waterfall([
-            getHistoryTimeline,
-            deleteHistoryTimeLineDocs,
-            updateNewOriginalText
+            async.apply(updateOriginalTextFunctions.getHistoryTimeline, originalText._id),
+            updateOriginalTextFunctions.deleteHistoryTimeLineDocs,
+            async.apply(updateOriginalTextFunctions.updateNewOriginalText,
+                originalText._id, originalText.history_timeline)
         ], function (status, results) {
             originalTextCallback(null, results);
         });
@@ -525,7 +534,6 @@ function updateOriginalText(originalText, type, originalTextCallback) {
                 }
             }
         });
-
 
     }
 
@@ -683,105 +691,115 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
     );
 }
 
+
+var updateRequirementsFunctions = (function () {
+
+    return {
+
+        getRequirements: function (matchingObjectId, callback) {
+
+            var query = MatchingObjectsModel.find(
+                {_id: matchingObjectId}, {requirements: 1}
+            );
+
+            query.exec(function (err, results) {
+
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to get the requirements from the db";
+                    callback(500, error);
+                } else {
+                    if (results.length > 0) {
+                        console.log("the requirements extracted successfully from the db");
+                        callback(null, results[0].requirements);
+                    } else {
+                        errorMessage = "matching object not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(404, error);
+                    }
+                }
+            });
+
+        },
+
+        getCombination: function (requirementsArr, callback) {
+
+            var combinationArr = [];
+
+            var query = RequirementsModel.find(
+                {_id: {$in: requirementsArr}}, {combination: 1}
+            );
+
+            query.exec(function (err, results) {
+
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to get the combination of requirements";
+                    callback(500, error);
+                } else {
+                    if (results.length > 0) {
+
+                        console.log("the combination of requirements extracted successfully");
+                        for (var i = 0; i < results.length; i++) {
+                            combinationArr.push.apply(combinationArr, results[i].combination);
+                        }
+                        callback(null, requirementsArr, combinationArr);
+
+                    } else {
+                        errorMessage = "requirements not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(404, error);
+                    }
+                }
+            });
+        },
+
+        removeProfessionalKnowledge: function (requirementsArr, combinationArr, callback) {
+
+            ProfessionalKnowledgeModel.remove({_id: {$in: combinationArr}}, function (err) {
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to delete professional knowledge";
+                    callback(500, error);
+                } else {
+                    console.log("professional knowledge deleted successfully");
+                    callback(null, requirementsArr);
+                }
+
+            });
+        },
+
+        deleteCombinationDocs: function (requirementsArr, callback) {
+
+            RequirementsModel.remove({_id: {$in: requirementsArr}}, function (err) {
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to delete history timeline docs from db";
+                    callback(500, error);
+                } else {
+                    console.log("combination deleted successfully");
+                    callback();
+                }
+
+            });
+        }
+
+    }
+
+})();
+
+
 function updateRequirements(matchingObjectId, requirements, requirementsCallback) {
 
     console.log("in updateRequirements function");
 
-    function getRequirements(callback) {
-
-        var query = MatchingObjectsModel.find(
-            {_id: matchingObjectId}, {requirements: 1}
-        );
-
-        query.exec(function (err, results) {
-
-            if (err) {
-                console.log("something went wrong " + err);
-                error.error = "something went wrong while trying to get the requirements from the db";
-                callback(500, error);
-            } else {
-                if (results.length > 0) {
-                    console.log("the requirements extracted successfully from the db");
-                    callback(null, results[0].requirements);
-                } else {
-                    errorMessage = "matching object not exists";
-                    console.log(errorMessage);
-                    error.error = errorMessage;
-                    callback(404, error);
-                }
-            }
-        });
-
-    }
-
-    function getCombination(requirementsArr, callback) {
-
-        var combinationArr = [];
-
-        var query = RequirementsModel.find(
-            {_id: {$in: requirementsArr}}, {combination: 1}
-        );
-
-        query.exec(function (err, results) {
-
-            if (err) {
-                console.log("something went wrong " + err);
-                error.error = "something went wrong while trying to get the combination of requirements";
-                callback(500, error);
-            } else {
-                if (results.length > 0) {
-
-                    console.log("the combination of requirements extracted successfully");
-                    for (var i = 0; i < results.length; i++) {
-                        combinationArr.push.apply(combinationArr, results[i].combination);
-                    }
-                    callback(null, requirementsArr, combinationArr);
-
-                } else {
-                    errorMessage = "requirements not exists";
-                    console.log(errorMessage);
-                    error.error = errorMessage;
-                    callback(404, error);
-                }
-            }
-        });
-    }
-
-    function removeProfessionalKnowledge(requirementsArr, combinationArr, callback) {
-
-        ProfessionalKnowledgeModel.remove({_id: {$in: combinationArr}}, function (err) {
-            if (err) {
-                console.log("something went wrong " + err);
-                error.error = "something went wrong while trying to delete professional knowledge";
-                callback(500, error);
-            } else {
-                console.log("professional knowledge deleted successfully");
-                callback(null, requirementsArr);
-            }
-
-        });
-    }
-
-    function deleteCombinationDocs(requirementsArr, callback) {
-
-        RequirementsModel.remove({_id: {$in: requirementsArr}}, function (err) {
-            if (err) {
-                console.log("something went wrong " + err);
-                error.error = "something went wrong while trying to delete history timeline docs from db";
-                callback(500, error);
-            } else {
-                console.log("combination deleted successfully");
-                callback();
-            }
-
-        });
-    }
-
     async.waterfall([
-        getRequirements,
-        getCombination,
-        removeProfessionalKnowledge,
-        deleteCombinationDocs,
+        async.apply(updateRequirementsFunctions.getRequirements, matchingObjectId),
+        updateRequirementsFunctions.getCombination,
+        updateRequirementsFunctions.removeProfessionalKnowledge,
+        updateRequirementsFunctions.deleteCombinationDocs,
         async.apply(addRequirements, requirements)
     ], function (status, results) {
         console.log("results waterfall ", results);
@@ -927,7 +945,7 @@ function addPersonalProperties(personalProperties, callback) {
 
 }
 
-function updatePersonalProperties(personalProperties,callback) {
+function updatePersonalProperties(personalProperties, callback) {
 
     console.log("in updatePersonalProperties");
 
@@ -1219,33 +1237,30 @@ function getMyJobs(userId, callback) {
 
     var query = UserModel.find(
         {_id: userId, active: true}, {jobs: 1}
-    );
+    )
+        .populate({
+            path: 'jobs.job',
+            populate: {
+                path: 'original_text academy'
+            }
+        })
+        .populate({
+            path: 'jobs.cv',
+            select: 'status',
+            populate: {path: 'status.status_id'}
+
+        });
 
     query.exec(function (err, results) {
 
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user from the db";
+            error.error = "something went wrong while trying to get the jobs from the db";
             callback(500, error);
         } else {
             if (results.length > 0) {
-                var query = MatchingObjectsModel.find(
-                    {active: true, matching_object_type: "job", _id: {$in: results[0].jobs}, archive: false}
-                ).populate('status.status_id')
-                    .populate('original_text')
-                    .populate('academy');
-
-                query.exec(function (err, results) {
-
-                    if (err) {
-                        console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to get the jobs from the db";
-                        callback(500, error);
-                    } else {
-                        console.log("the jobs extracted successfully from the db");
-                        callback(200, results);
-                    }
-                });
+                console.log("the jobs extracted successfully from the db");
+                callback(200, results);
             } else {
                 console.log("user not exists");
                 error.error = "user not exists";
@@ -1320,28 +1335,158 @@ function getIdOfCV(userId, callback) {
     })
 }
 
-function addCvToJob(jobId, cvId, callback) {
 
-    var matchObjectToSend = {
-        job: null,
-        cv: null
-    };
+var addCvToJobFunctions = (function () {
 
-    getMatchingObject(jobId, "job", function (status, jobResults) {
-        if (status === 200) {
-            matchObjectToSend.job = jobResults[0];
-        } else {
-            console.log("cannot extract job from db");
-            return callback(status, jobResults);
+    return {
+        getJob: function (jobId, callback) {
+
+            getMatchingObject(jobId, "job", function (status, jobResults) {
+                if (status === 200) {
+                    //matchObjectToSend.job = jobResults[0];
+                    callback(null, jobResults[0]);
+                } else {
+                    console.log("cannot extract job from db");
+                    callback(status, jobResults);
+                }
+            })
+        },
+        getCV: function (cvId, callback) {
+
+            getMatchingObject(cvId, "cv", function (status, cvResults) {
+                if (status === 200) {
+                    //matchObjectToSend.cv = CvResults[0];
+                    callback(null, cvResults[0])
+                } else {
+                    console.log("cannot extract cv from db");
+                    callback(status, cvResults);
+                }
+
+            })
+        },
+        addJobToUser: function (userId, jobId, cvId, callback) {
+            var query = {
+                '_id': userId
+            };
+            var doc = {
+                $addToSet: {
+                    'jobs': {
+                        job: jobId,
+                        cv: cvId
+                    }
+                }
+            };
+            var options = {
+                upsert: true, new: true
+            };
+            UserModel.findOneAndUpdate(query, doc, options, function (err, results) {
+                if (err) {
+                    console.log("error in add job to user " + err);
+                    error.error = "error in add job to user";
+                    callback(500, error);
+
+                } else {
+                    if (results != null) {
+                        callback(null, results);
+                    } else {
+                        errorMessage = "user not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(500, error);
+                    }
+                }
+            })
+        },
+
+        updateDataForCV: function (totalGrade, cvId, callback) {
+
+            var query = {"_id": cvId};
+            var update = {
+                "status.current_status": "unread",
+                compatibility_level: totalGrade
+            };
+            var options = {new: true, upsert: true};
+            MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+                if (err) {
+                    console.log('error in updating data for cv ' + err);
+                    error.error = "error in updating data for cv";
+                    callback(500, error);
+                } else {
+                    if (results != null) {
+                        callback();
+                    } else {
+                        errorMessage = "cv not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(500, error);
+                    }
+                }
+            })
+        },
+
+        sendCvForJob: function (cvId, jobId, callback) {
+
+            var query = {
+                '_id': jobId
+            };
+            var doc = {
+                $addToSet: {'cvs': cvId}
+            };
+            var options = {
+                upsert: true, new: true
+            };
+            MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err, results) {
+                if (err) {
+                    console.log("error in add cv to job " + err);
+                    error.error = "error in add cv to job";
+                    callback(500, error);
+
+                } else {
+
+                    if (results != null) {
+                        console.log("cv added to the job successfully");
+                        callback();
+                    } else {
+                        errorMessage = "job not exists";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(500, error);
+                    }
+
+                }
+            });
+
+        },
+
+        copyCV: function (cv,callback) {
+
+            addMatchingObject(cv,function(status,results) {
+
+                if (status === 200) {
+                    callback(null,results._id);
+                }else {
+                    callback(status, results);
+                }
+            })
         }
+    }
 
-        getMatchingObject(cvId, "cv", function (status, CvResults) {
-            if (status === 200) {
-                matchObjectToSend.cv = CvResults[0];
-            } else {
-                console.log("cannot extract cv from db");
-                return callback(status, CvResults);
-            }
+})();
+
+function addCvToJob(jobId, cvId, addCvCallback) {
+
+    async.parallel([
+        async.apply(addCvToJobFunctions.getJob, jobId),
+        async.apply(addCvToJobFunctions.getCV, cvId)
+
+    ], function (status, results) {
+
+        var matchObjectToSend = {
+            job: results[0],
+            cv: results[1]
+        };
+
+        if (status == null) {
 
             unirest.post('https://matcherlogic.herokuapp.com/addFormula')
                 .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
@@ -1349,95 +1494,67 @@ function addCvToJob(jobId, cvId, callback) {
                 .end(function (response) {
                     if (validation.matcherResponse(response.body)) {
                         if (response.code == 200) {
-                            saveMatcherFormula(cvId, response.body, function (status, result) {
 
-                                if (status == 200) {
+                            if (response.body.total_grade > matchObjectToSend.job.compatibility_level) {
 
-                                    if (response.body.total_grade > jobResults[0].compatibility_level) {
 
-                                        var query = {"_id": cvId};
-                                        var update = {
-                                            "status.current_status": "unread",
-                                            compatibility_level: response.body.total_grade
-                                        };
-                                        var options = {new: true, upsert: true};
-                                        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err) {
-                                            if (err) {
-                                                console.log('error in updating data for cv ' + err);
-                                                error.error = "error in updating data for cv";
-                                                callback(500, error);
-                                            } else {
+                                function parallelTasks(totalGrade , jobId, user, cvId, callback) {
 
-                                                var query = {
-                                                    '_id': CvResults[0].user
-                                                };
-                                                var doc = {
-                                                    $addToSet: {'jobs': jobId}
-                                                };
-                                                var options = {
-                                                    upsert: true, new: true
-                                                };
-                                                UserModel.findOneAndUpdate(query, doc, options, function (err, userResults) {
-                                                    if (err) {
-                                                        console.log("error in add job to user " + err);
-                                                        error.error = "error in add job to user";
-                                                        callback(500, error);
+                                    console.log("cvId" + cvId);
 
-                                                    } else {
-                                                        var query = {
-                                                            '_id': jobId
-                                                        };
-                                                        var doc = {
-                                                            $addToSet: {'cvs': cvId}
-                                                        };
-                                                        var options = {
-                                                            upsert: true, new: true
-                                                        };
-                                                        MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err) {
-                                                            if (err) {
-                                                                console.log("error in add cv to job " + err);
-                                                                error.error = "error in add cv to job";
-                                                                callback(500, error);
-
-                                                            } else {
-                                                                console.log("cv added to the job successfully");
-                                                                callback(200, userResults);
-                                                            }
-                                                        });
-                                                    }
-                                                });
-
-                                            }
-                                        });
-                                    } else {
-                                        errorMessage = "cannot add cv to the job because it didn't passed the compatibility level of job";
-                                        console.log(errorMessage);
-                                        error.error = errorMessage;
-                                        callback(404, error);
-                                    }
-                                } else {
-                                    // error save matcher formula to db
-                                    callback(status, result);
+                                    async.parallel([
+                                        async.apply(saveMatcherFormula, cvId, response.body),
+                                        async.apply(addCvToJobFunctions.updateDataForCV, totalGrade, cvId),
+                                        async.apply(addCvToJobFunctions.addJobToUser, user, jobId, cvId),
+                                        async.apply(addCvToJobFunctions.sendCvForJob, cvId, jobId)
+                                    ], callback);
                                 }
 
-                            });
+                                async.waterfall([
+                                    async.apply(addCvToJobFunctions.copyCV, matchObjectToSend.cv),
+                                    async.apply(parallelTasks, response.body.total_grade,
+                                        jobId , matchObjectToSend.cv.user)
+
+                                ], function (status, results) {
+
+                                    if (status === null) {
+                                        addCvCallback(200, results[2]);
+                                    } else {
+                                        errorMessage = "error in add cv to job ";
+                                        console.log(errorMessage);
+                                        error.error = errorMessage;
+                                        addCvCallback(500, error);
+                                    }
+
+                                });
+                            } else {
+                                errorMessage = "cannot add cv to the job because it didn't passed the compatibility level of job";
+                                console.log(errorMessage);
+                                error.error = errorMessage;
+                                addCvCallback(404, error);
+                            }
+
                         } else {
                             console.log("error occurred during matcher process: ", response.body);
-                            callback(response.code, response.body);
+                            addCvCallback(response.code, response.body);
                         }
                     } else {
                         errorMessage = "matcher response format is incorrect";
                         console.log(errorMessage);
                         error.error = errorMessage;
-                        callback(404, error);
+                        addCvCallback(404, error);
                     }
                 });
-        })
+        } else {
+            errorMessage = "something went wrong while trying send the cv";
+            console.log(errorMessage);
+            error.error = errorMessage;
+            addCvCallback(404, error);
+        }
+
     });
 
-
 }
-
 
 ///////////////////////////////////////////// *** Matcher *** ///////////////////////
 
@@ -1482,7 +1599,7 @@ function saveMatcherFormula(cvId, matcherResponse, callback) {
                             callback(500, error);
                         } else {
                             console.log("matcher formula saved successfully to db");
-                            callback(200, matcherResponse);
+                            callback(null, matcherResponse);
                         }
                     });
                 }
@@ -1529,7 +1646,6 @@ function buildMatchingDetails(matchingDetails, callback) {
         callback("matching details is empty or undefined", [])
     }
 
-
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
@@ -1561,6 +1677,25 @@ function getKeyWordsBySector(sector, callback) {
 
 }
 
+function cleanDB(cleanDBCallback) {
+
+    async.parallel([
+        function(callback){ AcademyModel.remove({}, callback)},
+        function(callback){ FormulaModel.remove({}, callback)},
+        function(callback){ HistoryTimelineModel.remove({}, callback)},
+        function(callback){ MatchingDetailsModel.remove({}, callback)},
+        function(callback){ MatchingObjectsModel.remove({}, callback)},
+        function(callback){ OriginalTextModel.remove({}, callback)},
+        function(callback){ PersonalPropertiesModel.remove({}, callback)},
+        function(callback){ ProfessionalKnowledgeModel.remove({}, callback)},
+        function(callback){ RequirementsModel.remove({}, callback)},
+        function(callback){ StatusModel.remove({}, callback)}
+
+    ], function (err) {
+        cleanDBCallback(err)
+    })
+
+}
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 exports.addMatchingObject = addMatchingObject;
@@ -1585,3 +1720,4 @@ exports.addCvToJob = addCvToJob;
 exports.saveMatcherFormula = saveMatcherFormula;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
+exports.cleanDB = cleanDB;

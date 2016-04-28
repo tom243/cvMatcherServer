@@ -44,7 +44,11 @@ var usersSchema = new users_schema({
     phone_number: String,
     linkedin: String,
     favorites: [String],
-    jobs:[String],
+    jobs: [{
+        job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
+        cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' }
+    }],
+    current_cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
     active: {
         index: 1,
         type: Boolean,
