@@ -117,7 +117,7 @@ var getUser = function getUser(userId, callback) {
 
     var query = UserModel.find(
         {_id: userId, active: true}
-    );
+    ).populate('current_cv');
 
     query.exec(function (err, results) {
         if (err) {
@@ -164,13 +164,13 @@ var getUserId = function getUserId(googleUserId, callback) {
 };
 
 
-function saveCurrentCV(userId, cvId) {
+function saveCurrentCV(userId, cvId,callback) {
 
     var query = {"_id": userId};
     var update = {
-        $setOnInsert: {
+        //$setOnInsert: {
             current_cv: cvId
-        }
+       // }
     };
     var options = {new: true, upsert:true};
     UserModel.findOneAndUpdate(query, update, options, function (err, results) {
