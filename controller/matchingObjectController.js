@@ -1,5 +1,5 @@
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
-var usersDAO = require("./../model/dao/UsersDao"); // dao = data access object = model
+var usersDAO = require("./../model/dao/usersDao"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var unirest = require('unirest');
