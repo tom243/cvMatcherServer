@@ -19,7 +19,7 @@ function addMatchingObject(req, res) {
         matchingObjectDAO.addMatchingObject(req.body, function (status, result) {
 
             if(status === 200 && result.matching_object_type === "cv") {
-                usersDAO.saveCurrentCV(result.user, result._id, function (status, result) {
+                usersDAO.saveCurrentCV(result.user, result._id, function (status,result) {
                     res.status(status).json(result);
                 })
             }else {

@@ -108,10 +108,10 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
     matchingObjectToAdd.save(function (err, result) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to insert matching object to the DB";
+            error.error = "something went wrong while trying to insert matching object";
             callback(500, error);
         } else {
-            console.log("the matching object saved successfully to the db ", result);
+            console.log("the matching object saved successfully");
             callback(200, result);
         }
     });

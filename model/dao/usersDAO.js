@@ -117,7 +117,19 @@ var getUser = function getUser(userId, callback) {
 
     var query = UserModel.find(
         {_id: userId, active: true}
-    ).populate('current_cv');
+    );
+/*    .populate({
+        path: 'current_cv',
+        populate: {
+            path: 'original_text academy personal_properties requirements formula',
+            populate: {
+                path: 'history_timeline', options: {sort: {'start_year': 1}},
+                path: 'combination',
+                path: 'matching_requirements.details'
+
+            }
+        }
+    });*/
 
     query.exec(function (err, results) {
         if (err) {
