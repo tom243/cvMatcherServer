@@ -81,6 +81,33 @@ function addMatchingObject(matchingObject, callback) {
     });
 }
 
+function testAddMatchingObject(matchingObject, callback) {
+
+    var parallelArr = [];
+
+    if (matchingObject.matching_object_type === "cv") {
+        parallelArr = [
+            async.apply(addOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
+            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
+            async.apply(updateAcademy, matchingObject.academy),
+            async.apply(updatePersonalProperties, matchingObject.personal_properties)
+        ]
+    } else { //job
+        parallelArr = [
+            async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
+            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
+            async.apply(updateAcademy, matchingObject.academy),
+            async.apply(updateFormula, matchingObject.formula)
+        ]
+    }
+
+    async.parallel(parallelArr, function (status, results) {
+
+    })
+
+
+}
+
 function buildAndSaveMatchingObject(matchingObject, callback) {
 
     var matchingObjectToAdd = new MatchingObjectsModel({
@@ -1198,12 +1225,17 @@ function getAllJobsBySector(userId, sector, callback) {
 
             if (results.length > 0) {
 
+                var jobsArr = [];
+                for (var i=0; i < results[0].jobs.length; i++) {
+                    jobsArr.push(results[0].jobs[i].job);
+                }
+
                 var query = MatchingObjectsModel.find(
                     {
                         sector: sector,
                         active: true,
                         matching_object_type: "job",
-                        _id: {$nin: results[0].jobs},
+                        _id: {$nin: jobsArr},
                         archive: false
                     }
                 ).populate('original_text')
@@ -1685,7 +1717,7 @@ function getKeyWordsBySector(sector, callback) {
 
 }
 
-function cleanDB(cleanDBCallback) {
+function cleanDB(cleanDBCallback) { // TODO: DELETE IT
 
     async.parallel([
         function(callback){ AcademyModel.remove({}, callback)},
@@ -1728,4 +1760,4 @@ exports.addJobToFavorites = addJobToFavorites;
 exports.saveMatcherFormula = saveMatcherFormula;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
-exports.cleanDB = cleanDB;
+exports.cleanDB = cleanDB; // TODO: DELETE IT

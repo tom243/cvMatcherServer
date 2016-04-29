@@ -51,7 +51,6 @@ module.exports = function (app) {
 ////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////////
 
     app.post('/getKeyWordsBySector', matchingObjectController.getKeyWordsBySector);
-
     app.get('/cleanDB', matchingObjectController.cleanDB); //TODO: DELETE IT
 
 };
