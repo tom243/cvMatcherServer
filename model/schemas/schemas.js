@@ -46,7 +46,11 @@ var usersSchema = new users_schema({
     favorites: [String],
     jobs: [{
         job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
-        cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' }
+        cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
+        favorite: {
+            type: Boolean,
+            default: false
+        }
     }],
     current_cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
     active: {
@@ -119,7 +123,8 @@ var matchingObjectsSchema = new matching_objects_schema({
     compatibility_level: Number,
     status:{
         status_id: { type: Schema.Types.ObjectId, ref: 'StatusModel' },
-        current_status: String
+        current_status: String,
+        timestamp: Date //TODO: Not Forget to add to code get it from roni
     },
     personal_properties: { type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' },
     favorites: [String],
@@ -176,19 +181,10 @@ var formulasSchema = new formulas_schema({
 
 // Status Schema
 var statusSchema = new status_schema({
-
-    seen: {
-        status: Boolean,
-        timestamp: Date
-    },
     rate: {
         status: Boolean,
         stars: Number,
         description: String,
-        timestamp: Date
-    },
-    received: {
-        status: Boolean,
         timestamp: Date
     }
 }, {collection: 'Status'});

@@ -1305,7 +1305,7 @@ function getMyJobs(userId, callback) {
 function getFavoritesJobs(userId, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true}, {favorites: 1}
+        {_id: userId, active: true}, {jobs: 1}
     );
 
     query.exec(function (err, results) {
@@ -1316,8 +1316,17 @@ function getFavoritesJobs(userId, callback) {
             callback(500, error);
         } else {
             if (results.length > 0) {
+
+                var favoriteJobs = [];
+
+                for (var i=0; i < results[0].jobs.length; i ++) {
+                    if (results[0].jobs[i].favorite) {
+                        favoriteJobs.push(results[0].jobs[i].job)
+                    }
+                }
+
                 var query = MatchingObjectsModel.find(
-                    {active: true, matching_object_type: "job", _id: {$in: results[0].favorites}, archive: false}
+                    {active: true, matching_object_type: "job", _id: {$in: favoriteJobs}, archive: false}
                 ).populate('status.status_id')
                     .populate('original_text')
                     .populate('academy');
@@ -1565,11 +1574,11 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 function addJobToFavorites(userId, jobId, callback) {
 
     var query = {
-        '_id': userId
+        '_id': userId, 'jobs.job': jobId
     };
     var doc = {
-        $addToSet: {
-            'favorites': jobId
+        '$set': {
+            'jobs.$.favorite': true
         }
     };
     var options = {
