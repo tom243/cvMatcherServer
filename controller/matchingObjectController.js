@@ -249,9 +249,9 @@ function checkCV(req, res) {
                     .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
                     .send(matchObjectToSend)
                     .end(function (response) {
+                        console.log("response from matcher: ", response.body);
+                        console.log("response from matcher - details: " , response.body.formula.requirements.details);
                         if (validation.matcherResponse(response.body)) {
-                            console.log("response from matcher: ", response.body);
-                            console.log("response from matcher - details: " , response.body.formula.requirements.details);
                             res.status(response.code).json(response.body);
                         } else {
                             error.error = "error occurred during matcher process";
