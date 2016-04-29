@@ -1516,7 +1516,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
                         errorMessage = "matcher response format is incorrect";
                         console.log(errorMessage);
                         error.error = errorMessage;
-                        addCvCallback(404, error);
+                        addCvCallback(400, error);
                     }
                 });
         } else {

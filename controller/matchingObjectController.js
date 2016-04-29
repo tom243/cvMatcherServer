@@ -254,7 +254,7 @@ function checkCV(req, res) {
                             res.status(response.code).json(response.body);
                         } else {
                             error.error = "error occurred during matcher process";
-                            res.status(response.code).json(error);
+                            res.status(400).json(error);
                         }
 
                     });
