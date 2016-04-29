@@ -43,7 +43,6 @@ var usersSchema = new users_schema({
     company: { type: Schema.Types.ObjectId, ref: 'CompanyModel' },
     phone_number: String,
     linkedin: String,
-    favorites: [String],
     jobs: [{
         job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
         cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
