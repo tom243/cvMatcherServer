@@ -250,7 +250,7 @@ function checkCV(req, res) {
                     .send(matchObjectToSend)
                     .end(function (response) {
                         if (validation.matcherResponse(response.body)) {
-                            console.log("response from matcher: ", JSON.stringify(response.body));
+                            console.log("response from matcher: " + JSON.stringify(response.body));
                             res.status(response.code).json(response.body);
                         } else {
                             error.error = "error occurred during matcher process";
