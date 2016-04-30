@@ -245,7 +245,7 @@ function checkCV(req, res) {
                     return res.status(status).json(results);
                 }
 
-                unirest.post('https://matcherlogic.herokuapp.com/addFormula')
+                unirest.post('https://matcherlogic.herokuapp.com/calculateMatching')
                     .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
                     .send(matchObjectToSend)
                     .end(function (response) {

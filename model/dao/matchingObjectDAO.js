@@ -1502,7 +1502,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 
         if (status == null) {
 
-            unirest.post('https://matcherlogic.herokuapp.com/addFormula')
+            unirest.post('https://matcherlogic.herokuapp.com/calculateMatching')
                 .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
                 .send(matchObjectToSend)
                 .end(function (response) {
