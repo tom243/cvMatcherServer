@@ -30,7 +30,7 @@ module.exports = function (app) {
     app.post('/jobSeeker/getFavoritesJobs', matchingObjectController.getFavoritesJobs);
     app.post('/jobSeeker/checkCV', matchingObjectController.checkCV);
     app.post('/jobSeeker/addCvToJob', matchingObjectController.addCvToJob);
-    app.post('/jobSeeker/addJobToFavorites', matchingObjectController.addJobToFavorites);
+    app.post('/jobSeeker/updateFavoriteJob', matchingObjectController.updateFavoriteJob);
 
 //////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
 

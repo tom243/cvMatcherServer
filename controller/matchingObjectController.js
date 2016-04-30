@@ -282,12 +282,13 @@ function addCvToJob(req, res) {
 
 }
 
-function addJobToFavorites(req, res) {
+function updateFavoriteJob(req, res) {
 
     console.log("in addJobToFavorites");
 
-    if (validation.addJobToFavorites(req)) {
-        matchingObjectDAO.addJobToFavorites(req.body.user_id, req.body.job_id,  function (status, result) {
+    if (validation.updateFavoriteJob(req)) {
+        matchingObjectDAO.updateFavoriteJob(req.body.user_id, req.body.job_id,
+            req.body.favorite,  function (status, result) {
             res.status(status).json(result);
         });
     } else {
@@ -342,7 +343,7 @@ exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
 exports.checkCV = checkCV;
 exports.addCvToJob = addCvToJob;
-exports.addJobToFavorites = addJobToFavorites;
+exports.updateFavoriteJob = updateFavoriteJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
 exports.cleanDB = cleanDB; // TODO: DELETE IT

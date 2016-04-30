@@ -529,10 +529,12 @@ function matcherResponse(response) {
     && matcherFormulaValidation(response.formula) ? true : false
 }
 
-function addJobToFavorites(req) {
+function updateFavoriteJob(req) {
     return req.body
     && fieldValidation(req.body.user_id)
-    && fieldValidation(req.body.job_id) ? true : false
+    && fieldValidation(req.body.job_id)
+    && fieldValidation(req.body.favorite)
+    && typeof(req.body.favorite) === "boolean" ? true : false
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
@@ -574,6 +576,6 @@ exports.getFavoritesJobs = getFavoritesJobs;
 exports.checkCV = checkCV;
 exports.addCvToJob = addCvToJob;
 exports.matcherResponse = matcherResponse;
-exports.addJobToFavorites = addJobToFavorites;
+exports.updateFavoriteJob = updateFavoriteJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;

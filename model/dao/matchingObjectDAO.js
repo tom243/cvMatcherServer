@@ -1576,14 +1576,14 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 
 }
 
-function addJobToFavorites(userId, jobId, callback) {
+function updateFavoriteJob(userId, jobId, isFavorite, callback) {
 
     var query = {
         '_id': userId, 'jobs.job': jobId
     };
     var doc = {
         '$set': {
-            'jobs.$.favorite': true
+            'jobs.$.favorite': isFavorite
         }
     };
     var options = {
@@ -1769,7 +1769,7 @@ exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
 exports.addCvToJob = addCvToJob;
-exports.addJobToFavorites = addJobToFavorites;
+exports.updateFavoriteJob = updateFavoriteJob;
 
 exports.saveMatcherFormula = saveMatcherFormula;
 
