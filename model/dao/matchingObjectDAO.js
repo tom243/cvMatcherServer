@@ -1310,48 +1310,42 @@ function getMyJobs(userId, callback) {
 function getFavoritesJobs(userId, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true}, {jobs: 1}
-    );
+        {_id: userId, active: true, 'jobs': {$elemMatch: {favorite: true}}}, {jobs: 1}
+    )
+        .populate({
+            path: 'jobs.job',
+            populate: {
+                path: 'original_text academy user',
+                populate: {
+                    path: 'company',
+                    model: CompanyModel
+                }
+            }
+        })
+        .populate({
+            path: 'jobs.cv',
+            select: 'status',
+            populate: {path: 'status.status_id'}
+
+        });
 
     query.exec(function (err, results) {
 
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user from the db";
+            error.error = "something went wrong while trying to get the favorite jobs from the db";
             callback(500, error);
         } else {
-            if (results.length > 0) {
-
-                var favoriteJobs = [];
-
-                for (var i=0; i < results[0].jobs.length; i ++) {
-                    if (results[0].jobs[i].favorite) {
-                        favoriteJobs.push(results[0].jobs[i].job)
-                    }
-                }
-
-                var query = MatchingObjectsModel.find(
-                    {active: true, matching_object_type: "job", _id: {$in: favoriteJobs}, archive: false}
-                ).populate('status.status_id')
-                    .populate('original_text')
-                    .populate('academy');
-
-                query.exec(function (err, results) {
-
-                    if (err) {
-                        console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to get the favorite jobs from the db";
-                        callback(500, error);
-                    } else {
-                        console.log("the favorite jobs extracted successfully from the db");
-                        callback(200, results);
-                    }
-                });
+/*            if (results.length > 0) {
+                console.log("the favorite jobs extracted successfully from the db");
+                callback(200, results);
             } else {
-                console.log("user not exists");
-                error.error = "user not exists";
-                callback(404, error);
-            }
+                console.log("favorite jobs empty");
+                results.jobs = [];
+                callback(200, results);
+            }*/
+            console.log("the favorite jobs extracted successfully from the db");
+            callback(200, results);
         }
     });
 }
