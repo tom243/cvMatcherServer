@@ -14,6 +14,7 @@ var AcademyModel = require('./../schemas/schemas').AcademyModel;
 var ProfessionalKnowledgeModel = require('./../schemas/schemas').ProfessionalKnowledgeModel;
 var MatchingDetailsModel = require('./../schemas/schemas').MatchingDetailsModel;
 var KeyWordsModel = require('./../schemas/schemas').KeyWordsModel;
+var CompanyModel = require('./../schemas/schemas').CompanyModel;
 
 var errorMessage;
 
@@ -1273,7 +1274,11 @@ function getMyJobs(userId, callback) {
         .populate({
             path: 'jobs.job',
             populate: {
-                path: 'original_text academy'
+                path: 'original_text academy user',
+                populate: {
+                    path: 'company',
+                    model: CompanyModel
+                }
             }
         })
         .populate({
