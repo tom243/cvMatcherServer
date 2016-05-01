@@ -772,6 +772,7 @@ var updateRequirementsFunctions = (function () {
                         for (var i = 0; i < results.length; i++) {
                             combinationArr.push.apply(combinationArr, results[i].combination);
                         }
+
                         callback(null, requirementsArr, combinationArr);
 
                     } else {
@@ -1227,7 +1228,7 @@ function getAllJobsBySector(userId, sector, callback) {
             if (results.length > 0) {
 
                 var jobsArr = [];
-                for (var i=0; i < results[0].jobs.length; i++) {
+                for (var i = 0; i < results[0].jobs.length; i++) {
                     jobsArr.push(results[0].jobs[i].job);
                 }
 
@@ -1310,42 +1311,43 @@ function getMyJobs(userId, callback) {
 function getFavoritesJobs(userId, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true, 'jobs': {$elemMatch: {favorite: true}}}, {jobs: 1}
+        {_id: userId, active: true}, {jobs: 1}
     )
-        .populate({
-            path: 'jobs.job',
-            populate: {
-                path: 'original_text academy user',
-                populate: {
-                    path: 'company',
-                    model: CompanyModel
-                }
-            }
-        })
-        .populate({
-            path: 'jobs.cv',
-            select: 'status',
-            populate: {path: 'status.status_id'}
+    /*        .populate({
+     path: 'jobs.job',
+     populate: {
+     path: 'original_text academy user',
+     populate: {
+     path: 'company',
+     model: CompanyModel
+     }
+     }
+     })
+     .populate({
+     path: 'jobs.cv',
+     select: 'status',
+     populate: {path: 'status.status_id'}
 
-        });
+     });*/
 
     query.exec(function (err, results) {
 
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the favorite jobs from the db";
+            error.error = "something went wrong while trying to get the jobs from the db";
             callback(500, error);
         } else {
-/*            if (results.length > 0) {
-                console.log("the favorite jobs extracted successfully from the db");
+            if (results.length > 0) {
+                console.log("the jobs extracted successfully from the db");
+                results[0].jobs = results[0].jobs.filter(function (obj) {
+                    return obj.favorite != false;
+                });
                 callback(200, results);
             } else {
-                console.log("favorite jobs empty");
-                results.jobs = [];
-                callback(200, results);
-            }*/
-            console.log("the favorite jobs extracted successfully from the db");
-            callback(200, results);
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404, error);
+            }
         }
     });
 }
@@ -1472,13 +1474,13 @@ var addCvToJobFunctions = (function () {
 
         },
 
-        copyCV: function (cv,callback) {
+        copyCV: function (cv, callback) {
 
-            addMatchingObject(cv,function(status,results) {
+            addMatchingObject(cv, function (status, results) {
 
                 if (status === 200) {
-                    callback(null,results._id);
-                }else {
+                    callback(null, results._id);
+                } else {
                     callback(status, results);
                 }
             })
@@ -1512,7 +1514,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
                             if (response.body.total_grade > matchObjectToSend.job.compatibility_level) {
 
 
-                                function parallelTasks(totalGrade , jobId, user, cvId, callback) {
+                                function parallelTasks(totalGrade, jobId, user, cvId, callback) {
 
                                     console.log("cvId" + cvId);
 
@@ -1527,7 +1529,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
                                 async.waterfall([
                                     async.apply(addCvToJobFunctions.copyCV, matchObjectToSend.cv),
                                     async.apply(parallelTasks, response.body.total_grade,
-                                        jobId , matchObjectToSend.cv.user)
+                                        jobId, matchObjectToSend.cv.user)
 
                                 ], function (status, results) {
 
@@ -1728,16 +1730,36 @@ function getKeyWordsBySector(sector, callback) {
 function cleanDB(cleanDBCallback) { // TODO: DELETE IT
 
     async.parallel([
-        function(callback){ AcademyModel.remove({}, callback)},
-        function(callback){ FormulaModel.remove({}, callback)},
-        function(callback){ HistoryTimelineModel.remove({}, callback)},
-        function(callback){ MatchingDetailsModel.remove({}, callback)},
-        function(callback){ MatchingObjectsModel.remove({}, callback)},
-        function(callback){ OriginalTextModel.remove({}, callback)},
-        function(callback){ PersonalPropertiesModel.remove({}, callback)},
-        function(callback){ ProfessionalKnowledgeModel.remove({}, callback)},
-        function(callback){ RequirementsModel.remove({}, callback)},
-        function(callback){ StatusModel.remove({}, callback)}
+        function (callback) {
+            AcademyModel.remove({}, callback)
+        },
+        function (callback) {
+            FormulaModel.remove({}, callback)
+        },
+        function (callback) {
+            HistoryTimelineModel.remove({}, callback)
+        },
+        function (callback) {
+            MatchingDetailsModel.remove({}, callback)
+        },
+        function (callback) {
+            MatchingObjectsModel.remove({}, callback)
+        },
+        function (callback) {
+            OriginalTextModel.remove({}, callback)
+        },
+        function (callback) {
+            PersonalPropertiesModel.remove({}, callback)
+        },
+        function (callback) {
+            ProfessionalKnowledgeModel.remove({}, callback)
+        },
+        function (callback) {
+            RequirementsModel.remove({}, callback)
+        },
+        function (callback) {
+            StatusModel.remove({}, callback)
+        }
 
     ], function (err) {
         cleanDBCallback(err)
