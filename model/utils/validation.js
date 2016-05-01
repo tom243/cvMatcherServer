@@ -231,7 +231,6 @@ function formulaValidation(formula) {
     var formulaAmount = 0;
     if (valid) {
         for (var property in formula) {
-            console.log("here " + property);
 
             if ( property != "_id" && property != "__v" && property != "matching_requirements") {
                 if (!(validatePositiveNumber(formula[property]))) { // check for positive number and lower then 100
