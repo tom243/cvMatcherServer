@@ -1312,8 +1312,7 @@ function getFavoritesJobs(userId, callback) {
 
     var query = UserModel.find(
         {_id: userId, active: true}, {jobs: 1}
-    )
-    /*        .populate({
+    ).populate({
      path: 'jobs.job',
      populate: {
      path: 'original_text academy user',
@@ -1328,7 +1327,7 @@ function getFavoritesJobs(userId, callback) {
      select: 'status',
      populate: {path: 'status.status_id'}
 
-     });*/
+     });
 
     query.exec(function (err, results) {
 
