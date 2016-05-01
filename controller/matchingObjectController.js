@@ -250,7 +250,7 @@ function checkCV(req, res) {
                     .send(matchObjectToSend)
                     .end(function (response) {
                         console.log("response from matcher: ", response.body);
-                        console.log("response from matcher - details: " , response.body.formula.requirements.details);
+                        //console.log("response from matcher - details: " , response.body.formula.requirements.details);
                         if (validation.matcherResponse(response.body)) {
                             res.status(response.code).json(response.body);
                         } else {
