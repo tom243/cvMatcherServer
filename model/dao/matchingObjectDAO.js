@@ -27,86 +27,41 @@ var error = {
 // Add Object
 function addMatchingObject(matchingObject, callback) {
 
-    /* First we need to insert all embedded documents and after it insert
-     matching object with all id references */
-
-    /* common to job and cv */
-    addOriginalText(matchingObject.original_text, matchingObject.matching_object_type, function (status, originalTextResults) {
-        if (status === 200) {
-            matchingObject.original_text = originalTextResults._id;
-            /* Add Requirements */
-            addRequirements(matchingObject.requirements, function (status, requirementsResults) {
-                if (status === 200) {
-                    matchingObject.requirements = requirementsResults;
-                    addAcademy(matchingObject.academy, function (status, academyResult) {
-                        if (status === 200) {
-                            matchingObject.academy = academyResult;
-                            /* start unique parameters */
-                            if (matchingObject.matching_object_type === "cv") {
-                                /* Add Personal Properties */
-                                addPersonalProperties(matchingObject.personal_properties,
-                                    function (status, personalPropertiesResult) {
-                                        if (status === 200) {
-                                            matchingObject.personal_properties = personalPropertiesResult._id;
-                                            buildAndSaveMatchingObject(matchingObject, function (status, matchingObjectResult) {
-                                                callback(status, matchingObjectResult);
-                                            })
-                                        } else {
-                                            callback(status, personalPropertiesResult);
-                                        }
-                                    })
-                            } else { // Add Job
-                                /* Add Formula */
-                                addFormula(matchingObject.formula, function (status, formulaResult) {
-                                    if (status === 200) {
-                                        matchingObject.formula = formulaResult._id;
-                                        buildAndSaveMatchingObject(matchingObject, function (status, matchingObjectResult) {
-                                            callback(status, matchingObjectResult);
-                                        })
-                                    } else {
-                                        callback(status, formulaResult);
-                                    }
-                                })
-                            }
-                        } else {
-                            callback(status, academyResult);
-                        }
-                    })
-                } else {
-                    callback(status, requirementsResults);
-                }
-            })
-        } else {
-            callback(status, originalTextResults);
-        }
-    });
-}
-
-function testAddMatchingObject(matchingObject, callback) {
-
-    var parallelArr = [];
+    var parallelArr = [
+        async.apply(addOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
+        async.apply(addRequirements, matchingObject.requirements),
+        async.apply(addAcademy, matchingObject.academy)
+    ];
 
     if (matchingObject.matching_object_type === "cv") {
-        parallelArr = [
-            async.apply(addOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
-            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
-            async.apply(updateAcademy, matchingObject.academy),
-            async.apply(updatePersonalProperties, matchingObject.personal_properties)
-        ]
+        parallelArr.push(async.apply(addPersonalProperties, matchingObject.personal_properties));
     } else { //job
-        parallelArr = [
-            async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
-            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
-            async.apply(updateAcademy, matchingObject.academy),
-            async.apply(updateFormula, matchingObject.formula)
-        ]
+        parallelArr.push(async.apply(addFormula, matchingObject.formula));
     }
 
     async.parallel(parallelArr, function (status, results) {
 
-    })
+        if (status == null) {
+            matchingObject.original_text = results[0];
+            matchingObject.requirements = results[1];
+            matchingObject.academy = results[2];
 
+            if (matchingObject.matching_object_type == "cv") {
+                matchingObject.personal_properties = results[3];
+            } else {
+                matchingObject.formula = results[3];
+            }
 
+            buildAndSaveMatchingObject(matchingObject, function (status, matchingObjectResult) {
+                callback(status, matchingObjectResult);
+            })
+        }else {
+            errorMessage = "error while trying to add matching object";
+            console.log(errorMessage);
+            error.error = errorMessage;
+            callback(status,error);
+        }
+    });
 }
 
 function buildAndSaveMatchingObject(matchingObject, callback) {
@@ -362,7 +317,7 @@ function addOriginalText(originalText, type, callback) {
 
                     } else {
                         console.log("originalText saved successfully to the db");
-                        callback(200, doc);
+                        callback(null, doc);
                     }
                 })
             }
@@ -383,7 +338,7 @@ function addOriginalText(originalText, type, callback) {
                 callback(500, error);
             } else {
                 console.log("originalText saved successfully to the db");
-                callback(200, doc);
+                callback(null, doc);
             }
         })
     }
@@ -588,7 +543,7 @@ function addAcademy(academy, callback) {
             callback(500, error);
         } else {
             console.log("academy saved successfully");
-            callback(200, doc._id);
+            callback(null, doc._id);
         }
     })
 }
@@ -675,7 +630,7 @@ function addRequirements(requirements, callback) {
                 callback(500, error);
             } else {
                 console.log("Requirements saved successfully to the db");
-                callback(200, requirementsArr);
+                callback(null, requirementsArr);
             }
 
         }
@@ -968,7 +923,7 @@ function addPersonalProperties(personalProperties, callback) {
             callback(500, error);
         } else {
             console.log("personal properties saved successfully to db");
-            callback(200, doc);
+            callback(null, doc);
         }
     });
 
@@ -1038,7 +993,7 @@ function addFormula(formula, callback) {
             callback(500, error);
         } else {
             console.log("formula saved successfully to db");
-            callback(200, doc);
+            callback(null, doc);
         }
     });
 
@@ -1313,21 +1268,21 @@ function getFavoritesJobs(userId, callback) {
     var query = UserModel.find(
         {_id: userId, active: true}, {jobs: 1}
     ).populate({
-     path: 'jobs.job',
-     populate: {
-     path: 'original_text academy user',
-     populate: {
-     path: 'company',
-     model: CompanyModel
-     }
-     }
-     })
-     .populate({
-     path: 'jobs.cv',
-     select: 'status',
-     populate: {path: 'status.status_id'}
+            path: 'jobs.job',
+            populate: {
+                path: 'original_text academy user',
+                populate: {
+                    path: 'company',
+                    model: CompanyModel
+                }
+            }
+        })
+        .populate({
+            path: 'jobs.cv',
+            select: 'status',
+            populate: {path: 'status.status_id'}
 
-     });
+        });
 
     query.exec(function (err, results) {
 
