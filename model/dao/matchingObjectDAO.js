@@ -1253,8 +1253,7 @@ function getMyJobs(userId, callback) {
         .populate({
             path: 'jobs',
             match: {
-                active: true,
-                favorite: false
+                active: true
             },
             populate: {
                 path: 'cv',
