@@ -507,7 +507,9 @@ function getAllJobsBySector(req) {
 
 function getMyJobs(req) {
     return req.body
-    && fieldValidation(req.body.user_id) ? true : false
+    && fieldValidation(req.body.user_id)
+    && fieldValidation(req.body.active)
+    && typeof(req.body.active) === "boolean" ? true : false
 }
 
 function getFavoritesJobs(req) {

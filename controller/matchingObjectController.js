@@ -211,7 +211,7 @@ function getMyJobs(req, res) {
     console.log("in getMyJobs");
 
     if (validation.getMyJobs(req)) {
-        matchingObjectDAO.getMyJobs(req.body.user_id, function (status, result) {
+        matchingObjectDAO.getMyJobs(req.body.user_id, req.body.active, function (status, result) {
             res.status(status).json(result);
         });
     } else {

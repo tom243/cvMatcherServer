@@ -1229,10 +1229,10 @@ function getAllJobsBySector(userId, sector, callback) {
     });
 }
 
-function getMyJobs(userId, callback) {
+function getMyJobs(userId, active, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true}, {jobs: 1}
+        {_id: userId, active: active}, {jobs: 1}
     )
         .populate({
             path: 'jobs',
@@ -1270,14 +1270,8 @@ function getMyJobs(userId, callback) {
             error.error = "something went wrong while trying to get the jobs from the db";
             callback(500, error);
         } else {
-            if (results.length > 0) {
-                console.log("the jobs extracted successfully from the db");
-                callback(200, results);
-            } else {
-                console.log("user not exists");
-                error.error = "user not exists";
-                callback(404, error);
-            }
+            console.log("the jobs extracted successfully from the db");
+            callback(200, results);
         }
     });
 }
