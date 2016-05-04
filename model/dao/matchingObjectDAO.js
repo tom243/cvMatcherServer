@@ -1237,8 +1237,7 @@ function getMyJobs(userId, callback) {
         .populate({
             path: 'jobs',
             match: {
-                active: true,
-                favorite: false
+                active: true
             },
             populate: {
                 path: 'job',
@@ -1793,6 +1792,9 @@ function cleanDB(cleanDBCallback) { // TODO: DELETE IT
         },
         function (callback) {
             StatusModel.remove({}, callback)
+        },
+        function (callback) {
+            JobSeekerJobsModel.remove({}, callback)
         }
 
     ], function (err) {
