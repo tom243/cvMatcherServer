@@ -12,6 +12,7 @@ var history_timeline_schema = mongoose.Schema;
 var academy_schema = mongoose.Schema;
 var professional_knowledge_schema = mongoose.Schema;
 var matching_details_schema = mongoose.Schema;
+var jobseeker_jobs_schema = mongoose.Schema;
 
 // Users Schema
 var usersSchema = new users_schema({
@@ -37,24 +38,31 @@ var usersSchema = new users_schema({
     company: { type: Schema.Types.ObjectId, ref: 'CompanyModel' },
     phone_number: String,
     linkedin: String,
-    jobs: [{
-        job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
-        cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
-        favorite: {
-            type: Boolean,
-            default: false
-        }
-    }],
+    jobs: [{ type: Schema.Types.ObjectId, ref: 'JobSeekerJobsModel'}],
     current_cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
     active: {
         index: 1,
         type: Boolean,
-        required: true
+        default: true
     }
 }, {collection: 'Users'});
 
 
+// historyTimeline Schema
+var jobSeekerJobsSchema = new jobseeker_jobs_schema({
 
+    job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
+    cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
+    favorite: {
+        type: Boolean,
+        default: false
+    },
+    active: {
+        type: Boolean,
+        default: true
+    }
+
+}, {collection: 'JobSeeker_Jobs'});
 
 // Companies Schema
 var companiesSchema = new companies_schema({
@@ -81,10 +89,11 @@ var companiesSchema = new companies_schema({
         type: Number,
         required: true
     },
+    employers:[{ type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' }],
     active: {
         index: 1,
         type: Boolean,
-        required: true
+        default: true
     }
 
 }, {collection: 'Companies'});
@@ -130,7 +139,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     active: {
         index: 1,
         type: Boolean,
-        required: true
+        default: true
     },
     user: {
             type: Schema.Types.ObjectId,
@@ -251,7 +260,7 @@ var historyTimelineSchema = new history_timeline_schema({
 }, {collection: 'History_Timeline'});
 
 // AcademySchema Schema
-var AcademySchema = new academy_schema({
+var academySchema = new academy_schema({
     academy_type: [String],
     degree_name: String,
     degree_type: [String]
@@ -259,7 +268,7 @@ var AcademySchema = new academy_schema({
 }, {collection: 'Academy'});
 
 // ProfessionalKnowledgeSchema Schema
-var ProfessionalKnowledgeSchema = new professional_knowledge_schema({
+var professionalKnowledgeSchema = new professional_knowledge_schema({
     name: {
         type : String,
         required : true
@@ -273,7 +282,7 @@ var ProfessionalKnowledgeSchema = new professional_knowledge_schema({
 }, {collection: 'Professional_Knowledge'});
 
 // MatchingDetailsSchema Schema
-var MatchingDetailsSchema = matching_details_schema({
+var matchingDetailsSchema = matching_details_schema({
     name: {
         type : String,
         required : true
@@ -285,7 +294,7 @@ var MatchingDetailsSchema = matching_details_schema({
 }, {collection: 'Matching_Details'});
 
 // keyWords Schema
-var KeyWordsSchema = key_words_schema({
+var keyWordsSchema = key_words_schema({
     sector: String,
     key_words: [String]
 }, {collection: 'Key_Words'});
@@ -299,10 +308,11 @@ var MatchingObjectsModel        = mongoose.model('MatchingObjectsModel', matchin
 var OriginalTextModel           = mongoose.model('OriginalTextModel', originalTextSchema);
 var PersonalPropertiesModel     = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
 var HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', historyTimelineSchema);
-var AcademyModel                = mongoose.model('AcademyModel', AcademySchema);
-var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', ProfessionalKnowledgeSchema);
-var MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', MatchingDetailsSchema);
-var KeyWordsModel               = mongoose.model('KeyWordsModel', KeyWordsSchema);
+var AcademyModel                = mongoose.model('AcademyModel', academySchema);
+var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', professionalKnowledgeSchema);
+var MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', matchingDetailsSchema);
+var KeyWordsModel               = mongoose.model('KeyWordsModel', keyWordsSchema);
+var JobSeekerJobsModel          = mongoose.model('JobSeekerJobsModel', jobSeekerJobsSchema);
 
 
 exports.CompanyModel                = CompanyModel;
@@ -318,3 +328,4 @@ exports.AcademyModel                = AcademyModel;
 exports.ProfessionalKnowledgeModel  = ProfessionalKnowledgeModel;
 exports.MatchingDetailsModel        = MatchingDetailsModel;
 exports.KeyWordsModel               = KeyWordsModel;
+exports.JobSeekerJobsModel          = JobSeekerJobsModel;

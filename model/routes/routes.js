@@ -31,6 +31,7 @@ module.exports = function (app) {
     app.post('/jobSeeker/checkCV', matchingObjectController.checkCV);
     app.post('/jobSeeker/addCvToJob', matchingObjectController.addCvToJob);
     app.post('/jobSeeker/updateFavoriteJob', matchingObjectController.updateFavoriteJob);
+    app.post('/jobSeeker/updateActivityJob', matchingObjectController.updateActivityJob);
 
 //////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
 
@@ -39,6 +40,7 @@ module.exports = function (app) {
     app.post('/employer/getRateCvsForJob', matchingObjectController.getRateCvsForJob);
     app.post('/employer/rateCV', matchingObjectController.rateCV);
     app.post('/employer/updateRateCV', matchingObjectController.updateRateCV);
+    app.post('/employer/hireToJob', matchingObjectController.hireToJob);
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 

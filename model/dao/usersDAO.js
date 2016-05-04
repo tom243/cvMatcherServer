@@ -14,8 +14,7 @@ function addUser(newUser, callback) {
         google_user_id: newUser['google_user_id'],
         first_name: newUser['first_name'],
         last_name: newUser['last_name'],
-        email: newUser['email'],
-        active: true
+        email: newUser['email']
     });
 
     var query = UserModel.find().where('google_user_id', newTable.google_user_id);
@@ -222,8 +221,7 @@ function addCompany(addCompany, callback) {
                     logo: addCompany.logo,
                     p_c: addCompany.p_c,
                     address: addCompany.address,
-                    phone_number: addCompany.phone_number,
-                    active: true
+                    phone_number: addCompany.phone_number
                 });
 
                 /*save the company to db*/

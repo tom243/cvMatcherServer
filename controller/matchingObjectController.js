@@ -173,6 +173,21 @@ function updateRateCV(req, res) {
 
 }
 
+// hire job seeker to job
+function hireToJob(req, res) {
+
+    console.log("in updateRateCV");
+
+    if (validation.hireToJob(req)) {
+        matchingObjectDAO.hireToJob(req.body.cv_id, req.body.job_id, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 //** get jobs by sector for jobSeeker  **//
@@ -284,16 +299,31 @@ function addCvToJob(req, res) {
 
 function updateFavoriteJob(req, res) {
 
-    console.log("in addJobToFavorites");
+    console.log("in updateFavoriteJob");
 
     if (validation.updateFavoriteJob(req)) {
-        matchingObjectDAO.updateFavoriteJob(req.body.user_id, req.body.job_id,
+        matchingObjectDAO.updateFavoriteJob(req.body.job_seeker_job_id,
             req.body.favorite,  function (status, result) {
             res.status(status).json(result);
         });
     } else {
         utils.sendErrorValidation(res);
     }
+}
+
+function  updateActivityJob(req,res){
+
+    console.log("in updateJobSeekerJob");
+
+    if (validation.updateActivityJob(req)) {
+        matchingObjectDAO.updateActivityJob(req.body.job_seeker_job_id,req.body.active
+            , function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
@@ -334,9 +364,9 @@ exports.getMatchingObject = getMatchingObject;
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
-
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
+exports.hireToJob = hireToJob;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
@@ -344,6 +374,7 @@ exports.getFavoritesJobs = getFavoritesJobs;
 exports.checkCV = checkCV;
 exports.addCvToJob = addCvToJob;
 exports.updateFavoriteJob = updateFavoriteJob;
+exports.updateActivityJob = updateActivityJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
 exports.cleanDB = cleanDB; // TODO: DELETE IT

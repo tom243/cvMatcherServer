@@ -491,6 +491,11 @@ function updateRateCV(req) {
     && statusValidation(req.body.status) ? true : false
 }
 
+function hireToJob(req) {
+    return req.body
+    && fieldValidation(req.body.cv_id)
+    && fieldValidation(req.body.job_id) ? true : false
+}
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 function getAllJobsBySector(req) {
@@ -532,10 +537,16 @@ function matcherResponse(response) {
 
 function updateFavoriteJob(req) {
     return req.body
-    && fieldValidation(req.body.user_id)
-    && fieldValidation(req.body.job_id)
+    && fieldValidation(req.body.job_seeker_job_id)
     && fieldValidation(req.body.favorite)
     && typeof(req.body.favorite) === "boolean" ? true : false
+}
+
+function updateActivityJob(req) {
+    return req.body
+    && fieldValidation(req.body.job_seeker_job_id)
+    && fieldValidation(req.body.active)
+    && typeof(req.body.active) === "boolean" ? true : false
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
@@ -564,6 +575,7 @@ exports.getMatchingObject = getMatchingObject;
 exports.deleteMatchingObject = deleteMatchingObject;
 exports.reviveMatchingObject = reviveMatchingObject;
 exports.updateMatchingObject = updateMatchingObject;
+exports.hireToJob = hireToJob;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
@@ -578,5 +590,6 @@ exports.checkCV = checkCV;
 exports.addCvToJob = addCvToJob;
 exports.matcherResponse = matcherResponse;
 exports.updateFavoriteJob = updateFavoriteJob;
+exports.updateActivityJob = updateActivityJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;

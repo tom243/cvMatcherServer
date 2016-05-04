@@ -15,6 +15,7 @@ var ProfessionalKnowledgeModel = require('./../schemas/schemas').ProfessionalKno
 var MatchingDetailsModel = require('./../schemas/schemas').MatchingDetailsModel;
 var KeyWordsModel = require('./../schemas/schemas').KeyWordsModel;
 var CompanyModel = require('./../schemas/schemas').CompanyModel;
+var JobSeekerJobsModel = require('./../schemas/schemas').JobSeekerJobsModel;
 
 var errorMessage;
 
@@ -83,7 +84,6 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
         favorites: [],
         cvs: [],
         archive: false,
-        active: true,
         user: matchingObject.user
     });
 
@@ -895,6 +895,10 @@ function updateRateCV(cvId, status, callback) {
     });
 }
 
+function hireToJob(cvId, jobId, callback) {
+
+}
+
 /////////////////////////////////////// ***  Personal Properties  *** /////////////////////////////
 
 // Add Status
@@ -1169,8 +1173,11 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
 function getAllJobsBySector(userId, sector, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true}
-    );
+        {_id: userId, active: true},{jobs:1}
+    ).populate({
+            path: 'jobs',
+            select: 'job'
+        });
 
     query.exec(function (err, results) {
 
@@ -1228,19 +1235,33 @@ function getMyJobs(userId, callback) {
         {_id: userId, active: true}, {jobs: 1}
     )
         .populate({
-            path: 'jobs.job',
+            path: 'jobs',
+            match: {
+                active: true,
+                favorite: false
+            },
             populate: {
-                path: 'original_text academy user',
+                path: 'job',
                 populate: {
-                    path: 'company',
-                    model: CompanyModel
+                    path: 'original_text academy user',
+                    populate: {
+                        path: 'company',
+                        model: CompanyModel
+                    }
                 }
             }
         })
         .populate({
-            path: 'jobs.cv',
-            select: 'status',
-            populate: {path: 'status.status_id'}
+            path: 'jobs',
+            match: {
+                active: true,
+                favorite: false
+            },
+            populate: {
+                path: 'cv',
+                select: 'status',
+                populate: {path: 'status.status_id'}
+            }
 
         });
 
@@ -1267,20 +1288,35 @@ function getFavoritesJobs(userId, callback) {
 
     var query = UserModel.find(
         {_id: userId, active: true}, {jobs: 1}
-    ).populate({
-            path: 'jobs.job',
+    )
+        .populate({
+            path: 'jobs',
+            match: {
+                active: true,
+                favorite: true
+            },
             populate: {
-                path: 'original_text academy user',
+                path: 'job',
                 populate: {
-                    path: 'company',
-                    model: CompanyModel
+                    path: 'original_text academy user',
+                    populate: {
+                        path: 'company',
+                        model: CompanyModel
+                    }
                 }
             }
         })
         .populate({
-            path: 'jobs.cv',
-            select: 'status',
-            populate: {path: 'status.status_id'}
+            path: 'jobs',
+            match: {
+                active: true,
+                favorite: true
+            },
+            populate: {
+                path: 'cv',
+                select: 'status',
+                populate: {path: 'status.status_id'}
+            }
 
         });
 
@@ -1293,9 +1329,6 @@ function getFavoritesJobs(userId, callback) {
         } else {
             if (results.length > 0) {
                 console.log("the jobs extracted successfully from the db");
-                results[0].jobs = results[0].jobs.filter(function (obj) {
-                    return obj.favorite != false;
-                });
                 callback(200, results);
             } else {
                 console.log("user not exists");
@@ -1335,37 +1368,53 @@ var addCvToJobFunctions = (function () {
             })
         },
         addJobToUser: function (userId, jobId, cvId, callback) {
-            var query = {
-                '_id': userId
-            };
-            var doc = {
-                $addToSet: {
-                    'jobs': {
-                        job: jobId,
-                        cv: cvId
-                    }
-                }
-            };
-            var options = {
-                upsert: true, new: true
-            };
-            UserModel.findOneAndUpdate(query, doc, options, function (err, results) {
-                if (err) {
-                    console.log("error in add job to user " + err);
-                    error.error = "error in add job to user";
-                    callback(500, error);
 
+
+            var jobToAdd = new JobSeekerJobsModel({
+                job: jobId,
+                cv: cvId
+            });
+
+
+            /*save the Formula in db*/
+            jobToAdd.save(function (err, doc) {
+                if (err) {
+                    console.log("something went wrong " + err);
+                    error.error = "something went wrong while trying to save job seeker job";
+                    callback(500, error);
                 } else {
-                    if (results != null) {
-                        callback(null, results);
-                    } else {
-                        errorMessage = "user not exists";
-                        console.log(errorMessage);
-                        error.error = errorMessage;
-                        callback(500, error);
-                    }
+
+                    console.log("job seeker job saved successfully to db");
+
+                    var query = {
+                        '_id': userId
+                    };
+                    var doc = {
+                        $addToSet: {'jobs': doc._id}
+                    };
+                    var options = {
+                        upsert: true, new: true
+                    };
+                    UserModel.findOneAndUpdate(query, doc, options, function (err, results) {
+                        if (err) {
+                            console.log("error in add job to user " + err);
+                            error.error = "error in add job to user";
+                            callback(500, error);
+
+                        } else {
+                            if (results != null) {
+                                callback(null, results);
+                            } else {
+                                errorMessage = "user not exists";
+                                console.log(errorMessage);
+                                error.error = errorMessage;
+                                callback(500, error);
+                            }
+                        }
+                    })
                 }
-            })
+            });
+
         },
 
         updateDataForCV: function (totalGrade, cvId, callback) {
@@ -1526,31 +1575,62 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 
 }
 
-function updateFavoriteJob(userId, jobId, isFavorite, callback) {
+function updateFavoriteJob(jobId, isFavorite, callback) {
 
     var query = {
-        '_id': userId, 'jobs.job': jobId
+        '_id': jobId
     };
     var doc = {
-        '$set': {
-            'jobs.$.favorite': isFavorite
-        }
+        favorite: isFavorite
     };
     var options = {
         new: true
     };
-    UserModel.findOneAndUpdate(query, doc, options, function (err, results) {
+    JobSeekerJobsModel.findOneAndUpdate(query, doc, options, function (err, results) {
         if (err) {
-            console.log("error in add job to favorites " + err);
-            error.error = "error in add job to favorites";
+            console.log("error in update favorite job " + err);
+            error.error = "error in update favorite job";
             callback(500, error);
 
         } else {
             if (results != null) {
-                console.log("job added to favorites successfully");
+                console.log("job favorite updated successfully");
                 callback(200, results);
             } else {
-                errorMessage = "user not exists";
+                errorMessage = "job not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(500, error);
+            }
+        }
+    })
+
+}
+
+function updateActivityJob(jobId, isActive, callback) {
+
+    var query = {
+        '_id': jobId
+    };
+    var doc = {
+        active: isActive
+    };
+    var options = {
+        new: true
+    };
+    JobSeekerJobsModel.findOneAndUpdate(query, doc, options, function (err, results) {
+        if (err) {
+            errorMessage = "error in change job activity ";
+            console.log(errorMessage + err);
+            error.error = errorMessage;
+            callback(500, error);
+
+        } else {
+            if (results != null) {
+                console.log("job activity changed successfully");
+                callback(200, results);
+            } else {
+                errorMessage = "job not exists";
                 console.log(errorMessage);
                 error.error = errorMessage;
                 callback(500, error);
@@ -1731,15 +1811,16 @@ exports.getMatchingObject = getMatchingObject;
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
-
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
+exports.hireToJob = hireToJob;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
 exports.addCvToJob = addCvToJob;
 exports.updateFavoriteJob = updateFavoriteJob;
+exports.updateActivityJob = updateActivityJob;
 
 exports.saveMatcherFormula = saveMatcherFormula;
 
