@@ -93,6 +93,21 @@ function addCompany(req, res) {
     }
 }
 
+function addToExistingCompany(req, res) {
+
+    console.log("in addToExistingCompany");
+
+    if (validation.addToExistingCompany(req)) {
+        usersDAO.addToExistingCompany(req.body.user_id, req.body.company_id,
+            req.body.password, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
 //** Delete an existing company **//
 function deleteCompany(req, res) {
 
@@ -179,6 +194,7 @@ exports.getUser = getUser;
 exports.getUserId = getUserId;
 
 exports.addCompany = addCompany;
+exports.addToExistingCompany = addToExistingCompany;
 exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;

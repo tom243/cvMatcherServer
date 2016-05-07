@@ -16,10 +16,10 @@ var error = {
 function addUser(newUser, callback) {
 
     var newTable = new UserModel({
-        google_user_id: newUser['google_user_id'],
-        first_name: newUser['first_name'],
-        last_name: newUser['last_name'],
-        email: newUser['email']
+        google_user_id: newUser.google_user_id,
+        first_name: newUser.first_name,
+        last_name: newUser.last_name,
+        email: newUser.email
     });
 
     var query = UserModel.find().where('google_user_id', newTable.google_user_id);
@@ -236,7 +236,7 @@ function addCompany(addCompany, callback) {
                         var update = {
                             company: result._id
                         };
-                        var options = {new: true, upsert: true};
+                        var options = {new: true};
                         UserModel.findOneAndUpdate(query, update, options, function (err, user) {
                             if (err) {
                                 console.log("something went wrong " + err);
@@ -256,6 +256,46 @@ function addCompany(addCompany, callback) {
             }
         }
     });
+}
+
+function addToExistingCompany(userId,companyId, password, callback) {
+
+    var query = CompanyModel.find(
+        {_id: companyId, active: true, password:md5(password)}
+    ).limit(1);
+
+    query.exec(function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to find company";
+            callback(500,error);
+        } else {
+            if (results.length > 0) {
+
+                var query = {"_id": userId};
+                var update = {
+                    company: companyId
+                };
+                var options = {new: true};
+                UserModel.findOneAndUpdate(query, update, options, function (err, user) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to assign the company to the user";
+                        callback(500, error);
+                    } else {
+                        console.log("the company added successfully " , results);
+                        callback(200, results);
+                    }
+                });
+
+            }else {
+                console.log("company not exists or password not equals");
+                error.error = "company not exists or password not equals";
+                callback(404,error);
+            }
+        }
+    });
+
 }
 
 // Delete Company
@@ -423,6 +463,7 @@ exports.getUserId = getUserId;
 exports.saveCurrentCV = saveCurrentCV;
 
 exports.addCompany = addCompany;
+exports.addToExistingCompany = addToExistingCompany;
 exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;

@@ -350,6 +350,13 @@ function addCompany(req) {
     && fieldValidation(req.body.user_id) ? true : false
 }
 
+function addToExistingCompany(req) {
+    return req.body
+    && fieldValidation(req.body.user_id)
+    && fieldValidation(req.body.company_id)
+    && fieldValidation(req.body.password) ? true : false
+}
+
 function deleteCompany(req) {
     return req.body && fieldValidation(req.body.company_id) ? true : false
 }
@@ -576,6 +583,7 @@ exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 
 exports.addCompany = addCompany;
+exports.addToExistingCompany = addToExistingCompany;
 exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;

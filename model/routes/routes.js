@@ -46,6 +46,7 @@ module.exports = function (app) {
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
     app.post('/employer/addCompany', usersController.addCompany);
+    app.post('/employer/addToExistingCompany', usersController.addToExistingCompany);
     app.post('/employer/deleteCompany', usersController.deleteCompany);
     app.post('/employer/updateCompany', usersController.updateCompany);
     app.post('/employer/getCompany', usersController.getCompany);
