@@ -2,20 +2,22 @@ var async = require("async");
 var unirest = require('unirest');
 var validation = require("./../utils/validation");
 
-var MatchingObjectsModel = require('./../schemas/schemas').MatchingObjectsModel;
-var FormulaModel = require('./../schemas/schemas').FormulaModel;
-var UserModel = require('./../schemas/schemas').UserModel;
-var StatusModel = require('./../schemas/schemas').StatusModel;
-var RequirementsModel = require('./../schemas/schemas').RequirementsModel;
-var OriginalTextModel = require('./../schemas/schemas').OriginalTextModel;
-var PersonalPropertiesModel = require('./../schemas/schemas').PersonalPropertiesModel;
-var HistoryTimelineModel = require('./../schemas/schemas').HistoryTimelineModel;
-var AcademyModel = require('./../schemas/schemas').AcademyModel;
-var ProfessionalKnowledgeModel = require('./../schemas/schemas').ProfessionalKnowledgeModel;
-var MatchingDetailsModel = require('./../schemas/schemas').MatchingDetailsModel;
-var KeyWordsModel = require('./../schemas/schemas').KeyWordsModel;
-var CompanyModel = require('./../schemas/schemas').CompanyModel;
-var JobSeekerJobsModel = require('./../schemas/schemas').JobSeekerJobsModel;
+var schemas = require('./../schemas/schemas');
+
+var MatchingObjectsModel = schemas.MatchingObjectsModel;
+var FormulaModel = schemas.FormulaModel;
+var UserModel = schemas.UserModel;
+var StatusModel = schemas.StatusModel;
+var RequirementsModel = schemas.RequirementsModel;
+var OriginalTextModel = schemas.OriginalTextModel;
+var PersonalPropertiesModel = schemas.PersonalPropertiesModel;
+var HistoryTimelineModel = schemas.HistoryTimelineModel;
+var AcademyModel = schemas.AcademyModel;
+var ProfessionalKnowledgeModel = schemas.ProfessionalKnowledgeModel;
+var MatchingDetailsModel = schemas.MatchingDetailsModel;
+var KeyWordsModel = schemas.KeyWordsModel;
+var CompanyModel = schemas.CompanyModel;
+var JobSeekerJobsModel = schemas.JobSeekerJobsModel;
 
 var errorMessage;
 
@@ -56,11 +58,11 @@ function addMatchingObject(matchingObject, callback) {
             buildAndSaveMatchingObject(matchingObject, function (status, matchingObjectResult) {
                 callback(status, matchingObjectResult);
             })
-        }else {
+        } else {
             errorMessage = "error while trying to add matching object";
             console.log(errorMessage);
             error.error = errorMessage;
-            callback(status,error);
+            callback(status, error);
         }
     });
 }
@@ -83,7 +85,6 @@ function buildAndSaveMatchingObject(matchingObject, callback) {
         personal_properties: matchingObject.personal_properties,
         favorites: [],
         cvs: [],
-        archive: false,
         user: matchingObject.user
     });
 
@@ -157,22 +158,16 @@ function reviveMatchingObject(matching_object_id, callback) {
 // Update Object
 function updateMatchingObject(matchingObject, callback) {
 
-    var parallelArr = [];
+    var parallelArr = [
+        async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
+        async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
+        async.apply(updateAcademy, matchingObject.academy)
+    ];
 
     if (matchingObject.matching_object_type === "cv") {
-        parallelArr = [
-            async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
-            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
-            async.apply(updateAcademy, matchingObject.academy),
-            async.apply(updatePersonalProperties, matchingObject.personal_properties)
-        ]
+        parallelArr.push(async.apply(updatePersonalProperties, matchingObject.personal_properties));
     } else { //job
-        parallelArr = [
-            async.apply(updateOriginalText, matchingObject.original_text, matchingObject.matching_object_type),
-            async.apply(updateRequirements, matchingObject._id, matchingObject.requirements),
-            async.apply(updateAcademy, matchingObject.academy),
-            async.apply(updateFormula, matchingObject.formula)
-        ]
+        parallelArr.push(async.apply(updateFormula, matchingObject.formula));
     }
 
     async.parallel(parallelArr, function (status, results) {
@@ -235,7 +230,7 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
 
         query = MatchingObjectsModel.find(
             {_id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
-        ).populate('user')
+        ).limit(1).populate('user')
             .populate('academy')
             .populate('personal_properties')
             .populate({
@@ -255,7 +250,7 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
     } else {//job
         query = MatchingObjectsModel.find(
             {_id: matchingObjectId, active: true, matching_object_type: matchingObjectType}
-        ).populate('original_text')
+        ).limit(1).populate('original_text')
             .populate('academy')
             .populate({
                 path: 'requirements',
@@ -895,10 +890,6 @@ function updateRateCV(cvId, status, callback) {
     });
 }
 
-function hireToJob(cvId, jobId, callback) {
-
-}
-
 /////////////////////////////////////// ***  Personal Properties  *** /////////////////////////////
 
 // Add Status
@@ -1085,7 +1076,7 @@ function getUnreadCvsForJob(userId, jobId, callback) {
                             _id: {$in: results[0].cvs},
                             active: true,
                             "status.current_status": "unread",
-                            matching_object_type: "cv"
+                            matching_object_type: "cv",
                         }
                     ).populate('user').populate('original_text')
                         .populate('academy');
@@ -1133,8 +1124,11 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
 
                     var query = MatchingObjectsModel.find(
                         {
-                            _id: {$in: results[0].cvs}, active: true,
-                            "status.current_status": current_status, matching_object_type: "cv"
+                            _id: {$in: results[0].cvs},
+                            active: true,
+                            "status.current_status": current_status,
+                            matching_object_type: "cv",
+                            hired: false
                         }
                     ).populate('user')
                         .populate('status.status_id')
@@ -1167,13 +1161,99 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
     });
 }
 
+function hireToJob(cvId, callback) {
+
+    console.log("in hireToJob");
+
+    console.log("cvId " + cvId);
+
+    var query = {
+        _id: cvId,
+        matching_object_type: "cv"
+    };
+    var update = {
+        hired: true
+    };
+    var options = {new: true};
+    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to hire job seeker to job";
+            callback(500, error);
+        } else {
+            if (results != null) {
+                console.log("job seeker hired successfully");
+                callback(null, results.personal_properties);
+            } else {
+                errorMessage = "cv not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
+        }
+    });
+
+}
+
+function getHiredCvs(userId, jobId, callback) {
+
+    var query = MatchingObjectsModel.find(
+        {_id: jobId, user: userId, active: true, matching_object_type: "job"},
+        {cvs: 1}
+    );
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the job from the db";
+            callback(500, error);
+        } else {
+            if (results.length > 0) {
+                if (results[0].cvs.length > 0) {
+
+                    var query = MatchingObjectsModel.find(
+                        {
+                            _id: {$in: results[0].cvs},
+                            active: true,
+                            matching_object_type: "cv",
+                            hired: true
+                        }
+                    ).populate('user').populate('original_text')
+                        .populate('academy');
+                    query.exec(function (err, results) {
+                        if (err) {
+                            console.log("something went wrong " + err);
+                            error.error = "something went wrong while trying to get the  hired cvs for job from the db";
+                            callback(500, error);
+                        } else {
+                            console.log("the cvs extracted successfully from the db");
+                            callback(200, results);
+                        }
+                    });
+                } else {
+                    console.log("no hired cvs for this job");
+                    callback(200, results[0].cvs);
+                }
+            } else {
+                errorMessage = "job not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
+        }
+
+    });
+
+}
+
 ///////////////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 
 function getAllJobsBySector(userId, sector, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true},{jobs:1}
+        {_id: userId, active: true}, {jobs: 1}
     ).populate({
             path: 'jobs',
             select: 'job'
@@ -1239,7 +1319,7 @@ function getMyJobs(userId, active, callback) {
             match: {
                 active: active
             },
-            model:JobSeekerJobsModel,
+            model: JobSeekerJobsModel,
             populate: {
                 path: 'job',
                 populate: {
@@ -1258,7 +1338,7 @@ function getMyJobs(userId, active, callback) {
             },
             populate: {
                 path: 'cv',
-                select: 'status',
+                select: 'status hired',
                 populate: {path: 'status.status_id'}
             }
 
@@ -1517,8 +1597,6 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 
 
                                 function parallelTasks(totalGrade, jobId, user, cvId, callback) {
-
-                                    console.log("cvId" + cvId);
 
                                     async.parallel([
                                         async.apply(saveMatcherFormula, cvId, response.body),
@@ -1816,6 +1894,7 @@ exports.getRateCvsForJob = getRateCvsForJob;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;
+exports.getHiredCvs = getHiredCvs;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;

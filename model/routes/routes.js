@@ -41,6 +41,7 @@ module.exports = function (app) {
     app.post('/employer/rateCV', matchingObjectController.rateCV);
     app.post('/employer/updateRateCV', matchingObjectController.updateRateCV);
     app.post('/employer/hireToJob', matchingObjectController.hireToJob);
+    app.post('/employer/getHiredCvs', matchingObjectController.getHiredCvs);
 
 /////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
 
@@ -48,6 +49,7 @@ module.exports = function (app) {
     app.post('/employer/deleteCompany', usersController.deleteCompany);
     app.post('/employer/updateCompany', usersController.updateCompany);
     app.post('/employer/getCompany', usersController.getCompany);
+    app.get ('/employer/getCompanies', usersController.getCompanies);
     app.post('/getLogoImages' ,usersController.getLogoImages);
 
 ////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////////

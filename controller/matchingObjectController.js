@@ -3,6 +3,7 @@ var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object =
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var unirest = require('unirest');
+var async = require("async");
 
 var error = {
     error: null
@@ -18,11 +19,11 @@ function addMatchingObject(req, res) {
     if (validation.addMatchingObject(req)) {
         matchingObjectDAO.addMatchingObject(req.body, function (status, result) {
 
-            if(status === 200 && result.matching_object_type === "cv") {
-                usersDAO.saveCurrentCV(result.user, result._id, function (status,result) {
+            if (status === 200 && result.matching_object_type === "cv") {
+                usersDAO.saveCurrentCV(result.user, result._id, function (status, result) {
                     res.status(status).json(result);
                 })
-            }else {
+            } else {
                 res.status(status).json(result);
             }
         });
@@ -176,10 +177,41 @@ function updateRateCV(req, res) {
 // hire job seeker to job
 function hireToJob(req, res) {
 
-    console.log("in updateRateCV");
+    console.log("in hireToJob");
 
     if (validation.hireToJob(req)) {
-        matchingObjectDAO.hireToJob(req.body.cv_id, req.body.job_id, function (status, result) {
+
+        async.waterfall([
+            async.apply(matchingObjectDAO.hireToJob, req.body.cv_id),
+            async.apply(usersDAO.addJobSeekerToCompany, req.body.user_id)
+
+        ], function (status, results) {
+
+            if (status == null) {
+
+                console.log("job seeker hired to job successfully");
+                res.status(200).json(results);
+
+            } else {
+                console.log("error while trying to hire job seeker to job");
+                error.error = "error while trying to hire job seeker to job";
+                callback(status, error);
+            }
+
+        });
+
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
+function getHiredCvs(req, res) {
+
+    console.log("in getHiredCvs");
+
+    if (validation.getHiredCvs(req)) {
+        matchingObjectDAO.getHiredCvs(req.body.user_id, req.body.job_id, function (status, result) {
             res.status(status).json(result);
         });
     } else {
@@ -303,23 +335,23 @@ function updateFavoriteJob(req, res) {
 
     if (validation.updateFavoriteJob(req)) {
         matchingObjectDAO.updateFavoriteJob(req.body.job_seeker_job_id,
-            req.body.favorite,  function (status, result) {
-            res.status(status).json(result);
-        });
+            req.body.favorite, function (status, result) {
+                res.status(status).json(result);
+            });
     } else {
         utils.sendErrorValidation(res);
     }
 }
 
-function  updateActivityJob(req,res){
+function updateActivityJob(req, res) {
 
     console.log("in updateJobSeekerJob");
 
     if (validation.updateActivityJob(req)) {
-        matchingObjectDAO.updateActivityJob(req.body.job_seeker_job_id,req.body.active
+        matchingObjectDAO.updateActivityJob(req.body.job_seeker_job_id, req.body.active
             , function (status, result) {
-            res.status(status).json(result);
-        });
+                res.status(status).json(result);
+            });
     } else {
         utils.sendErrorValidation(res);
     }
@@ -344,10 +376,10 @@ function getKeyWordsBySector(req, res) {
 }
 
 function cleanDB(req, res) { // TODO: DELETE IT
-    matchingObjectDAO.cleanDB(function(err) {
+    matchingObjectDAO.cleanDB(function (err) {
         if (err === null) {
             res.status(200).json();
-        }else {
+        } else {
             res.status(500).json();
         }
     });
@@ -367,6 +399,7 @@ exports.getRateCvsForJob = getRateCvsForJob;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;
+exports.getHiredCvs = getHiredCvs;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;

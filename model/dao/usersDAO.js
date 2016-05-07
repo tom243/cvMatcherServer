@@ -1,5 +1,10 @@
-var UserModel = require('./../schemas/schemas').UserModel;
-var CompanyModel = require('./../schemas/schemas').CompanyModel;
+
+var schemas = require('./../schemas/schemas');
+
+var UserModel = schemas.UserModel;
+var CompanyModel = schemas.CompanyModel;
+
+var md5 = require('md5');
 
 var error = {
     error: null
@@ -30,11 +35,11 @@ function addUser(newUser, callback) {
             newTable.save(function (err, result) {
                 if (err) {
                     console.log("something went wrong " + err);
-                    error.error = "something went wrong while insert user to the DB";
+                    error.error = "something went wrong while insert user";
                     callback(500,error);
 
                 } else {
-                    console.log(" the user saved successfully to the DB: " , result);
+                    console.log(" the user saved successfully " , result);
                     callback(200,result);
                 }
             });
@@ -48,7 +53,6 @@ function addUser(newUser, callback) {
     });
 }
 
-
 // Delete User
 function deleteUser(userId, callback) {
 
@@ -60,11 +64,11 @@ function deleteUser(userId, callback) {
     UserModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while delete user from the DB";
+            error.error = "something went wrong while delete user";
             callback(500,error);
         } else {
             if (results != null) {
-                console.log("the user deleted successfully from the db " , results );
+                console.log("the user deleted successfully " , results );
                 callback(200, results);
             }else {
                 console.log("user not exists");
@@ -76,10 +80,8 @@ function deleteUser(userId, callback) {
 
 }
 
-
 // Update User
 function updateUser(updateUser, callback) {
-
 
     var query = {"_id": updateUser._id};
     var update = {
@@ -96,12 +98,12 @@ function updateUser(updateUser, callback) {
     UserModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while update user to DB";
+            error.error = "something went wrong while update user";
             callback(500,error);
         } else {
 
             if (results != null) {
-                console.log("the user updated successfully to the db, user: " , results );
+                console.log("the user updated successfully, user: " , results );
                 callback(200,results);
             }else {
                 console.log("user not exists");
@@ -112,11 +114,11 @@ function updateUser(updateUser, callback) {
     });
 }
 
-var getUser = function getUser(userId, callback) {
+function getUser(userId, callback) {
 
     var query = UserModel.find(
         {_id: userId, active: true}
-    );
+    ).limit(1);
 /*    .populate({
         path: 'current_cv',
         populate: {
@@ -133,11 +135,11 @@ var getUser = function getUser(userId, callback) {
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user from the db";
+            error.error = "something went wrong while trying to get the user";
             callback(500,error);
         } else {
             if (results.length > 0) {
-                console.log("the user extracted successfully from the db ", results);
+                console.log("the user extracted successfully ", results);
                 callback(200, results);
             }else {
                 console.log("user not exists");
@@ -146,24 +148,24 @@ var getUser = function getUser(userId, callback) {
             }
         }
     });
-};
+}
 
-var getUserId = function getUserId(googleUserId, callback) {
+function getUserId(googleUserId, callback) {
 
     var query = UserModel.find(
         {google_user_id: googleUserId, active: true},
         {_id: 1}
-    );
+    ).limit(1);
 
     query.exec(function (err, results) {
 
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user id from the db";
+            error.error = "something went wrong while trying to get the user id";
             callback(500,error);
         } else {
             if (results.length > 0) {
-                console.log("the user id extracted successfully from the db ", results);
+                console.log("the user id extracted successfully ", results);
                 callback(200, results);
             }else {
                 console.log("google user id not exists");
@@ -172,16 +174,13 @@ var getUserId = function getUserId(googleUserId, callback) {
             }
         }
     });
-};
-
+}
 
 function saveCurrentCV(userId, cvId,callback) {
 
     var query = {"_id": userId};
     var update = {
-        //$setOnInsert: {
-            current_cv: cvId
-       // }
+        current_cv: cvId
     };
     var options = {new: true, upsert:true};
     UserModel.findOneAndUpdate(query, update, options, function (err, results) {
@@ -221,17 +220,17 @@ function addCompany(addCompany, callback) {
                     logo: addCompany.logo,
                     p_c: addCompany.p_c,
                     address: addCompany.address,
-                    phone_number: addCompany.phone_number
+                    phone_number: addCompany.phone_number,
+                    password: md5(addCompany.password) // MD5 encryption to password
                 });
 
                 /*save the company to db*/
                 newTable.save(function (err, result) {
                     if (err) {
                         console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to insert the company to db";
+                        error.error = "something went wrong while trying to insert the company";
                         callback(500, error);
                     } else {
-                        console.log("Company saved to DB: " + result);
 
                         var query = {"_id": addCompany.user_id};
                         var update = {
@@ -241,10 +240,10 @@ function addCompany(addCompany, callback) {
                         UserModel.findOneAndUpdate(query, update, options, function (err, user) {
                             if (err) {
                                 console.log("something went wrong " + err);
-                                error.error = "something went wrong while trying to assign the company to the user in db";
+                                error.error = "something went wrong while trying to assign the company to the user";
                                 callback(500, error);
                             } else {
-                                console.log("the company added successfully to the db" , result);
+                                console.log("the company added successfully " , result);
                                 callback(200, result);
                             }
                         });
@@ -270,12 +269,12 @@ function deleteCompany(companyId, callback) {
     CompanyModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while delete company from DB";
+            error.error = "something went wrong while delete company";
             callback(500,error);
         } else {
 
             if (results != null) {
-                console.log("the company deleted successfully from the db, company: " , results);
+                console.log("the company deleted successfully, company: " , results);
                 callback(200,results);
             }else {
                 console.log("company not exists");
@@ -296,18 +295,19 @@ function updateCompany(updateCompany, callback) {
         logo: updateCompany.logo,
         p_c: updateCompany.p_c,
         address: updateCompany.address,
-        phone_number: updateCompany.phone_number
+        phone_number: updateCompany.phone_number,
+        password: md5(updateCompany.password) // MD5 encryption to password
     };
     var options = {new: true};
     CompanyModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while update company to DB";
+            error.error = "something went wrong while update company";
             callback(500,error);
         } else {
 
             if (results != null) {
-                console.log("the company updated successfully to the db, company: " , results );
+                console.log("the company updated successfully, company: " , results );
                 callback(200,results);
             }else {
                 console.log("company not exists");
@@ -318,20 +318,20 @@ function updateCompany(updateCompany, callback) {
     });
 }
 
-var getCompany = function getCompany(companyId, callback) {
+function getCompany(companyId, callback) {
 
     var query = CompanyModel.find(
         {_id: companyId, active: true}
-    );
+    ).limit(1);
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the company from the db";
+            error.error = "something went wrong while trying to get the company";
             callback(500,error);
         } else {
             if (results.length > 0) {
-                console.log("the company extracted successfully from the db ", results);
+                console.log("the company extracted successfully ", results);
                 callback(200, results);
             }else {
                 console.log("company not exists");
@@ -341,7 +341,77 @@ var getCompany = function getCompany(companyId, callback) {
         }
     });
 
-};
+}
+
+function getCompanies(callback) {
+    var query = CompanyModel.find(
+        {active: true},{name:1,logo:1}
+    );
+
+    query.exec(function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the companies";
+            callback(500,error);
+        } else {
+            if (results.length > 0) {
+                console.log("the companies extracted successfully");
+                callback(200, results);
+            }else {
+                console.log("no companies in the system");
+                error.error = "no companies in the system";
+                callback(404,error);
+            }
+        }
+    });
+}
+
+function addJobSeekerToCompany(userId,personalPropertiesId,callback) {
+
+    var query = UserModel.find(
+        {_id: userId, active: true},{company:1}
+    ).limit(1);
+
+    query.exec(function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the user from the db";
+            callback(500,error);
+        } else {
+            if (results.length > 0) {
+
+                var query = {"_id": results[0].company};
+                var update = {
+                    $addToSet: {'employers': personalPropertiesId}
+                };
+                var options = {new: true};
+                CompanyModel.findOneAndUpdate(query, update, options, function (err, results) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to add personal properties to company employers";
+                        callback(500,error);
+                    } else {
+
+                        if (results != null) {
+                            console.log(" the personal properties added to company employers successfully");
+                            callback(null,results);
+                        }else {
+                            console.log("user not exists");
+                            error.error = "user not exists";
+                            callback(404,error);
+                        }
+                    }
+                });
+
+            }else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404,error);
+            }
+        }
+    });
+
+}
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
@@ -356,5 +426,7 @@ exports.addCompany = addCompany;
 exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
+exports.getCompanies = getCompanies;
+exports.addJobSeekerToCompany = addJobSeekerToCompany;
 
 

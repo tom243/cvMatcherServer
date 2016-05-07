@@ -90,6 +90,10 @@ var companiesSchema = new companies_schema({
         required: true
     },
     employers:[{ type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' }],
+    password: {
+        type: String,
+        required: true
+    },
     active: {
         index: 1,
         type: Boolean,
@@ -134,7 +138,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     archive:{
         index: 1,
         type: Boolean,
-        required: true
+        default: false
     },
     active: {
         index: 1,
@@ -146,6 +150,10 @@ var matchingObjectsSchema = new matching_objects_schema({
             required:true,
             index:1,
             ref: 'UserModel'
+    },
+    hired: {
+        type: Boolean,
+        default: false
     }
 
 }, {collection: 'Matching_Objects'});

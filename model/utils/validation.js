@@ -233,11 +233,12 @@ function formulaValidation(formula) {
         for (var property in formula) {
 
             if ( property != "_id" && property != "__v" && property != "matching_requirements") {
-                if (!(validatePositiveNumber(formula[property]))) { // check for positive number and lower then 100
+                if ((validatePositiveNumber(formula[property]))) { // check for positive number and lower then 100
+                    formulaAmount += formula[property];
+                }else {
                     valid = false;
                     break;
                 }
-                formulaAmount += formula[property];
             }
         }
         return !!(valid && formulaAmount === 100); // verify formula is not bigger the 100
@@ -494,8 +495,15 @@ function updateRateCV(req) {
 function hireToJob(req) {
     return req.body
     && fieldValidation(req.body.cv_id)
+    && fieldValidation(req.body.user_id) ? true : false
+}
+
+function getHiredCvs(req) {
+    return req.body
+    && fieldValidation(req.body.user_id)
     && fieldValidation(req.body.job_id) ? true : false
 }
+
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 function getAllJobsBySector(req) {
@@ -578,6 +586,7 @@ exports.deleteMatchingObject = deleteMatchingObject;
 exports.reviveMatchingObject = reviveMatchingObject;
 exports.updateMatchingObject = updateMatchingObject;
 exports.hireToJob = hireToJob;
+exports.getHiredCvs = getHiredCvs;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
