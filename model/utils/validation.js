@@ -3,7 +3,7 @@
 /* Common */
 
 function fieldValidation(field) {
-    return !!(typeof field !== 'undefined' && field != null );
+    return !!(typeof field !== 'undefined' && field != null && field );
 }
 
 /* Input types validations */
@@ -308,8 +308,6 @@ var sectorArr = ["software engineering"];
 function addUser(req) {
     return req.body
     && fieldValidation(req.body.google_user_id)
-    && fieldValidation(req.body.first_name)
-    && fieldValidation(req.body.last_name)
     && (fieldValidation(req.body.email) && validateEmail(req.body.email)) ? true : false
 }
 
@@ -347,6 +345,7 @@ function addCompany(req) {
     && fieldValidation(req.body.p_c)
     && fieldValidation(req.body.address)
     && fieldValidation(req.body.phone_number)
+    && fieldValidation(req.body.password)
     && fieldValidation(req.body.user_id) ? true : false
 }
 
@@ -373,6 +372,13 @@ function updateCompany(req) {
 
 function getCompany(req) {
     return req.body && fieldValidation(req.body.company_id) ? true : false
+}
+
+function changeCompanyPassword(req) {
+    return req.body
+    && fieldValidation(req.body.company_id)
+    && fieldValidation(req.body.old_password)
+    && fieldValidation(req.body.new_password) ? true : false
 }
 
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
@@ -587,6 +593,7 @@ exports.addToExistingCompany = addToExistingCompany;
 exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
+exports.changeCompanyPassword = changeCompanyPassword;
 
 exports.addMatchingObject = addMatchingObject;
 exports.getMatchingObject = getMatchingObject;

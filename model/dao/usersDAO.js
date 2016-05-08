@@ -335,9 +335,9 @@ function updateCompany(updateCompany, callback) {
         logo: updateCompany.logo,
         p_c: updateCompany.p_c,
         address: updateCompany.address,
-        phone_number: updateCompany.phone_number,
-        password: md5(updateCompany.password) // MD5 encryption to password
+        phone_number: updateCompany.phone_number
     };
+
     var options = {new: true};
     CompanyModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
@@ -453,6 +453,46 @@ function addJobSeekerToCompany(userId,personalPropertiesId,callback) {
 
 }
 
+function changeCompanyPassword(companyId, oldPassword, newPassword, callback) {
+
+    var query = CompanyModel.find(
+        {_id: companyId, active: true, password:md5(oldPassword) }
+    ).limit(1);
+
+    query.exec(function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to find company";
+            callback(500,error);
+        } else {
+            if (results.length > 0) {
+
+                var query = {"_id": companyId};
+                var update = {
+                    password: md5(newPassword)
+                };
+                var options = {new: true};
+                CompanyModel.findOneAndUpdate(query, update, options, function (err, results) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to update password";
+                        callback(500, error);
+                    } else {
+                        console.log("the password updated successfully");
+                        callback(200, results);
+                    }
+                });
+
+            }else {
+                console.log("company not exists or password not equals");
+                error.error = "company not exists or password not equals";
+                callback(404,error);
+            }
+        }
+    });
+
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addUser = addUser;
@@ -469,5 +509,6 @@ exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.getCompanies = getCompanies;
 exports.addJobSeekerToCompany = addJobSeekerToCompany;
+exports.changeCompanyPassword = changeCompanyPassword;
 
 

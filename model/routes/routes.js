@@ -51,7 +51,9 @@ module.exports = function (app) {
     app.post('/employer/updateCompany', usersController.updateCompany);
     app.post('/employer/getCompany', usersController.getCompany);
     app.get ('/employer/getCompanies', usersController.getCompanies);
+    app.post ('/employer/changeCompanyPassword', usersController.changeCompanyPassword);
     app.post('/getLogoImages' ,usersController.getLogoImages);
+
 
 ////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////////
 

@@ -185,6 +185,21 @@ function getLogoImages(req, res) {
         });
 }
 
+function changeCompanyPassword(req, res) {
+
+    console.log("in changeCompanyPassword");
+
+    if (validation.changeCompanyPassword(req)) {
+        usersDAO.changeCompanyPassword(req.body.company_id,req.body.old_password,
+            req.body.new_password, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addUser = addUser;
@@ -200,6 +215,7 @@ exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.getCompanies = getCompanies;
 exports.getLogoImages = getLogoImages;
+exports.changeCompanyPassword = changeCompanyPassword;
 
 
 
