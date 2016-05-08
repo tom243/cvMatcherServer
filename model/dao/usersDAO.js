@@ -361,7 +361,7 @@ function updateCompany(updateCompany, callback) {
 function getCompany(companyId, callback) {
 
     var query = CompanyModel.find(
-        {_id: companyId, active: true}
+        {_id: companyId, active: true},{password:0}
     ).limit(1);
 
     query.exec(function (err, results) {
