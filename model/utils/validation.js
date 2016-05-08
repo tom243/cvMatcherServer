@@ -3,7 +3,7 @@
 /* Common */
 
 function fieldValidation(field) {
-    return !!(typeof field !== 'undefined' && field != null && field );
+    return !!(typeof field !== 'undefined' && field != null);
 }
 
 /* Input types validations */
