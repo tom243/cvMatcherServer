@@ -104,7 +104,7 @@ function personalPropertiesValidation(personalProperties) {
     && fieldValidation(personalProperties.multilingual)
     && fieldValidation(personalProperties.volunteering)
     && fieldValidation(personalProperties.full_army_service)
-    && fieldValidation(personalProperties.officer)
+    && fieldValidation(personalProperties.officer_in_the_military)
     && fieldValidation(personalProperties.high_school_graduation_with_honors)
     && fieldValidation(personalProperties.youth_movements) ? true : false;
 
@@ -494,6 +494,7 @@ function getRateCvsForJob(req) {
 function rateCV(req) {
     return req.body
     && fieldValidation(req.body.cv_id)
+    && fieldValidation(req.body.user_id)
     && fieldValidation(req.body.status)
     && statusValidation(req.body.status) ? true : false
 }
@@ -558,6 +559,10 @@ function matcherResponse(response) {
     && matcherFormulaValidation(response.formula) ? true : false
 }
 
+function predictorResponse(response) {
+    return typeof(response) === "boolean"
+}
+
 function updateFavoriteJob(req) {
     return req.body
     && fieldValidation(req.body.job_seeker_job_id)
@@ -614,8 +619,12 @@ exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
 exports.checkCV = checkCV;
 exports.addCvToJob = addCvToJob;
-exports.matcherResponse = matcherResponse;
+
 exports.updateFavoriteJob = updateFavoriteJob;
 exports.updateActivityJob = updateActivityJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
+
+exports.predictorResponse = predictorResponse;
+exports.matcherResponse = matcherResponse;
+

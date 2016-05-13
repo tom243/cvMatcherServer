@@ -13,6 +13,7 @@ var academy_schema = mongoose.Schema;
 var professional_knowledge_schema = mongoose.Schema;
 var matching_details_schema = mongoose.Schema;
 var jobseeker_jobs_schema = mongoose.Schema;
+var validation_schema = mongoose.Schema;
 
 // Users Schema
 var usersSchema = new users_schema({
@@ -89,7 +90,7 @@ var companiesSchema = new companies_schema({
         type: Number,
         required: true
     },
-    employers:[{ type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' }],
+    employees:[{ type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' }],
     password: {
         type: String,
         required: true
@@ -154,7 +155,8 @@ var matchingObjectsSchema = new matching_objects_schema({
     hired: {
         type: Boolean,
         default: false
-    }
+    },
+    predict_result: Boolean
 
 }, {collection: 'Matching_Objects'});
 
@@ -244,7 +246,7 @@ var personalPropertiesSchema = new personal_properties_schema({
         type : Boolean,
         required : true
     },
-    officer: {
+    officer_in_the_military: {
         type : Boolean,
         required : true
     },
@@ -255,7 +257,8 @@ var personalPropertiesSchema = new personal_properties_schema({
     youth_movements: {
         type : Boolean,
         required : true
-    }
+    },
+    decision: Boolean
 }, {collection: 'Personal_Properties'});
 
 // historyTimeline Schema
@@ -307,6 +310,16 @@ var keyWordsSchema = key_words_schema({
     key_words: [String]
 }, {collection: 'Key_Words'});
 
+var validationSchema = validation_schema({
+    sector: [String],
+    candidate_type: [String],
+    scope_of_position: [String],
+    academy_type: [String],
+    degree_name: [String],
+    degree_type: [String]
+}, {collection: 'Validation'});
+
+
 var UserModel                   = mongoose.model('UserModel', usersSchema);
 var StatusModel                 = mongoose.model('StatusModel',statusSchema);
 var RequirementsModel           = mongoose.model('RequirementsModel',requirementSchema);
@@ -321,7 +334,7 @@ var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', p
 var MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', matchingDetailsSchema);
 var KeyWordsModel               = mongoose.model('KeyWordsModel', keyWordsSchema);
 var JobSeekerJobsModel          = mongoose.model('JobSeekerJobsModel', jobSeekerJobsSchema);
-
+var ValidationModel             = mongoose.model('ValidationModel', validationSchema);
 
 exports.CompanyModel                = CompanyModel;
 exports.MatchingObjectsModel        = MatchingObjectsModel;
@@ -337,3 +350,4 @@ exports.ProfessionalKnowledgeModel  = ProfessionalKnowledgeModel;
 exports.MatchingDetailsModel        = MatchingDetailsModel;
 exports.KeyWordsModel               = KeyWordsModel;
 exports.JobSeekerJobsModel          = JobSeekerJobsModel;
+exports.ValidationModel             = ValidationModel;

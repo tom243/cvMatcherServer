@@ -150,9 +150,43 @@ function rateCV(req, res) {
     console.log("in rateCV");
 
     if (validation.rateCV(req)) {
-        matchingObjectDAO.rateCV(req.body.cv_id, req.body.status, function (status, result) {
-            res.status(status).json(result);
-        });
+
+
+        if (req.body.status.current_status === "liked") {
+
+            matchingObjectDAO.rateCV(req.body.cv_id, req.body.status, function (status, result) {
+
+                if (status === null) {
+                    res.status(200).json(result);
+                } else {
+                    res.status(status).json(result);
+                }
+            });
+        } else { // === unliked
+
+            function waterfallTasks(cvId, userId, callback) {
+
+                async.waterfall([
+                    async.apply(matchingObjectDAO.setDecisionToFalse, cvId),
+                    async.apply(usersDAO.addPersonalPropertiesToCompany, userId)
+                ], callback);
+            }
+
+            async.parallel([
+                async.apply(matchingObjectDAO.rateCV, req.body.cv_id, req.body.status),
+                async.apply(waterfallTasks, req.body.cv_id, req.body.user_id)
+
+            ], function (status, results) {
+
+                if (status === null) {
+                    res.status(200).json(results[0]);
+                } else {
+                    res.status(status).json(results);
+                }
+
+            });
+
+        }
     } else {
         utils.sendErrorValidation(res);
     }
@@ -165,9 +199,41 @@ function updateRateCV(req, res) {
     console.log("in updateRateCV");
 
     if (validation.updateRateCV(req)) {
-        matchingObjectDAO.updateRateCV(req.body.cv_id, req.body.status, function (status, result) {
-            res.status(status).json(result);
+
+        function waterfallTasks(cvId, userId, callback) {
+
+            var waterfallArr = [];
+
+            if (req.body.status.current_status === "liked") {
+                waterfallArr = [
+                    async.apply(matchingObjectDAO.getPersonalPropertiesID, cvId),
+                    async.apply(usersDAO.removePersonalPropertiesFromCompany, userId)
+                ];
+            } else {// === unliked
+                waterfallArr = [
+                    async.apply(matchingObjectDAO.setDecisionToFalse, cvId),
+                    async.apply(usersDAO.addPersonalPropertiesToCompany, userId)
+                ];
+            }
+
+            async.waterfall(waterfallArr, callback);
+
+        }
+
+        async.parallel([
+            async.apply(matchingObjectDAO.updateRateCV, req.body.cv_id, req.body.status),
+            async.apply(waterfallTasks, req.body.cv_id, req.body.user_id)
+
+        ], function (status, results) {
+
+            if (status === null) {
+                res.status(200).json(results[0]);
+            } else {
+                res.status(status).json(results);
+            }
+
         });
+
     } else {
         utils.sendErrorValidation(res);
     }
@@ -183,7 +249,7 @@ function hireToJob(req, res) {
 
         async.waterfall([
             async.apply(matchingObjectDAO.hireToJob, req.body.cv_id),
-            async.apply(usersDAO.addJobSeekerToCompany, req.body.user_id)
+            async.apply(usersDAO.addPersonalPropertiesToCompany, req.body.user_id)
 
         ], function (status, results) {
 

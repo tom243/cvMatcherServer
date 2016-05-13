@@ -1,4 +1,3 @@
-
 var schemas = require('./../schemas/schemas');
 
 var UserModel = schemas.UserModel;
@@ -28,7 +27,7 @@ function addUser(newUser, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to find if user already exist";
-            callback(500,error);
+            callback(500, error);
         }
         if (results.length == 0) {
             /*save the User in db*/
@@ -36,18 +35,18 @@ function addUser(newUser, callback) {
                 if (err) {
                     console.log("something went wrong " + err);
                     error.error = "something went wrong while insert user";
-                    callback(500,error);
+                    callback(500, error);
 
                 } else {
-                    console.log(" the user saved successfully " , result);
-                    callback(200,result);
+                    console.log(" the user saved successfully ", result);
+                    callback(200, result);
                 }
             });
         }
         else {
             console.log("user already exists with the same google id, user id returns to client!!!");
-            getUserId(newUser.google_user_id, function(status,userId){
-                callback(status,userId);
+            getUserId(newUser.google_user_id, function (status, userId) {
+                callback(status, userId);
             })
         }
     });
@@ -56,7 +55,7 @@ function addUser(newUser, callback) {
 // Delete User
 function deleteUser(userId, callback) {
 
-    var query = {"_id":userId};
+    var query = {"_id": userId};
     var update = {
         active: false
     };
@@ -65,15 +64,15 @@ function deleteUser(userId, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while delete user";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results != null) {
-                console.log("the user deleted successfully " , results );
+                console.log("the user deleted successfully ", results);
                 callback(200, results);
-            }else {
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -99,16 +98,16 @@ function updateUser(updateUser, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while update user";
-            callback(500,error);
+            callback(500, error);
         } else {
 
             if (results != null) {
-                console.log("the user updated successfully, user: " , results );
-                callback(200,results);
-            }else {
+                console.log("the user updated successfully, user: ", results);
+                callback(200, results);
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -119,32 +118,32 @@ function getUser(userId, callback) {
     var query = UserModel.find(
         {_id: userId, active: true}
     ).limit(1);
-/*    .populate({
-        path: 'current_cv',
-        populate: {
-            path: 'original_text academy personal_properties requirements formula',
-            populate: {
-                path: 'history_timeline', options: {sort: {'start_year': 1}},
-                path: 'combination',
-                path: 'matching_requirements.details'
+    /*    .populate({
+     path: 'current_cv',
+     populate: {
+     path: 'original_text academy personal_properties requirements formula',
+     populate: {
+     path: 'history_timeline', options: {sort: {'start_year': 1}},
+     path: 'combination',
+     path: 'matching_requirements.details'
 
-            }
-        }
-    });*/
+     }
+     }
+     });*/
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the user";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
                 console.log("the user extracted successfully ", results);
                 callback(200, results);
-            }else {
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -162,41 +161,41 @@ function getUserId(googleUserId, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the user id";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
                 console.log("the user id extracted successfully ", results);
                 callback(200, results);
-            }else {
+            } else {
                 console.log("google user id not exists");
                 error.error = "google user id not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
 }
 
-function saveCurrentCV(userId, cvId,callback) {
+function saveCurrentCV(userId, cvId, callback) {
 
     var query = {"_id": userId};
     var update = {
         current_cv: cvId
     };
-    var options = {new: true, upsert:true};
+    var options = {new: true};
     UserModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while update current cv";
-            callback(500,error);
+            callback(500, error);
         } else {
 
             if (results != null) {
                 console.log("the current cv updated successfully");
-                callback(200,results);
-            }else {
+                callback(200, results);
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -243,7 +242,7 @@ function addCompany(addCompany, callback) {
                                 error.error = "something went wrong while trying to assign the company to the user";
                                 callback(500, error);
                             } else {
-                                console.log("the company added successfully " , result);
+                                console.log("the company added successfully ", result);
                                 callback(200, result);
                             }
                         });
@@ -258,17 +257,17 @@ function addCompany(addCompany, callback) {
     });
 }
 
-function addToExistingCompany(userId,companyId, password, callback) {
+function addToExistingCompany(userId, companyId, password, callback) {
 
     var query = CompanyModel.find(
-        {_id: companyId, active: true, password:md5(password)}
+        {_id: companyId, active: true, password: md5(password)}
     ).limit(1);
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to find company";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
 
@@ -283,15 +282,15 @@ function addToExistingCompany(userId,companyId, password, callback) {
                         error.error = "something went wrong while trying to assign the company to the user";
                         callback(500, error);
                     } else {
-                        console.log("the company added successfully " , results);
+                        console.log("the company added successfully ", results);
                         callback(200, results);
                     }
                 });
 
-            }else {
+            } else {
                 console.log("company not exists or password not equals");
                 error.error = "company not exists or password not equals";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -301,7 +300,7 @@ function addToExistingCompany(userId,companyId, password, callback) {
 // Delete Company
 function deleteCompany(companyId, callback) {
 
-    var query = {"_id":companyId};
+    var query = {"_id": companyId};
     var update = {
         active: false
     };
@@ -310,16 +309,16 @@ function deleteCompany(companyId, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while delete company";
-            callback(500,error);
+            callback(500, error);
         } else {
 
             if (results != null) {
-                console.log("the company deleted successfully, company: " , results);
-                callback(200,results);
-            }else {
+                console.log("the company deleted successfully, company: ", results);
+                callback(200, results);
+            } else {
                 console.log("company not exists");
                 error.error = "company not exists ";
-                callback(404,error);
+                callback(404, error);
             }
 
         }
@@ -343,16 +342,16 @@ function updateCompany(updateCompany, callback) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while update company";
-            callback(500,error);
+            callback(500, error);
         } else {
 
             if (results != null) {
-                console.log("the company updated successfully, company: " , results );
-                callback(200,results);
-            }else {
+                console.log("the company updated successfully, company: ", results);
+                callback(200, results);
+            } else {
                 console.log("company not exists");
                 error.error = "company not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -361,22 +360,22 @@ function updateCompany(updateCompany, callback) {
 function getCompany(companyId, callback) {
 
     var query = CompanyModel.find(
-        {_id: companyId, active: true},{password:0}
+        {_id: companyId, active: true}, {password: 0}
     ).limit(1);
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the company";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
                 console.log("the company extracted successfully ", results);
                 callback(200, results);
-            }else {
+            } else {
                 console.log("company not exists");
                 error.error = "company not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -384,86 +383,136 @@ function getCompany(companyId, callback) {
 }
 
 function getCompanies(callback) {
+
+
     var query = CompanyModel.find(
-        {active: true},{name:1,logo:1}
+        {active: true}, {name: 1, logo: 1}
     );
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the companies";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
                 console.log("the companies extracted successfully");
                 callback(200, results);
-            }else {
+            } else {
                 console.log("no companies in the system");
                 error.error = "no companies in the system";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
 }
 
-function addJobSeekerToCompany(userId,personalPropertiesId,callback) {
+function addPersonalPropertiesToCompany(userId, personalPropertiesId, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true},{company:1}
+        {_id: userId, active: true}, {company: 1}
     ).limit(1);
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to get the user from the db";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
 
                 var query = {"_id": results[0].company};
                 var update = {
-                    $addToSet: {'employers': personalPropertiesId}
+                    $addToSet: {'employees': personalPropertiesId}
                 };
                 var options = {new: true};
-                CompanyModel.findOneAndUpdate(query, update, options, function (err, results) {
+                CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
                     if (err) {
                         console.log("something went wrong " + err);
                         error.error = "something went wrong while trying to add personal properties to company employers";
-                        callback(500,error);
+                        callback(500, error);
                     } else {
 
-                        if (results != null) {
-                            console.log(" the personal properties added to company employers successfully");
-                            callback(null,results);
-                        }else {
-                            console.log("user not exists");
-                            error.error = "user not exists";
-                            callback(404,error);
+                        if (result != null) {
+                            console.log("the personal properties added to company employers successfully");
+                            callback(null, result);
+                        } else {
+                            console.log("company not exists");
+                            error.error = "company not exists";
+                            callback(404, error);
                         }
                     }
                 });
 
-            }else {
+            } else {
                 console.log("user not exists");
                 error.error = "user not exists";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
 
 }
 
+function removePersonalPropertiesFromCompany(userId, personalPropertiesId, callback) {
+
+    var query = UserModel.find(
+        {_id: userId, active: true}, {company: 1}
+    ).limit(1);
+
+    query.exec(function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the user from the db";
+            callback(500, error);
+        } else {
+            if (results.length > 0) {
+
+                var query = {"_id": results[0].company};
+                var update = {
+                    $pull: {'employees': personalPropertiesId}
+                };
+                var options = {new: true};
+                CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to remove personal properties from company";
+                        callback(500, error);
+                    } else {
+
+                        if (result != null) {
+                            console.log("the personal properties removed from the company successfully");
+                            callback(null, result);
+                        } else {
+                            console.log("company not exists");
+                            error.error = "company not exists";
+                            callback(404, error);
+                        }
+                    }
+                });
+
+            } else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404, error);
+            }
+        }
+    });
+
+
+}
+
 function changeCompanyPassword(companyId, oldPassword, newPassword, callback) {
 
     var query = CompanyModel.find(
-        {_id: companyId, active: true, password:md5(oldPassword) }
+        {_id: companyId, active: true, password: md5(oldPassword)}
     ).limit(1);
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
             error.error = "something went wrong while trying to find company";
-            callback(500,error);
+            callback(500, error);
         } else {
             if (results.length > 0) {
 
@@ -483,10 +532,10 @@ function changeCompanyPassword(companyId, oldPassword, newPassword, callback) {
                     }
                 });
 
-            }else {
+            } else {
                 console.log("company not exists or password not equals");
                 error.error = "company not exists or password not equals";
-                callback(404,error);
+                callback(404, error);
             }
         }
     });
@@ -508,7 +557,8 @@ exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.getCompanies = getCompanies;
-exports.addJobSeekerToCompany = addJobSeekerToCompany;
+exports.addPersonalPropertiesToCompany = addPersonalPropertiesToCompany;
+exports.removePersonalPropertiesFromCompany = removePersonalPropertiesFromCompany;
 exports.changeCompanyPassword = changeCompanyPassword;
 
 
