@@ -1,3 +1,35 @@
+var validationDAO = require('./../dao/validationDAO');
+
+/* Load validation values from DB */
+
+var sectorArr = [];
+var candidateTypeArr = [];
+var scopeOfPositionArr = [];
+var academyTypeArr = [];
+var degreeNameArr = [];
+var degreeTypeArr = [];
+
+
+validationDAO.loadValidationValues(function(status, result) {
+
+    if (status === 200 ) {
+
+        sectorArr = result.sector;
+        candidateTypeArr = result.candidate_type;
+        scopeOfPositionArr = result.scope_of_position;
+        academyTypeArr = result.academy_type;
+        degreeNameArr = result.degree_name;
+        degreeTypeArr = result.degree_type;
+
+        console.log("init values loaded successfully");
+
+    }else {
+        console.log("error while trying to upload init data");
+    }
+
+
+});
+
 /* Private Functions */
 
 /* Common */
@@ -161,7 +193,7 @@ function locationsValidation(locations) {
 
 function candidateTypeValidation(candidateType) {
 
-    var candidateTypeArr = ["student", "mothers", "pensioners", "graduated", "discharged"];
+
     var valid = candidateType
     && candidateType.constructor === Array
     && candidateType.length > 0 ? true : false;
@@ -177,7 +209,7 @@ function candidateTypeValidation(candidateType) {
 }
 
 function scopeOfPositionValidation(scopeOfPosition) {
-    var scopeOfPositionArr = ["full", "part", "hours"];
+
     var valid = scopeOfPosition
     && scopeOfPosition.constructor === Array
     && scopeOfPosition.length > 0 ? true : false;
@@ -192,11 +224,6 @@ function scopeOfPositionValidation(scopeOfPosition) {
 }
 
 function academyValidation(academy) {
-
-    var academyTypeArr = ["university", "college"];
-    var degreeNameArr = ["software engineering", "Industrial Engineering and Management"
-        , "Electrical Engineering", "Mechanical Engineering"];
-    var degreeTypeArr = ["bsc", "msc", "mres"];
 
     var valid = academy
     && (fieldValidation(academy.academy_type) && academy.academy_type.constructor === Array
@@ -299,7 +326,6 @@ function requirementsValidation(requirements, type) {
 
 /* End private functions for matching object */
 
-var sectorArr = ["software engineering"];
 
 /* Public functions */
 

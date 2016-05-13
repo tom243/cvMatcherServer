@@ -34,4 +34,5 @@ module.exports = function() {
     require ('./../routes/routes')(app);
 
     return app;
+
 };
