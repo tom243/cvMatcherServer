@@ -1,5 +1,9 @@
 var usersController = require('./../../controller/usersController');
 var matchingObjectController = require('./../../controller/matchingObjectController');
+var jobSeekerController = require('./../../controller/jobSeekerController');
+var employerController = require('./../../controller/employerController');
+var utilsController = require('./../../controller/utilsController');
+var companyController = require('./../../controller/companyController');
 
 module.exports = function (app) {
 
@@ -7,7 +11,7 @@ module.exports = function (app) {
         res.send("Welcome To CV Matcher");
     });
 
-/////////////////////////////////////////////////////////////// *** Users *** //////////////////////////////////////////
+/////////////////////////////////////////////////////////////// *** Users *** //////////////////////////
 
     app.post('/addUser', usersController.addUser);
     app.post('/deleteUser', usersController.deleteUser);
@@ -15,7 +19,7 @@ module.exports = function (app) {
     app.post('/getUser', usersController.getUser);
     app.post('/getUserId', usersController.getUserId);
 
-/////////////////////////////////////////////////////////////// *** Matching Objects *** //////////////////////
+/////////////////////////////////////////////////////////////// *** Matching Objects *** ///////////////
 
     app.post('/addMatchingObject', matchingObjectController.addMatchingObject);
     app.post('/deleteMatchingObject', matchingObjectController.deleteMatchingObject);
@@ -23,42 +27,40 @@ module.exports = function (app) {
     app.post('/updateMatchingObject', matchingObjectController.updateMatchingObject);
     app.post('/getMatchingObject', matchingObjectController.getMatchingObject);
 
-    /////////////////////////////////////////////////////////////// *** JobSeeker *** /////////////////////////////////
+    /////////////////////////////////////////////////////////////// *** JobSeeker *** ///////////////////
 
-    app.post('/jobSeeker/getJobsBySector', matchingObjectController.getAllJobsBySector);
-    app.post('/jobSeeker/getMyJobs', matchingObjectController.getMyJobs);
-    app.post('/jobSeeker/getFavoritesJobs', matchingObjectController.getFavoritesJobs);
-    app.post('/jobSeeker/checkCV', matchingObjectController.checkCV);
-    app.post('/jobSeeker/addCvToJob', matchingObjectController.addCvToJob);
-    app.post('/jobSeeker/updateFavoriteJob', matchingObjectController.updateFavoriteJob);
-    app.post('/jobSeeker/updateActivityJob', matchingObjectController.updateActivityJob);
+    app.post('/jobSeeker/getJobsBySector', jobSeekerController.getAllJobsBySector);
+    app.post('/jobSeeker/getMyJobs', jobSeekerController.getMyJobs);
+    app.post('/jobSeeker/getFavoritesJobs', jobSeekerController.getFavoritesJobs);
+    app.post('/jobSeeker/checkCV', jobSeekerController.checkCV);
+    app.post('/jobSeeker/addCvToJob', jobSeekerController.addCvToJob);
+    app.post('/jobSeeker/updateFavoriteJob', jobSeekerController.updateFavoriteJob);
+    app.post('/jobSeeker/updateActivityJob', jobSeekerController.updateActivityJob);
 
-//////////////////////////////////////////////////////*** Employer *** ////////////////////////////////////////////////
+//////////////////////////////////////////////////////*** Employer *** /////////////////////////////////
 
-    app.post('/employer/getJobsBySector', matchingObjectController.getJobsBySector);
-    app.post('/employer/getUnreadCvsForJob', matchingObjectController.getUnreadCvsForJob);
-    app.post('/employer/getRateCvsForJob', matchingObjectController.getRateCvsForJob);
-    app.post('/employer/rateCV', matchingObjectController.rateCV);
-    app.post('/employer/updateRateCV', matchingObjectController.updateRateCV);
-    app.post('/employer/hireToJob', matchingObjectController.hireToJob);
-    app.post('/employer/getHiredCvs', matchingObjectController.getHiredCvs);
+    app.post('/employer/getJobsBySector', employerController.getJobsBySector);
+    app.post('/employer/getUnreadCvsForJob', employerController.getUnreadCvsForJob);
+    app.post('/employer/getRateCvsForJob', employerController.getRateCvsForJob);
+    app.post('/employer/rateCV', employerController.rateCV);
+    app.post('/employer/updateRateCV', employerController.updateRateCV);
+    app.post('/employer/hireToJob', employerController.hireToJob);
+    app.post('/employer/getHiredCvs', employerController.getHiredCvs);
 
-/////////////////////////////////////////////////////////////// ***  Companies  *** ///////////////////////////////////
+//////////////////////////////////////////////////***  Companies  ***//////////////////////////////////
 
-    app.post('/employer/addCompany', usersController.addCompany);
-    app.post('/employer/addToExistingCompany', usersController.addToExistingCompany);
-    app.post('/employer/deleteCompany', usersController.deleteCompany);
-    app.post('/employer/updateCompany', usersController.updateCompany);
-    app.post('/employer/getCompany', usersController.getCompany);
-    app.get ('/employer/getCompanies', usersController.getCompanies);
-    app.post ('/employer/changeCompanyPassword', usersController.changeCompanyPassword);
-    app.post('/getLogoImages' ,usersController.getLogoImages);
+    app.post('/employer/addCompany', companyController.addCompany);
+    app.post('/employer/addToExistingCompany', companyController.addToExistingCompany);
+    app.post('/employer/deleteCompany', companyController.deleteCompany);
+    app.post('/employer/updateCompany', companyController.updateCompany);
+    app.post('/employer/getCompany', companyController.getCompany);
+    app.get ('/employer/getCompanies', companyController.getCompanies);
+    app.post('/employer/changeCompanyPassword', companyController.changeCompanyPassword);
 
+////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////
 
-////////////////////////////////////////////////////// ***  Utils  *** ////////////////////////////////////
-
-    app.post('/getKeyWordsBySector', matchingObjectController.getKeyWordsBySector);
-    app.get('/cleanDB', matchingObjectController.cleanDB); //TODO: DELETE IT
+    app.post('/getKeyWordsBySector', utilsController.getKeyWordsBySector);
+    app.post('/getLogoImages', utilsController.getLogoImages);
+    app.get ('/cleanDB', utilsController.cleanDB); //TODO: DELETE IT
 
 };
-

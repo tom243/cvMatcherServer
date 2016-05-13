@@ -27,7 +27,6 @@ validationDAO.loadValidationValues(function(status, result) {
         console.log("error while trying to upload init data");
     }
 
-
 });
 
 /* Private Functions */
