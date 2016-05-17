@@ -40,9 +40,9 @@ function getAllJobsBySector(userId, sector, callback) {
 
             if (results.length > 0) {
 
-                var jobsArr = [];
+                var jobs = [];
                 for (var i = 0; i < results[0].jobs.length; i++) {
-                    jobsArr.push(results[0].jobs[i].job);
+                    jobs.push(results[0].jobs[i].job);
                 }
 
                 var query = MatchingObjectsModel.find(
@@ -50,7 +50,7 @@ function getAllJobsBySector(userId, sector, callback) {
                         sector: sector,
                         active: true,
                         matching_object_type: "job",
-                        _id: {$nin: jobsArr},
+                        _id: {$nin: jobs},
                         archive: false
                     }
                 ).populate('original_text')
@@ -68,7 +68,15 @@ function getAllJobsBySector(userId, sector, callback) {
                         callback(500, error);
                     } else {
                         console.log("the jobs extracted successfully from the db");
-                        callback(200, results);
+                        if (results.length > 0) {
+                            callback(200, results);
+                        }else {
+                            jobs = {
+                                jobs : []
+                            };
+                            callback(200,jobs)
+                        }
+
                     }
                 });
             } else {
