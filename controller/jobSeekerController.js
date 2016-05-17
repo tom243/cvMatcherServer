@@ -1,4 +1,5 @@
 var jobSeekerDAO = require("./../model/dao/jobSeekerDAO"); // dao = data access object = model
+var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var unirest = require('unirest');
@@ -61,14 +62,14 @@ function checkCV(req, res) {
             cv: null
         };
 
-        jobSeekerDAO.getMatchingObject(req.body.job_id, "job", function (status, results) {
+        matchingObjectDAO.getMatchingObject(req.body.job_id, "job", function (status, results) {
             if (status === 200) {
                 matchObjectToSend.job = results[0];
             } else {
                 return res.status(status).json(results);
             }
 
-            jobSeekerDAO.getMatchingObject(req.body.cv_id, "cv", function (status, results) {
+            matchingObjectDAO.getMatchingObject(req.body.cv_id, "cv", function (status, results) {
                 if (status === 200) {
                     matchObjectToSend.cv = results[0];
                 } else {
