@@ -68,14 +68,7 @@ function getAllJobsBySector(userId, sector, callback) {
                         callback(500, error);
                     } else {
                         console.log("the jobs extracted successfully from the db");
-                        if (results.length > 0) {
-                            callback(200, results);
-                        }else {
-                            jobs = {
-                                jobs : []
-                            };
-                            callback(200,jobs)
-                        }
+                        callback(200, results);
 
                     }
                 });
