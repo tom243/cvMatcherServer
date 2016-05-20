@@ -519,7 +519,8 @@ var addCvToJobFunctions = (function () {
                 }
             );
         } else {
-            callback("matching details is empty or undefined", [])
+            console.log("matching details is empty or undefined");
+            callback(false, [])
         }
 
     }
