@@ -14,6 +14,8 @@ var ProfessionalKnowledgeModel = schemas.ProfessionalKnowledgeModel;
 var MatchingDetailsModel = schemas.MatchingDetailsModel;
 var KeyWordsModel = schemas.KeyWordsModel;
 var JobSeekerJobsModel = schemas.JobSeekerJobsModel;
+var CompanyModel= schemas.CompanyModel;
+var UserModel = schemas.UserModel;
 
 var error = {
     error: null
@@ -81,6 +83,12 @@ function cleanDB(cleanDBCallback) { // TODO: DELETE IT
         },
         function (callback) {
             JobSeekerJobsModel.remove({}, callback)
+        },
+        function (callback) {
+            CompanyModel.remove({}, callback)
+        },
+        function (callback) {
+            UserModel.remove({}, callback)
         }
 
     ], function (err) {
