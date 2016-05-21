@@ -214,6 +214,8 @@ function getCompanies(callback) {
 
 function addPersonalPropertiesToCompany(userId, personalPropertiesId, callback) {
 
+    console.log("in addPersonalPropertiesToCompany");
+
     var query = UserModel.find(
         {_id: userId, active: true}, {company: 1}
     ).limit(1);

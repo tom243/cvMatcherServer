@@ -1,5 +1,5 @@
 var employerDAO = require("./../model/dao/employerDAO"); // dao = data access object = model
-var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object = model
+var companyDAO = require("./../model/dao/companyDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var async = require("async");
@@ -77,7 +77,7 @@ function rateCV(req, res) {
 
                 async.waterfall([
                     async.apply(employerDAO.setDecisionToFalse, cvId),
-                    async.apply(usersDAO.addPersonalPropertiesToCompany, userId)
+                    async.apply(companyDAO.addPersonalPropertiesToCompany, userId)
                 ], callback);
             }
 
@@ -86,6 +86,8 @@ function rateCV(req, res) {
                 async.apply(waterfallTasks, req.body.cv_id, req.body.user_id)
 
             ], function (status, results) {
+
+                console.log("in callback");
 
                 if (status === null) {
                     res.status(200).json(results[0]);
@@ -116,12 +118,12 @@ function updateRateCV(req, res) {
             if (req.body.status.current_status === "liked") {
                 waterfallArr = [
                     async.apply(employerDAO.getPersonalPropertiesID, cvId),
-                    async.apply(usersDAO.removePersonalPropertiesFromCompany, userId)
+                    async.apply(companyDAO.removePersonalPropertiesFromCompany, userId)
                 ];
             } else {// === unliked
                 waterfallArr = [
                     async.apply(employerDAO.setDecisionToFalse, cvId),
-                    async.apply(usersDAO.addPersonalPropertiesToCompany, userId)
+                    async.apply(companyDAO.addPersonalPropertiesToCompany, userId)
                 ];
             }
 
@@ -158,7 +160,7 @@ function hireToJob(req, res) {
 
         async.waterfall([
             async.apply(employerDAO.hireToJob, req.body.cv_id),
-            async.apply(usersDAO.addPersonalPropertiesToCompany, req.body.user_id)
+            async.apply(companyDAO.addPersonalPropertiesToCompany, req.body.user_id)
 
         ], function (status, results) {
 

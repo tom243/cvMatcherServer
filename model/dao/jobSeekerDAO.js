@@ -568,8 +568,6 @@ function addCvToJob(jobId, cvId, addCvCallback) {
                                     async.parallel(parallelArr, callback);
                                 }
 
-                                console.log(matchObjectToSend.job);
-
                                 async.waterfall([
                                     async.apply(addCvToJobFunctions.copyCV, matchObjectToSend.cv),
                                     async.apply(parallelTasks, response.body.total_grade,
@@ -580,7 +578,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
                                 ], function (status, results) {
 
                                     if (status === null) {
-                                        addCvCallback(200, results[4]);
+                                        addCvCallback(200, results[3]);
                                     } else {
                                         errorMessage = "error in add cv to job ";
                                         console.log(errorMessage);
