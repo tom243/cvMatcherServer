@@ -6,7 +6,8 @@ module.exports = function(server) {
         webSockets = {};// userID: webSocket
 
     webSocketServer.on('connection', function (webSocket) {
-        var userID = parseInt(webSocket.upgradeReq.url.substr(1), 10);
+        console.log("webSocket.upgradeReq.url " + webSocket.upgradeReq.url.substr(1));
+        var userID = webSocket.upgradeReq.url.substr(1);
         webSockets[userID] = webSocket;
         console.log('connected: ' + userID + ' in ' + Object.getOwnPropertyNames(webSockets));
 
