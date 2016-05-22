@@ -25,10 +25,10 @@ module.exports = function(server) {
             }
         });
 
-/*        webSocket.on('close', function () {
+        webSocket.on('close', function () {
             delete webSockets[userID];
             console.log('deleted: ' + userID)
-        })*/
+        })
     });
 
 };
