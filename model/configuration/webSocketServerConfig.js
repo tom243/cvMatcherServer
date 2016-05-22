@@ -6,6 +6,9 @@ module.exports = function(server) {
         webSockets = {};// userID: webSocket
 
     webSocketServer.on('connection', function (webSocket) {
+
+        webSocket.
+
         console.log("webSocket.upgradeReq.url " + webSocket.upgradeReq.url.substr(1));
         var userID = webSocket.upgradeReq.url.substr(1);
         webSockets[userID] = webSocket;
@@ -22,10 +25,10 @@ module.exports = function(server) {
             }
         });
 
-        webSocket.on('close', function () {
+/*        webSocket.on('close', function () {
             delete webSockets[userID];
             console.log('deleted: ' + userID)
-        })
+        })*/
     });
 
 };
