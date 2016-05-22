@@ -4,6 +4,10 @@ var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var async = require("async");
 
+var error = {
+    error: null
+};
+
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
 
 //** get jobs by sector for specific employer  **//

@@ -3,10 +3,6 @@ var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object =
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 
-var error = {
-    error: null
-};
-
 function checkIfAddingIsAllow(req, callback) {
 
     if (req.body.matching_object_type === "job") {

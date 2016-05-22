@@ -4,6 +4,10 @@ var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var unirest = require('unirest');
 
+var error = {
+    error: null
+};
+
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 //** get jobs by sector for jobSeeker  **//

@@ -3,10 +3,6 @@ var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var Bing = require('node-bing-api')({accKey: "701evtSNrrgXAfrchGXi6McRJ5U/23ga7WW2qANZgIk"});
 
-var error = {
-    error: null
-};
-
 //**  get key words  **//
 function getKeyWordsBySector(req, res) {
 
