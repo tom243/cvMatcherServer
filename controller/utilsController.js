@@ -25,10 +25,9 @@ function checkUrlExists(url, callback) {
 
     request(url, function (error, response) {
         if (!error && response.statusCode == 200) {
-            console.log("URL is OK");
             callback(true);
         } else {
-            console.log("bad url");
+            console.log("bad url " + url );
             callback(false);
         }
     });
