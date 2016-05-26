@@ -15,4 +15,4 @@ server = http.createServer(app);
 server.listen(port);
 console.log("listening on port " + port + "\n");
 
-webSocketServer(server); // Initialize web sockets
+//webSocketServer(server); // Initialize web sockets

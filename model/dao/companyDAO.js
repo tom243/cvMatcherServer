@@ -200,14 +200,8 @@ function getCompanies(callback) {
             error.error = "something went wrong while trying to get the companies";
             callback(500, error);
         } else {
-            if (results.length > 0) {
-                console.log("the companies extracted successfully");
-                callback(200, results);
-            } else {
-                console.log("no companies in the system");
-                error.error = "no companies in the system";
-                callback(404, error);
-            }
+            console.log("the companies extracted successfully");
+            callback(200, results);
         }
     });
 }

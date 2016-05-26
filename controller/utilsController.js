@@ -2,6 +2,8 @@ var utilsDAO = require("./../model/dao/utilsDAO"); // dao = data access object =
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var Bing = require('node-bing-api')({accKey: "701evtSNrrgXAfrchGXi6McRJ5U/23ga7WW2qANZgIk"});
+var http = require('http');
+var url = require('url');
 
 //**  get key words  **//
 function getKeyWordsBySector(req, res) {
@@ -17,6 +19,19 @@ function getKeyWordsBySector(req, res) {
     }
 
 }
+
+function checkUrlExists(Url, callback) {
+    var options = {
+        method: 'HEAD',
+        host: url.parse(Url).host,
+        port: 80,
+        path: url.parse(Url).pathname
+    };
+    http.request(options, function (r) {
+        callback( r.statusCode === 200);
+    });
+}
+
 
 function getLogoImages(req, res) {
     var imagesResponse = [];

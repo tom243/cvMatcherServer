@@ -52,8 +52,8 @@ var usersSchema = new users_schema({
 // historyTimeline Schema
 var jobSeekerJobsSchema = new jobseeker_jobs_schema({
 
-    job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
-    cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
+    job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel', required:true },
+    cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel', required:true },
     favorite: {
         type: Boolean,
         default: false
@@ -115,16 +115,25 @@ var matchingObjectsSchema = new matching_objects_schema({
         type: Date,
         required: true
     },
-    original_text: { type: Schema.Types.ObjectId, ref: 'OriginalTextModel' },
+    original_text: { type: Schema.Types.ObjectId, ref: 'OriginalTextModel', required:true },
     sector: {
         type: String,
         required: true,
         index: 1
     },
-    locations: [String],
-    candidate_type:[String],
-    scope_of_position:[String],
-    academy: { type: Schema.Types.ObjectId, ref: 'AcademyModel' },
+    locations: [{
+        type: String,
+        required:true
+    }],
+    candidate_type:[{
+        type: String,
+        required:true
+    }],
+    scope_of_position:[{
+        type: String,
+        required:true
+    }],
+    academy: { type: Schema.Types.ObjectId, ref: 'AcademyModel', required:true },
     formula: { type: Schema.Types.ObjectId, ref: 'FormulaModel' },
     requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
     compatibility_level: Number,
@@ -203,7 +212,7 @@ var statusSchema = new status_schema({
 
 // requirement Schema
 var requirementSchema = new requirements_schema({
-    combination:[{ type: Schema.Types.ObjectId, ref: 'ProfessionalKnowledgeModel' }]
+    combination:[{ type: Schema.Types.ObjectId, ref: 'ProfessionalKnowledgeModel', required:true }]
 }, {collection: 'Requirements'});
 
 
@@ -263,18 +272,39 @@ var personalPropertiesSchema = new personal_properties_schema({
 
 // historyTimeline Schema
 var historyTimelineSchema = new history_timeline_schema({
-    text: String,
-    start_year: Number,
-    end_year: Number,
-    type: String
+    text: {
+        type: String,
+        required:true
+    },
+    start_year: {
+        type: Number,
+        required:true
+    },
+    end_year: {
+        type: Number,
+        required:true
+    },
+    type: {
+        type: String,
+        required:true
+    }
 
 }, {collection: 'History_Timeline'});
 
 // AcademySchema Schema
 var academySchema = new academy_schema({
-    academy_type: [String],
-    degree_name: String,
-    degree_type: [String]
+    academy_type: [{
+        type: String,
+        required:true
+    }],
+    degree_name: {
+        type: String,
+        required:true
+    },
+    degree_type: [{
+        type: String,
+        required:true
+    }]
 
 }, {collection: 'Academy'});
 
@@ -282,13 +312,17 @@ var academySchema = new academy_schema({
 var professionalKnowledgeSchema = new professional_knowledge_schema({
     name: {
         type : String,
+        lowercase: true,
         required : true
     },
     years: {
         type : Number,
         required : true
     },
-    mode: String,
+    mode: {
+        type: String,
+        required:true
+    },
     percentage: Number
 }, {collection: 'Professional_Knowledge'});
 
@@ -306,17 +340,41 @@ var matchingDetailsSchema = matching_details_schema({
 
 // keyWords Schema
 var keyWordsSchema = key_words_schema({
-    sector: String,
-    key_words: [String]
+    sector: {
+        type: String,
+        required:true
+    },
+    key_words: [{
+        type: String,
+        required:true
+    }]
 }, {collection: 'Key_Words'});
 
 var validationSchema = validation_schema({
-    sector: [String],
-    candidate_type: [String],
-    scope_of_position: [String],
-    academy_type: [String],
-    degree_name: [String],
-    degree_type: [String]
+    sector: [{
+        type: String,
+        required:true
+    }],
+    candidate_type: [{
+        type: String,
+        required:true
+    }],
+    scope_of_position: [{
+        type: String,
+        required:true
+    }],
+    academy_type: [{
+        type: String,
+        required:true
+    }],
+    degree_name: [{
+        type: String,
+        required:true
+    }],
+    degree_type: [{
+        type: String,
+        required:true
+    }]
 }, {collection: 'Validation'});
 
 
