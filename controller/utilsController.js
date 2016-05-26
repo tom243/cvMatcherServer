@@ -3,7 +3,8 @@ var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 var Bing = require('node-bing-api')({accKey: "701evtSNrrgXAfrchGXi6McRJ5U/23ga7WW2qANZgIk"});
 var http = require('http');
-var url = require('url');
+var request = require('request');
+var async = require("async");
 
 //**  get key words  **//
 function getKeyWordsBySector(req, res) {
@@ -20,15 +21,16 @@ function getKeyWordsBySector(req, res) {
 
 }
 
-function checkUrlExists(Url, callback) {
-    var options = {
-        method: 'HEAD',
-        host: url.parse(Url).host,
-        port: 80,
-        path: url.parse(Url).pathname
-    };
-    http.request(options, function (r) {
-        callback( r.statusCode === 200);
+function checkUrlExists(url, callback) {
+
+    request(url, function (error, response) {
+        if (!error && response.statusCode == 200) {
+            console.log("URL is OK");
+            callback(true);
+        } else {
+            console.log("bad url");
+            callback(false);
+        }
     });
 }
 
@@ -47,10 +49,38 @@ function getLogoImages(req, res) {
                 console.log("something went wrong while trying to search the logo " + err);
                 res.status(500).json("something went wrong while trying to search the logo");
             } else {
-                for (var i = 0; i < body.d.results.length; i++) {
-                    imagesResponse.push(body.d.results[i].MediaUrl);
-                }
-                res.status(200).json(imagesResponse);
+                /*                for (var i = 0; i < body.d.results.length; i++) {
+
+                 imagesResponse.push(body.d.results[i].MediaUrl);
+                 }
+                 res.status(200).json(imagesResponse);*/
+
+                // 1st para in async.each() is the array of items
+                async.each(body.d.results,
+                    // 2nd param is the function that each item is passed to
+                    function (item, callbackAsync) {
+                        // Call an asynchronous function, often a save() to DB
+                        //console.log("item.MediaUrl" + item.MediaUrl);
+                        checkUrlExists(item.MediaUrl, function (isValidUrl) {
+                            if (isValidUrl) {
+                                console.log("isValidUrl " + isValidUrl);
+                                imagesResponse.push(item.MediaUrl);
+                            }
+                            callbackAsync()
+                        })
+
+                    },
+                    // 3rd param is the function to call when everything is done
+                    function (err) {
+                        if (err) {
+                            console.log("something went wrong while trying to search the logo " + err);
+                            res.status(500).json("something went wrong while trying to search the logo");
+                        }else {
+                            res.status(200).json(imagesResponse);
+                        }
+                    }
+                );
+
             }
 
         });

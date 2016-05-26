@@ -2,7 +2,7 @@ var http = require("http");
 
 var express = require('./model/configuration/expressConfig');
 var mongoose = require('./model/configuration/mongooseConfig');
-var webSocketServer = require('./model/configuration/webSocketServerConfig');
+//var webSocketServer = require('./model/configuration/webSocketServerConfig');
 
 
 var port = process.env.PORT || 8000;
