@@ -319,10 +319,7 @@ var professionalKnowledgeSchema = new professional_knowledge_schema({
         type : Number,
         required : true
     },
-    mode: {
-        type: String,
-        required:true
-    },
+    mode: String,
     percentage: Number
 }, {collection: 'Professional_Knowledge'});
 
