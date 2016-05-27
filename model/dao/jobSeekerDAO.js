@@ -164,7 +164,7 @@ function getFavoritesJobs(userId, callback) {
             },
             populate: {
                 path: 'cv',
-                select: 'status',
+                select: 'status hired',
                 populate: {path: 'status.status_id'}
             }
 
