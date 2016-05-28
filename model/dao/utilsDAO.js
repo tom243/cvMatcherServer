@@ -36,7 +36,8 @@ function getKeyWordsBySector(sector, callback) {
             callback(500, error);
         } else {
             console.log("the keywords extracted successfully from the db ");
-            callback(200, results);
+            var wordsArr = results.map(function(value) {return value.word;});
+            callback(200, wordsArr);
         }
     });
 
