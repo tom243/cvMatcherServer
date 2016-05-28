@@ -164,7 +164,7 @@ function getUserId(googleUserId, callback) {
             } else {
                 console.log("google user id not exists");
                 error.error = "google user id not exists";
-                callback(404, error);
+                callback(200, false);
             }
         }
     });
