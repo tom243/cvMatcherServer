@@ -341,10 +341,14 @@ var keyWordsSchema = key_words_schema({
         type: String,
         required:true
     },
-    key_words: [{
+    word: {
         type: String,
         required:true
-    }]
+    },
+    count: {
+        type: Number,
+        default:4
+    }
 }, {collection: 'Key_Words'});
 
 var validationSchema = validation_schema({

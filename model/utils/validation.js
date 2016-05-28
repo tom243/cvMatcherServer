@@ -708,6 +708,16 @@ function getKeyWordsBySector(req) {
     && sectorArr.indexOf(req.body.sector) != -1 ;
 }
 
+function addKeyWords(req) {
+    console.log("req.body.sector " + req.body.sector);
+
+    return req.body
+    && fieldValidation(req.body.sector, "sector")
+    && fieldValidation(req.body.words_list, "words_list")
+    && req.body.words_list.constructor === Array
+
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.getUser = getUser;
@@ -747,7 +757,10 @@ exports.updateFavoriteJob = updateFavoriteJob;
 exports.updateActivityJob = updateActivityJob;
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
+exports.addKeyWords = addKeyWords;
 
 exports.predictorResponse = predictorResponse;
 exports.matcherResponse = matcherResponse;
+
+
 

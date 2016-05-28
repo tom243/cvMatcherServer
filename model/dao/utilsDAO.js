@@ -14,7 +14,7 @@ var ProfessionalKnowledgeModel = schemas.ProfessionalKnowledgeModel;
 var MatchingDetailsModel = schemas.MatchingDetailsModel;
 var KeyWordsModel = schemas.KeyWordsModel;
 var JobSeekerJobsModel = schemas.JobSeekerJobsModel;
-var CompanyModel= schemas.CompanyModel;
+var CompanyModel = schemas.CompanyModel;
 var UserModel = schemas.UserModel;
 
 var error = {
@@ -23,7 +23,10 @@ var error = {
 
 function getKeyWordsBySector(sector, callback) {
 
-    var query = KeyWordsModel.find({sector: sector});
+    var query = KeyWordsModel.find({
+            sector: sector,
+            count: {$gt: 4}
+        },{word:1});
 
     query.exec(function (err, results) {
 
@@ -32,19 +35,49 @@ function getKeyWordsBySector(sector, callback) {
             error.error = "something went wrong while trying to get the keywords from DB";
             callback(500, error);
         } else {
-
-            if (results.length > 0) {
-                console.log("the keywords extracted successfully from the db ");
-                callback(200, results[0].key_words);
-            } else {
-                console.log("sector not exists");
-                error.error = "sector not exists";
-                callback(404, error);
-            }
-
-
+            console.log("the keywords extracted successfully from the db ");
+            callback(200, results);
         }
     });
+
+}
+
+function addKeyWords(sector, wordsList, callback) {
+
+    var resultArr = [];
+
+    // 1st para in async.each() is the array of items
+    async.each(wordsList,
+        // 2nd param is the function that each item is passed to
+        function (item, callbackAsync) {
+            // Call an asynchronous function, often a save() to DB
+
+            var query = {word: item, sector : sector};
+            var update = {
+                $inc: { count: 1 }
+                //count:5
+            };
+            var options = {new: true , upsert: true};
+            KeyWordsModel.findOneAndUpdate(query, update, options, function (err, result) {
+                resultArr.push(result);
+                callbackAsync();
+            });
+        },
+        // 3rd param is the function to call when everything is done
+        function (err) {
+            // All tasks are done now
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to update key words";
+                callback(500, error);
+            } else {
+                console.log("key words updated successfully");
+                console.log("resultArr" , resultArr);
+                callback(200,resultArr);
+            }
+
+        }
+    );
 
 }
 
@@ -100,4 +133,5 @@ function cleanDB(cleanDBCallback) { // TODO: DELETE IT
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
+exports.addKeyWords = addKeyWords;
 exports.cleanDB = cleanDB; // TODO: DELETE IT

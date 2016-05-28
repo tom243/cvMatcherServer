@@ -61,6 +61,7 @@ module.exports = function (app) {
 
     app.post('/getKeyWordsBySector', utilsController.getKeyWordsBySector);
     app.post('/getLogoImages', utilsController.getLogoImages);
+    app.post('/addKeyWords', utilsController.addKeyWords);
     app.get ('/cleanDB', utilsController.cleanDB); //TODO: DELETE IT
 
 };

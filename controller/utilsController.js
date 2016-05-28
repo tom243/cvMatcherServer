@@ -85,6 +85,20 @@ function getLogoImages(req, res) {
         });
 }
 
+function addKeyWords(req, res) {
+
+    console.log("in addKeyWords");
+
+    if (validation.addKeyWords(req)) {
+        utilsDAO.addKeyWords(req.body.sector, req.body.words_list, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
 function cleanDB(req, res) { // TODO: DELETE IT
     utilsDAO.cleanDB(function (err) {
         if (err === null) {
@@ -95,8 +109,10 @@ function cleanDB(req, res) { // TODO: DELETE IT
     });
 }
 
+
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
 exports.getKeyWordsBySector = getKeyWordsBySector;
 exports.getLogoImages = getLogoImages;
+exports.addKeyWords = addKeyWords;
 exports.cleanDB = cleanDB; // TODO: DELETE IT
