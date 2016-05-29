@@ -13,7 +13,8 @@ module.exports = function () {
     // When successfully connected
     mongoose.connection.on('connected', function () {
         console.log('Mongoose default connection open to ' + dbURI);
-        //validation();
+        validation.loadValidationValues(); // Load validation values form the db
+        console.error("try");
     });
 
     // If the connection throws an error
