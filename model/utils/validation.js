@@ -9,7 +9,7 @@ var academyTypeArr = [];
 var degreeNameArr = [];
 var degreeTypeArr = [];
 
-module.exports = function() {
+//module.exports = function() {
 
     validationDAO.loadValidationValues(function (status, result) {
 
@@ -28,7 +28,7 @@ module.exports = function() {
             console.log("error while trying to upload init data");
         }
     });
-};
+//};
 
 /* Private Functions */
 
