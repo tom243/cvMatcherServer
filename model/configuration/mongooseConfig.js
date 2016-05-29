@@ -14,7 +14,6 @@ module.exports = function () {
     mongoose.connection.on('connected', function () {
         console.log('Mongoose default connection open to ' + dbURI);
         validation.loadValidationValues(); // Load validation values form the db
-        console.error("try");
     });
 
     // If the connection throws an error
