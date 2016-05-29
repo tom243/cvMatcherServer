@@ -9,24 +9,26 @@ var academyTypeArr = [];
 var degreeNameArr = [];
 var degreeTypeArr = [];
 
+module.exports = function() {
 
-validationDAO.loadValidationValues(function (status, result) {
+    validationDAO.loadValidationValues(function (status, result) {
 
-    if (status === 200) {
+        if (status === 200) {
 
-        sectorArr = result.sector;
-        candidateTypeArr = result.candidate_type;
-        scopeOfPositionArr = result.scope_of_position;
-        academyTypeArr = result.academy_type;
-        degreeNameArr = result.degree_name;
-        degreeTypeArr = result.degree_type;
+            sectorArr = result.sector;
+            candidateTypeArr = result.candidate_type;
+            scopeOfPositionArr = result.scope_of_position;
+            academyTypeArr = result.academy_type;
+            degreeNameArr = result.degree_name;
+            degreeTypeArr = result.degree_type;
 
-        console.log("init values loaded successfully");
+            console.log("init values loaded successfully");
 
-    } else {
-        console.log("error while trying to upload init data");
-    }
-});
+        } else {
+            console.log("error while trying to upload init data");
+        }
+    });
+};
 
 /* Private Functions */
 

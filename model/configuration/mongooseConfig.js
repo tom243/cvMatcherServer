@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var validation = require('../utils/validation');
 
 module.exports = function () {
 
@@ -12,6 +13,7 @@ module.exports = function () {
     // When successfully connected
     mongoose.connection.on('connected', function () {
         console.log('Mongoose default connection open to ' + dbURI);
+        validation();
     });
 
     // If the connection throws an error
