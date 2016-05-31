@@ -428,8 +428,6 @@ function setDecisionToFalse(cvId, callback) {
 
 }
 
-
-
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 
 exports.getJobsBySector = getJobsBySector;
