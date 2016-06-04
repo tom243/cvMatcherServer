@@ -33,7 +33,7 @@ function addMatchingObject(matchingObject, callback) {
 
     async.parallel(parallelArr, function (status, results) {
 
-        if (status == null) {
+        if (status === null) {
             matchingObject.original_text = results[0];
             matchingObject.requirements = results[1];
             matchingObject.academy = results[2];
@@ -46,7 +46,7 @@ function addMatchingObject(matchingObject, callback) {
 
             buildAndSaveMatchingObject(matchingObject, function (status, matchingObjectResult) {
                 callback(status, matchingObjectResult);
-            })
+            });
         } else {
             errorMessage = "error while trying to add matching object";
             console.log(errorMessage);
@@ -104,7 +104,7 @@ function deleteMatchingObject(matching_object_id, callback) {
             error.error = "something went wrong while delete matching object from the DB";
             callback(500, error);
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("the matching object deleted successfully from the db ", results);
                 callback(200, results);
             } else {
@@ -131,7 +131,7 @@ function reviveMatchingObject(matching_object_id, callback) {
             error.error = "something went wrong while revive matching object";
             callback(500, error);
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("the matching object revived successfully", results);
                 callback(200, results);
             } else {
@@ -192,7 +192,7 @@ function updateMatchingObject(matchingObject, callback) {
                     error.error = "something went wrong while trying to update " + matchingObject.matching_object_type;
                     callback(500, error);
                 } else {
-                    if (results != null) {
+                    if (results !== null) {
                         console.log(matchingObject.matching_object_type + " updated successfully");
                         callback(200, results);
                     } else {
@@ -245,7 +245,7 @@ function getMatchingObject(matchingObjectId, matchingObjectType, callback) {
                 path: 'requirements',
                 populate: {path: 'combination'}
             })
-            .populate("formula")
+            .populate("formula");
     }
 
     query.exec(function (err, results) {
@@ -303,9 +303,9 @@ function addOriginalText(originalText, type, callback) {
                         console.log("originalText saved successfully to the db");
                         callback(null, doc);
                     }
-                })
+                });
             }
-        })
+        });
     } else { // job
         var originalTextToAdd = new OriginalTextModel({
             title: originalText.title,
@@ -324,7 +324,7 @@ function addOriginalText(originalText, type, callback) {
                 console.log("originalText saved successfully to the db");
                 callback(null, doc);
             }
-        })
+        });
     }
 }
 
@@ -355,7 +355,7 @@ function buildTimelineHistory(timeline, callback) {
                     historyTimeLineArray.push(doc._id);
                     callbackAsync();
                 }
-            })
+            });
         },
         // 3rd param is the function to call when everything is done
         function (err) {
@@ -438,7 +438,7 @@ var updateOriginalTextFunctions = (function () {
                             error.error = "something went wrong while trying to update original text";
                             callback(500, error);
                         } else {
-                            if (results != null) {
+                            if (results !== null) {
                                 console.log("Original Text updated successfully");
                                 callback(null, results);
                             } else {
@@ -450,11 +450,11 @@ var updateOriginalTextFunctions = (function () {
                         }
                     });
                 }
-            })
+            });
 
         }
 
-    }
+    };
 
 })();
 
@@ -490,7 +490,7 @@ function updateOriginalText(originalText, type, originalTextCallback) {
                 error.error = "something went wrong while trying to update original text";
                 originalTextCallback(500, error);
             } else {
-                if (results != null) {
+                if (results !== null) {
                     console.log("Original Text updated successfully");
                     originalTextCallback(null, results);
                 } else {
@@ -529,7 +529,7 @@ function addAcademy(academy, callback) {
             console.log("academy saved successfully");
             callback(null, doc._id);
         }
-    })
+    });
 }
 
 function updateAcademy(academy, callback) {
@@ -549,7 +549,7 @@ function updateAcademy(academy, callback) {
             error.error = "something went wrong while trying to update academy";
             callback(500, error);
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("academy updated successfully");
                 callback(null, results);
             } else {
@@ -601,9 +601,9 @@ function addRequirements(requirements, callback) {
                             requirementsArr.push(doc._id);
                             callbackAsync();
                         }
-                    })
+                    });
                 }
-            })
+            });
         },
         // 3rd param is the function to call when everything is done
         function (err) {
@@ -648,7 +648,7 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
                     professionalKnowledgeArr.push(doc._id);
                     callbackAsync();
                 }
-            })
+            });
         },
         // 3rd param is the function to call when everything is done
         function (err) {
@@ -754,7 +754,7 @@ var updateRequirementsFunctions = (function () {
             });
         }
 
-    }
+    };
 
 })();
 
@@ -836,7 +836,7 @@ function updatePersonalProperties(personalProperties, callback) {
             error.error = "something went wrong while trying to update personal properties";
             callback(500, error);
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("personal properties updated successfully");
                 callback(null, results);
             } else {
@@ -903,7 +903,7 @@ function updateFormula(formula, callback) {
             error.error = "something went wrong while trying to update formula";
             callback(500, error);
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("formula updated successfully");
                 callback(null, results);
             } else {

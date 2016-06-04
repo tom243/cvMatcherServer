@@ -117,7 +117,7 @@ function deleteCompany(companyId, callback) {
             callback(500, error);
         } else {
 
-            if (results != null) {
+            if (results !== null) {
                 console.log("the company deleted successfully, company: ", results);
                 callback(200, results);
             } else {
@@ -150,7 +150,7 @@ function updateCompany(updateCompany, callback) {
             callback(500, error);
         } else {
 
-            if (results != null) {
+            if (results !== null) {
                 console.log("the company updated successfully, company: ", results);
                 callback(200, results);
             } else {
@@ -234,7 +234,7 @@ function addPersonalPropertiesToCompany(userId, personalPropertiesId, callback) 
                         callback(500, error);
                     } else {
 
-                        if (result != null) {
+                        if (result !== null) {
                             console.log("the personal properties added to company employers successfully");
                             callback(null, result);
                         } else {
@@ -281,7 +281,7 @@ function removePersonalPropertiesFromCompany(userId, personalPropertiesId, callb
                         callback(500, error);
                     } else {
 
-                        if (result != null) {
+                        if (result !== null) {
                             console.log("the personal properties removed from the company successfully");
                             callback(null, result);
                         } else {

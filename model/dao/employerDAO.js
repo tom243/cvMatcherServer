@@ -2,8 +2,6 @@ var schemas = require('./../schemas/schemas');
 
 var MatchingObjectsModel = schemas.MatchingObjectsModel;
 var StatusModel = schemas.StatusModel;
-var RequirementsModel = schemas.RequirementsModel;
-var OriginalTextModel = schemas.OriginalTextModel;
 var PersonalPropertiesModel = schemas.PersonalPropertiesModel;
 
 var errorMessage;
@@ -118,8 +116,8 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
                     query.exec(function (err, results) {
                         if (err) {
                             console.log("something went wrong " + err);
-                            error.error = "something went wrong while trying to get the "
-                                + current_status + " cvs for job from the db";
+                            error.error = "something went wrong while trying to get the " + current_status +
+                                " cvs for job from the db";
                             callback(500, error);
                         } else {
                             console.log("the cvs extracted successfully from the db");
@@ -178,7 +176,7 @@ function rateCV(cvId, status, callback) {
                     error.error = "something went wrong while trying to save the Status id to cv";
                     callback(500, error);
                 } else {
-                    if (results != null) {
+                    if (results !== null) {
                         console.log("cv rated successfully");
                         callback(null, results);
                     } else {
@@ -208,7 +206,7 @@ function updateRateCV(cvId, status, callback) {
             callback(500, error);
         } else {
 
-            if (result != null) {
+            if (result !== null) {
                 var query = {"_id": result.status.status_id};
                 var update = {
                     "rate.stars": status.stars,
@@ -222,7 +220,7 @@ function updateRateCV(cvId, status, callback) {
                         error.error = "something went wrong while trying to update the current status of the cv";
                         callback(500, error);
                     } else {
-                        if (result != null) {
+                        if (result !== null) {
                             console.log("status of cv updated successfully");
                             callback(null, result);
                         } else {
@@ -260,7 +258,7 @@ function hireToJob(cvId, callback) {
             error.error = "something went wrong while trying to hire job seeker to job";
             callback(500, error);
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("job seeker hired successfully");
 
                 var query = {
@@ -276,7 +274,7 @@ function hireToJob(cvId, callback) {
                         error.error = "something went wrong while trying to update decision to true";
                         callback(500, error);
                     } else {
-                        if (result != null) {
+                        if (result !== null) {
                             console.log("decision updated to true successfully");
                             callback(null, result._id);
                         } else {
@@ -351,7 +349,7 @@ function getHiredCvs(userId, jobId, callback) {
 
 }
 
-function getPersonalPropertiesID(cvId, callback ) {
+function getPersonalPropertiesID(cvId, callback) {
 
     console.log("in getPersonalDetailsID");
 
@@ -391,9 +389,9 @@ function setDecisionToFalse(cvId, callback) {
 
     console.log("in setDecisionToFalse");
 
-    getPersonalPropertiesID(cvId, function(status,result) {
+    getPersonalPropertiesID(cvId, function (status, result) {
 
-        if (status === null ) {
+        if (status === null) {
 
             var query = {
                 _id: result
@@ -408,7 +406,7 @@ function setDecisionToFalse(cvId, callback) {
                     error.error = "something went wrong while trying to update decision to false";
                     callback(500, error);
                 } else {
-                    if (result != null) {
+                    if (result !== null) {
                         console.log("decision updated to false successfully");
                         callback(null, result._id);
                     } else {
@@ -420,8 +418,8 @@ function setDecisionToFalse(cvId, callback) {
                 }
             });
 
-        }else {
-            callback(status,result)
+        } else {
+            callback(status, result);
         }
 
     });

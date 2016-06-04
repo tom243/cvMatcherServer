@@ -202,20 +202,20 @@ var addCvToJobFunctions = (function () {
                     console.log("cannot extract job from db");
                     callback(status, jobResults);
                 }
-            })
+            });
         },
         getCV: function (cvId, callback) {
 
             matchingObjectDAO.getMatchingObject(cvId, "cv", function (status, cvResults) {
                 if (status === 200) {
                     //matchObjectToSend.cv = CvResults[0];
-                    callback(null, cvResults[0])
+                    callback(null, cvResults[0]);
                 } else {
                     console.log("cannot extract cv from db");
                     callback(status, cvResults);
                 }
 
-            })
+            });
         },
         addJobToUser: function (userId, jobId, cvId, callback) {
 
@@ -248,7 +248,7 @@ var addCvToJobFunctions = (function () {
                             callback(500, error);
 
                         } else {
-                            if (results != null) {
+                            if (results !== null) {
                                 callback(null, results);
                             } else {
                                 errorMessage = "user not exists";
@@ -257,7 +257,7 @@ var addCvToJobFunctions = (function () {
                                 callback(500, error);
                             }
                         }
-                    })
+                    });
                 } else {
                     console.log("something went wrong " + err);
                     error.error = "something went wrong while trying to save job seeker job";
@@ -281,7 +281,7 @@ var addCvToJobFunctions = (function () {
                     error.error = "error in updating data for cv";
                     callback(500, error);
                 } else {
-                    if (results != null) {
+                    if (results !== null) {
                         callback();
                     } else {
                         errorMessage = "cv not exists";
@@ -290,7 +290,7 @@ var addCvToJobFunctions = (function () {
                         callback(500, error);
                     }
                 }
-            })
+            });
         },
 
         sendCvForJob: function (cvId, jobId, callback) {
@@ -312,7 +312,7 @@ var addCvToJobFunctions = (function () {
 
                 } else {
 
-                    if (results != null) {
+                    if (results !== null) {
                         console.log("cv added to the job successfully");
                         callback();
                     } else {
@@ -336,7 +336,7 @@ var addCvToJobFunctions = (function () {
                 } else {
                     callback(status, results);
                 }
-            })
+            });
         },
 
         ///////////////////////////////////////////// *** Matcher *** ///////////////////////
@@ -443,7 +443,7 @@ var addCvToJobFunctions = (function () {
                                                     error.error = "something went wrong while trying to update predictor result";
                                                     callback(500, error);
                                                 } else {
-                                                    if (results != null) {
+                                                    if (results !== null) {
                                                         console.log("the predictor result updated successfully");
                                                         callback(null, results);
                                                     } else {
@@ -510,7 +510,7 @@ var addCvToJobFunctions = (function () {
                             matchingDetailsArray.push(result._id);
                             callbackAsync();
                         }
-                    })
+                    });
                 },
                 // 3rd param is the function to call when everything is done
                 function (err) {
@@ -520,7 +520,7 @@ var addCvToJobFunctions = (function () {
             );
         } else {
             console.log("matching details is empty or undefined");
-            callback(false, [])
+            callback(false, []);
         }
 
     }
@@ -540,7 +540,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
             cv: results[1]
         };
 
-        if (status == null) {
+        if (status === null) {
 
             unirest.post('https://matcherlogic.herokuapp.com/calculateMatching')
                 .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
@@ -553,7 +553,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
                             if (response.body.total_grade > matchObjectToSend.job.compatibility_level) {
 
 
-                                function parallelTasks(totalGrade, jobId, CvUser, userPersonalProperties,
+                                var parallelTasks =  function (totalGrade, jobId, CvUser, userPersonalProperties,
                                                        jobUser, cvId, callback) {
 
                                     var parallelArr = [
@@ -566,7 +566,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
                                     ];
 
                                     async.parallel(parallelArr, callback);
-                                }
+                                };
 
                                 async.waterfall([
                                     async.apply(addCvToJobFunctions.copyCV, matchObjectToSend.cv),
@@ -634,7 +634,7 @@ function updateFavoriteJob(jobId, isFavorite, callback) {
             callback(500, error);
 
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("job favorite updated successfully");
                 callback(200, results);
             } else {
@@ -644,7 +644,7 @@ function updateFavoriteJob(jobId, isFavorite, callback) {
                 callback(500, error);
             }
         }
-    })
+    });
 
 }
 
@@ -667,7 +667,7 @@ function updateActivityJob(jobId, isActive, callback) {
             callback(500, error);
 
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("job activity changed successfully");
                 callback(200, results);
             } else {
@@ -677,7 +677,7 @@ function updateActivityJob(jobId, isActive, callback) {
                 callback(500, error);
             }
         }
-    })
+    });
 
 }
 
