@@ -769,3 +769,5 @@ exports.predictorResponse = predictorResponse;
 exports.matcherResponse = matcherResponse;
 
 exports.loadValidationValues = loadValidationValues;
+
+exports.updateHWID = updateHWID;
