@@ -724,6 +724,12 @@ function updateHWID(req) {
         && fieldValidation(req.body.hwid, "hwid");
 }
 
+function sendNotification(req) {
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.message, "message");
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.getUser = getUser;
@@ -771,3 +777,4 @@ exports.matcherResponse = matcherResponse;
 exports.loadValidationValues = loadValidationValues;
 
 exports.updateHWID = updateHWID;
+exports.sendNotification = sendNotification;

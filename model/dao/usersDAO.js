@@ -250,6 +250,31 @@ function updateHWID(googleUserId, hwid, callback) {
 
 }
 
+function getHWID(userId, callback) {
+
+    var query = UserModel.find(
+        {_id: userId, active: true},{hwid:1}
+    ).limit(1);
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to extract hwid";
+            callback(500, error);
+        } else {
+            if (results.length > 0) {
+                console.log("hwid extracted successfully");
+                callback(200, results[0]);
+            } else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404, error);
+            }
+        }
+    });
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addUser = addUser;
@@ -260,3 +285,4 @@ exports.getUserId = getUserId;
 exports.saveCurrentCV = saveCurrentCV;
 exports.verifyEmployerAddedCompany = verifyEmployerAddedCompany;
 exports.updateHWID = updateHWID;
+exports.getHWID = getHWID;
