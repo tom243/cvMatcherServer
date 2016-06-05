@@ -4,6 +4,7 @@ var jobSeekerController = require('./../../controller/jobSeekerController');
 var employerController = require('./../../controller/employerController');
 var utilsController = require('./../../controller/utilsController');
 var companyController = require('./../../controller/companyController');
+var pushWooshController = require('./../../controller/pushWooshController');
 
 module.exports = function (app) {
 
@@ -18,6 +19,7 @@ module.exports = function (app) {
     app.post('/updateUser', usersController.updateUser);
     app.post('/getUser', usersController.getUser);
     app.post('/getUserId', usersController.getUserId);
+    app.post('/updateHWID', usersController.updateHWID);
 
 /////////////////////////////////////////////////////////////// *** Matching Objects *** ///////////////
 
@@ -64,4 +66,8 @@ module.exports = function (app) {
     app.post('/addKeyWords', utilsController.addKeyWords);
     app.get ('/cleanDB', utilsController.cleanDB); //TODO: DELETE IT
 
+///////////////////////////////////////////////////// *** pushWoosh *** ///////////////////////////////
+
+    app.post('/sendNotification', pushWooshController.sendNotification);
+    
 };

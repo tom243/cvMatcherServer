@@ -74,6 +74,19 @@ function getUserId(req, res) {
     }
 }
 
+function updateHWID(req, res) {
+
+    console.log("in updateHWID");
+
+    if (validation.updateHWID(req)) {
+        usersDAO.updateHWID(req.body.google_user_id, req.body.hwid, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addUser = addUser;
@@ -81,3 +94,4 @@ exports.deleteUser = deleteUser;
 exports.updateUser = updateUser;
 exports.getUser = getUser;
 exports.getUserId = getUserId;
+exports.updateHWID = updateHWID;

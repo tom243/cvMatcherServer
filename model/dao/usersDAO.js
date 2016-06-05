@@ -223,6 +223,33 @@ function verifyEmployerAddedCompany(userId, callback) {
 
 }
 
+function updateHWID(googleUserId, hwid) {
+
+    var query = {"google_user_id": googleUserId};
+    var update = {
+        hwid: hwid
+    };
+    var options = {new: true};
+    UserModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while update hwid";
+            callback(500, error);
+        } else {
+
+            if (results != null) {
+                console.log("the current hwid updated successfully");
+                callback(200, results);
+            } else {
+                console.log("google user id not exists");
+                error.error = "google user id not exists";
+                callback(404, error);
+            }
+        }
+    });
+
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addUser = addUser;
@@ -232,3 +259,4 @@ exports.getUser = getUser;
 exports.getUserId = getUserId;
 exports.saveCurrentCV = saveCurrentCV;
 exports.verifyEmployerAddedCompany = verifyEmployerAddedCompany;
+exports.updateHWID = updateHWID;

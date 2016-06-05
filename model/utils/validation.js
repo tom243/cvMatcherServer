@@ -711,13 +711,17 @@ function getKeyWordsBySector(req) {
 }
 
 function addKeyWords(req) {
-    console.log("req.body.sector " + req.body.sector);
-
     return req.body
     && fieldValidation(req.body.sector, "sector")
     && fieldValidation(req.body.words_list, "words_list")
-    && req.body.words_list.constructor === Array
+    && req.body.words_list.constructor === Array;
 
+}
+
+function updateHWID(req) {
+    return req.body
+        && fieldValidation(req.body.google_user_id, "google_user_id")
+        && fieldValidation(req.body.hwid, "hwid");
 }
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
