@@ -223,7 +223,7 @@ function verifyEmployerAddedCompany(userId, callback) {
 
 }
 
-function updateHWID(googleUserId, hwid) {
+function updateHWID(googleUserId, hwid, callback) {
 
     var query = {"google_user_id": googleUserId};
     var update = {
