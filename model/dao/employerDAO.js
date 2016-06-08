@@ -208,11 +208,18 @@ function updateRateCV(cvId, status, callback) {
 
             if (result !== null) {
                 var query = {"_id": result.status.status_id};
-                var update = {
-                    "rate.stars": status.stars,
-                    "rate.description": status.description,
-                    "rate.timestamp": status.timestamp
-                };
+                var update;
+                if (status.current_status === "liked") {
+                    update = {
+                        "rate.stars": status.stars,
+                        "rate.timestamp": status.timestamp
+                    };
+                }else { // unliked
+                    update = {
+                        "rate.description": status.description,
+                        "rate.timestamp": status.timestamp
+                    };
+                }
                 var options = {new: true};
                 StatusModel.findOneAndUpdate(query, update, options, function (err, result) {
                     if (err) {
