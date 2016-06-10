@@ -367,6 +367,7 @@ function formulaValidation(formula) {
 function requirementsValidation(requirements, type) {
 
     var mustPercentageSum = 0;
+    var mustExist = false;
     var isValid = requirements
         && requirements.constructor === Array;
 
@@ -385,6 +386,7 @@ function requirementsValidation(requirements, type) {
                         if (fieldValidation(requirements[i].combination[j].mode, "combination.mode")) {
                             switch (requirements[i].combination[j].mode) {
                                 case "must" :
+                                    mustExist = true;
                                     isValid = fieldValidation(requirements[i].combination[j].name, "combination.name")
                                         && (fieldValidation(requirements[i].combination[j].years, "combination.years")
                                         && validatePositiveNumber(requirements[i].combination[j].years))
@@ -409,8 +411,11 @@ function requirementsValidation(requirements, type) {
                     } else return false;
                     if (!isValid) return false;
                 }
-                if (mustPercentageSum != 100 && type == "job") return false;
-                else mustPercentageSum = 0;
+                if (mustPercentageSum != 100 && type == "job" && mustExist) return false;
+                else {
+                    mustPercentageSum = 0;
+                    mustExist = false;
+                }
             } else return false;
         }
         return isValid;
