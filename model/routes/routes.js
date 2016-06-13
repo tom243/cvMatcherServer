@@ -38,6 +38,7 @@ module.exports = function (app) {
     app.post('/jobSeeker/addCvToJob', jobSeekerController.addCvToJob);
     app.post('/jobSeeker/updateFavoriteJob', jobSeekerController.updateFavoriteJob);
     app.post('/jobSeeker/updateActivityJob', jobSeekerController.updateActivityJob);
+    app.post('/jobSeeker/getBestMatchJobs', jobSeekerController.getBestMatchJobs);
 
 //////////////////////////////////////////////////////*** Employer *** /////////////////////////////////
 

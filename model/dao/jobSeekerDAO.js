@@ -681,6 +681,68 @@ function updateActivityJob(jobId, isActive, callback) {
 
 }
 
+function getLastTenJobs(userId, sector, callback) {
+
+    var query = UserModel.find(
+        {_id: userId, active: true}, {jobs: 1}
+    ).populate({
+        path: 'jobs',
+        select: 'job'
+    });
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the user from the db";
+            callback(500, error);
+        } else {
+
+            if (results.length > 0) {
+
+                var jobs = [];
+                for (var i = 0; i < results[0].jobs.length; i++) {
+                    jobs.push(results[0].jobs[i].job);
+                }
+
+                var query = MatchingObjectsModel.find(
+                    {
+                        sector: sector,
+                        active: true,
+                        matching_object_type: "job",
+                        _id: {$nin: jobs},
+                        archive: false
+                    }
+                ).sort({date:-1}).limit(10)
+                    .populate('academy')
+                    .populate({
+                        path: 'requirements',
+                        populate: {path: 'combination'}
+                    })
+                    .populate("formula");
+
+                query.exec(function (err, results) {
+
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to get the jobs from the db";
+                        callback(500, error);
+                    } else {
+                        console.log("the jobs extracted successfully from the db");
+                        callback(null, results);
+                    }
+                });
+            } else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404, error);
+            }
+        }
+    });
+    
+
+}
+
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 
 exports.getAllJobsBySector = getAllJobsBySector;
@@ -689,3 +751,4 @@ exports.getFavoritesJobs = getFavoritesJobs;
 exports.addCvToJob = addCvToJob;
 exports.updateFavoriteJob = updateFavoriteJob;
 exports.updateActivityJob = updateActivityJob;
+exports.getLastTenJobs = getLastTenJobs;

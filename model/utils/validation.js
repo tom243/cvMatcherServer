@@ -178,16 +178,16 @@ function statusValidation(status) {
 function personalPropertiesValidation(personalProperties) {
 
     var isValid = personalProperties
-    && fieldValidation(personalProperties.university_degree, "university_degree")
-    && fieldValidation(personalProperties.degree_graduation_with_honors, "degree_graduation_with_honors")
-    && fieldValidation(personalProperties.above_two_years_experience, "above_two_years_experience")
-    && fieldValidation(personalProperties.psychometric_above_680, "psychometric_above_680")
-    && fieldValidation(personalProperties.multilingual, "multilingual")
-    && fieldValidation(personalProperties.volunteering, "volunteering")
-    && fieldValidation(personalProperties.full_army_service, "full_army_service")
-    && fieldValidation(personalProperties.officer_in_the_military, "officer_in_the_military")
-    && fieldValidation(personalProperties.high_school_graduation_with_honors, "high_school_graduation_with_honors")
-    && fieldValidation(personalProperties.youth_movements, "youth_movements");
+        && fieldValidation(personalProperties.university_degree, "university_degree")
+        && fieldValidation(personalProperties.degree_graduation_with_honors, "degree_graduation_with_honors")
+        && fieldValidation(personalProperties.above_two_years_experience, "above_two_years_experience")
+        && fieldValidation(personalProperties.psychometric_above_680, "psychometric_above_680")
+        && fieldValidation(personalProperties.multilingual, "multilingual")
+        && fieldValidation(personalProperties.volunteering, "volunteering")
+        && fieldValidation(personalProperties.full_army_service, "full_army_service")
+        && fieldValidation(personalProperties.officer_in_the_military, "officer_in_the_military")
+        && fieldValidation(personalProperties.high_school_graduation_with_honors, "high_school_graduation_with_honors")
+        && fieldValidation(personalProperties.youth_movements, "youth_movements");
 
     if (isValid) {
         for (var property in personalProperties) {
@@ -229,14 +229,14 @@ function originalTextValidation(originalText, type) {
 
     if (originalText) {
         if (type === "cv") {
-            isValid= originalText.history_timeline
-            && originalText.history_timeline.constructor === Array
-            && historyTimelineValidation(originalText.history_timeline);
+            isValid = originalText.history_timeline
+                && originalText.history_timeline.constructor === Array
+                && historyTimelineValidation(originalText.history_timeline);
 
         } else if (type === "job") {
-            isValid= fieldValidation(originalText.title, "title")
-            && fieldValidation(originalText.description, "description")
-            && fieldValidation(originalText.requirements, "requirements");
+            isValid = fieldValidation(originalText.title, "title")
+                && fieldValidation(originalText.description, "description")
+                && fieldValidation(originalText.requirements, "requirements");
         } else {
             console.log("type not valid");
             return false;
@@ -307,11 +307,11 @@ function scopeOfPositionValidation(scopeOfPosition) {
 function academyValidation(academy) {
 
     var isValid = academy
-    && (fieldValidation(academy.academy_type, "academy_type") && academy.academy_type.constructor === Array
-    && academy.academy_type.length > 0)
-    && (fieldValidation(academy.degree_name, "degree_name") && degreeNameArr.indexOf(academy.degree_name) != -1)
-    && (fieldValidation(academy.degree_type, "degree_type") && academy.degree_type.constructor === Array
-    && academy.degree_type.length > 0);
+        && (fieldValidation(academy.academy_type, "academy_type") && academy.academy_type.constructor === Array
+        && academy.academy_type.length > 0)
+        && (fieldValidation(academy.degree_name, "degree_name") && degreeNameArr.indexOf(academy.degree_name) != -1)
+        && (fieldValidation(academy.degree_type, "degree_type") && academy.degree_type.constructor === Array
+        && academy.degree_type.length > 0);
 
     if (isValid) {
         for (var i = 0; i < academy.academy_type.length; i++) {
@@ -355,7 +355,7 @@ function formulaValidation(formula) {
                 }
             }
         }
-        isValid =  isValid && formulaAmount === 100; // verify formula is not bigger the 100
+        isValid = isValid && formulaAmount === 100; // verify formula is not bigger the 100
     }
 
     if (!isValid) {
@@ -431,8 +431,8 @@ function requirementsValidation(requirements, type) {
 
 function addUser(req) {
     return req.body
-    && fieldValidation(req.body.google_user_id, "google_user_id")
-    && (fieldValidation(req.body.email, "email") && validateEmail(req.body.email));
+        && fieldValidation(req.body.google_user_id, "google_user_id")
+        && (fieldValidation(req.body.email, "email") && validateEmail(req.body.email));
 }
 
 function deleteUser(req) {
@@ -441,15 +441,15 @@ function deleteUser(req) {
 
 function updateUser(req) {
     return req.body
-    && fieldValidation(req.body._id, "_id")
-    && (fieldValidation(req.body.personal_id, "personal_id") && validatePersonalId(req.body.personal_id))
-    && fieldValidation(req.body.first_name, "first_name")
-    && fieldValidation(req.body.last_name, "last_name")
-    && fieldValidation(req.body.birth_date, "birth_date")
-    && fieldValidation(req.body.address, "address")
-    && (fieldValidation(req.body.email, "email") && validateEmail(req.body.email))
-    && fieldValidation(req.body.phone_number, "phone_number")
-    && fieldValidation(req.body.linkedin, "linkedin");
+        && fieldValidation(req.body._id, "_id")
+        && (fieldValidation(req.body.personal_id, "personal_id") && validatePersonalId(req.body.personal_id))
+        && fieldValidation(req.body.first_name, "first_name")
+        && fieldValidation(req.body.last_name, "last_name")
+        && fieldValidation(req.body.birth_date, "birth_date")
+        && fieldValidation(req.body.address, "address")
+        && (fieldValidation(req.body.email, "email") && validateEmail(req.body.email))
+        && fieldValidation(req.body.phone_number, "phone_number")
+        && fieldValidation(req.body.linkedin, "linkedin");
 }
 
 function getUser(req) {
@@ -464,20 +464,20 @@ function getUserId(req) {
 
 function addCompany(req) {
     return req.body
-    && fieldValidation(req.body.name, "name")
-    && fieldValidation(req.body.logo, "logo")
-    && fieldValidation(req.body.p_c, "p_c")
-    && fieldValidation(req.body.address, "address")
-    && fieldValidation(req.body.phone_number, "phone_number")
-    && fieldValidation(req.body.password, "password")
-    && fieldValidation(req.body.user_id, "user_id");
+        && fieldValidation(req.body.name, "name")
+        && fieldValidation(req.body.logo, "logo")
+        && fieldValidation(req.body.p_c, "p_c")
+        && fieldValidation(req.body.address, "address")
+        && fieldValidation(req.body.phone_number, "phone_number")
+        && fieldValidation(req.body.password, "password")
+        && fieldValidation(req.body.user_id, "user_id");
 }
 
 function addToExistingCompany(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id")
-    && fieldValidation(req.body.company_id, "company_id")
-    && fieldValidation(req.body.password, "password");
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.company_id, "company_id")
+        && fieldValidation(req.body.password, "password");
 }
 
 function deleteCompany(req) {
@@ -486,12 +486,12 @@ function deleteCompany(req) {
 
 function updateCompany(req) {
     return req.body
-    && fieldValidation(req.body._id, "_id")
-    && fieldValidation(req.body.name, "name")
-    && fieldValidation(req.body.logo, "logo")
-    && fieldValidation(req.body.p_c, "p_c")
-    && fieldValidation(req.body.address, "address")
-    && fieldValidation(req.body.phone_number, "phone_number");
+        && fieldValidation(req.body._id, "_id")
+        && fieldValidation(req.body.name, "name")
+        && fieldValidation(req.body.logo, "logo")
+        && fieldValidation(req.body.p_c, "p_c")
+        && fieldValidation(req.body.address, "address")
+        && fieldValidation(req.body.phone_number, "phone_number");
 }
 
 function getCompany(req) {
@@ -500,9 +500,9 @@ function getCompany(req) {
 
 function changeCompanyPassword(req) {
     return req.body
-    && fieldValidation(req.body.company_id, "company_id")
-    && fieldValidation(req.body.old_password, "old_password")
-    && fieldValidation(req.body.new_password, "new_password");
+        && fieldValidation(req.body.company_id, "company_id")
+        && fieldValidation(req.body.old_password, "old_password")
+        && fieldValidation(req.body.new_password, "new_password");
 }
 
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
@@ -531,8 +531,8 @@ function addMatchingObject(req) {
             return personalPropertiesValidation(matchingObject.personal_properties);
         } else if (matchingObject.matching_object_type === "job") {
             return fieldValidation(matchingObject.compatibility_level, "compatibility_level")
-            && validatePositiveNumber(matchingObject.compatibility_level) // check number between 1-100
-            && formulaValidation(matchingObject.formula);
+                && validatePositiveNumber(matchingObject.compatibility_level) // check number between 1-100
+                && formulaValidation(matchingObject.formula);
         } else {
             console.log("matching_object_type not valid");
             return false;
@@ -544,9 +544,9 @@ function addMatchingObject(req) {
 
 function getMatchingObject(req) {
     return req.body
-    && fieldValidation(req.body.matching_object_id, "matching_object_id")
-    && fieldValidation(req.body.matching_object_type, "matching_object_type")
-    && (req.body.matching_object_type == "cv" || req.body.matching_object_type == "job" );
+        && fieldValidation(req.body.matching_object_id, "matching_object_id")
+        && fieldValidation(req.body.matching_object_type, "matching_object_type")
+        && (req.body.matching_object_type == "cv" || req.body.matching_object_type == "job" );
 }
 
 function deleteMatchingObject(req) {
@@ -583,9 +583,9 @@ function updateMatchingObject(req) {
                 personalPropertiesValidation(matchingObject.personal_properties)
         } else if (matchingObject.matching_object_type === "job") {
             return fieldValidation(matchingObject.compatibility_level, "compatibility_level")
-            && validatePositiveNumber(matchingObject.compatibility_level) // check number between 1-100
-            && fieldValidation(matchingObject.formula._id, "formula._id")
-            && formulaValidation(matchingObject.formula);
+                && validatePositiveNumber(matchingObject.compatibility_level) // check number between 1-100
+                && fieldValidation(matchingObject.formula._id, "formula._id")
+                && formulaValidation(matchingObject.formula);
         } else {
             console.log("matching_object_type not valid");
             return false;
@@ -600,93 +600,93 @@ function updateMatchingObject(req) {
 
 function getJobsBySector(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id")
-    && fieldValidation(req.body.sector, "sector")
-    && sectorArr.indexOf(req.body.sector) != -1
-    && fieldValidation(req.body.archive, "archive")
-    && typeof(req.body.archive) === "boolean";
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.sector, "sector")
+        && sectorArr.indexOf(req.body.sector) != -1
+        && fieldValidation(req.body.archive, "archive")
+        && typeof(req.body.archive) === "boolean";
 }
 
 function getUnreadCvsForJob(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id")
-    && fieldValidation(req.body.job_id, "job_id");
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.job_id, "job_id");
 }
 
 function getRateCvsForJob(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id")
-    && fieldValidation(req.body.job_id, "job_id")
-    && fieldValidation(req.body.current_status, "current_status")
-    && ( req.body.current_status === "liked" || req.body.current_status === "unliked" );
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.job_id, "job_id")
+        && fieldValidation(req.body.current_status, "current_status")
+        && ( req.body.current_status === "liked" || req.body.current_status === "unliked" );
 }
 
 function rateCV(req) {
     return req.body
-    && fieldValidation(req.body.cv_id, "cv_id")
-    && fieldValidation(req.body.user_id, "user_id")
-    && fieldValidation(req.body.status, "status")
-    && statusValidation(req.body.status);
+        && fieldValidation(req.body.cv_id, "cv_id")
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.status, "status")
+        && statusValidation(req.body.status);
 }
 
 function updateRateCV(req) {
     return req.body
-    && fieldValidation(req.body.cv_id, "cv_id")
-    && fieldValidation(req.body.status, "status")
-    && statusValidation(req.body.status);
+        && fieldValidation(req.body.cv_id, "cv_id")
+        && fieldValidation(req.body.status, "status")
+        && statusValidation(req.body.status);
 }
 
 function hireToJob(req) {
     return req.body
-    && fieldValidation(req.body.cv_id, "cv_id")
-    && fieldValidation(req.body.user_id, "user_id");
+        && fieldValidation(req.body.cv_id, "cv_id")
+        && fieldValidation(req.body.user_id, "user_id");
 }
 
 function getHiredCvs(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id")
-    && fieldValidation(req.body.job_id, "job_id");
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.job_id, "job_id");
 }
 
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 function getAllJobsBySector(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id)")
-    && fieldValidation(req.body.sector, "sector")
-    && sectorArr.indexOf(req.body.sector) != -1 ;
+        && fieldValidation(req.body.user_id, "user_id)")
+        && fieldValidation(req.body.sector, "sector")
+        && sectorArr.indexOf(req.body.sector) != -1;
 }
 
 function getMyJobs(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id")
-    && fieldValidation(req.body.active, "active")
-    && typeof(req.body.active) === "boolean" ;
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.active, "active")
+        && typeof(req.body.active) === "boolean";
 }
 
 function getFavoritesJobs(req) {
     return req.body
-    && fieldValidation(req.body.user_id, "user_id");
+        && fieldValidation(req.body.user_id, "user_id");
 }
 
 function checkCV(req) {
     return req.body
-    && fieldValidation(req.body.job_id, "job_id")
-    && fieldValidation(req.body.cv_id, "cv_id");
+        && fieldValidation(req.body.job_id, "job_id")
+        && fieldValidation(req.body.cv_id, "cv_id");
 }
 
 function addCvToJob(req) {
     return req.body
-    && fieldValidation(req.body.job_id, "job_id")
-    && fieldValidation(req.body.cv_id, "cv_id");
+        && fieldValidation(req.body.job_id, "job_id")
+        && fieldValidation(req.body.cv_id, "cv_id");
 }
 
 function matcherResponse(response) {
     console.log("response", response);
     return response
-    && fieldValidation(response.total_grade, "total_grade")
-    && fieldValidation(response.formula, "formula")
-    && matcherFormulaValidation(response.formula) ;
+        && fieldValidation(response.total_grade, "total_grade")
+        && fieldValidation(response.formula, "formula")
+        && matcherFormulaValidation(response.formula);
 }
 
 function predictorResponse(response) {
@@ -695,31 +695,38 @@ function predictorResponse(response) {
 
 function updateFavoriteJob(req) {
     return req.body
-    && fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id")
-    && fieldValidation(req.body.favorite, "favorite")
-    && typeof(req.body.favorite) === "boolean" ;
+        && fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id")
+        && fieldValidation(req.body.favorite, "favorite")
+        && typeof(req.body.favorite) === "boolean";
 }
 
 function updateActivityJob(req) {
     return req.body
-    && fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id")
-    && fieldValidation(req.body.active, "active")
-    && typeof(req.body.active) === "boolean" ;
+        && fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id")
+        && fieldValidation(req.body.active, "active")
+        && typeof(req.body.active) === "boolean";
+}
+
+function getBestMatchJobs(req) {
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.sector, "sector")
+        && fieldValidation(req.body.cv, "cv")
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
 function getKeyWordsBySector(req) {
     return req.body
-    && fieldValidation(req.body.sector, "sector")
-    && sectorArr.indexOf(req.body.sector) != -1 ;
+        && fieldValidation(req.body.sector, "sector")
+        && sectorArr.indexOf(req.body.sector) != -1;
 }
 
 function addKeyWords(req) {
     return req.body
-    && fieldValidation(req.body.sector, "sector")
-    && fieldValidation(req.body.words_list, "words_list")
-    && req.body.words_list.constructor === Array;
+        && fieldValidation(req.body.sector, "sector")
+        && fieldValidation(req.body.words_list, "words_list")
+        && req.body.words_list.constructor === Array;
 
 }
 
@@ -769,6 +776,7 @@ exports.getMyJobs = getMyJobs;
 exports.getFavoritesJobs = getFavoritesJobs;
 exports.checkCV = checkCV;
 exports.addCvToJob = addCvToJob;
+exports.getBestMatchJobs = getBestMatchJobs;
 
 exports.updateFavoriteJob = updateFavoriteJob;
 exports.updateActivityJob = updateActivityJob;
