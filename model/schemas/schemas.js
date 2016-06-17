@@ -344,6 +344,7 @@ var keyWordsSchema = key_words_schema({
     },
     word: {
         type: String,
+        unique:true,
         required:true
     },
     count: {

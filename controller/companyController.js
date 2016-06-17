@@ -67,7 +67,7 @@ function getCompany(req, res) {
     console.log("in getCompany");
 
     if (validation.getCompany(req)) {
-        companyDAO.getCompany(req.body.company_id, function (status, result) {
+        companyDAO.getCompany(req.body.user_id, function (status, result) {
             res.status(status).json(result);
         });
     } else {

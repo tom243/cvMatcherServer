@@ -495,7 +495,7 @@ function updateCompany(req) {
 }
 
 function getCompany(req) {
-    return req.body && fieldValidation(req.body.company_id, "company_id");
+    return req.body && fieldValidation(req.body.user_id, "user_id");
 }
 
 function changeCompanyPassword(req) {

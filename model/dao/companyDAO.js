@@ -162,28 +162,50 @@ function updateCompany(updateCompany, callback) {
     });
 }
 
-function getCompany(companyId, callback) {
+function getCompany(userId, callback) {
 
-    var query = CompanyModel.find(
-        {_id: companyId, active: true}, {password: 0}
+    var query = UserModel.find(
+        {_id: userId, active: true}, {company: 1}
     ).limit(1);
 
     query.exec(function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the company";
+            error.error = "something went wrong while trying to get the user";
             callback(500, error);
         } else {
             if (results.length > 0) {
-                console.log("the company extracted successfully ", results);
-                callback(200, results);
+                console.log("the user extracted successfully ", results);
+                var query = CompanyModel.find(
+                    {_id: results[0].company, active: true}, {password: 0,employees:0,active:0}
+                ).limit(1);
+
+                query.exec(function (err, results) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to get the company";
+                        callback(500, error);
+                    } else {
+                        if (results.length > 0) {
+                            console.log("the company extracted successfully ", results);
+                            callback(200, results);
+                        } else {
+                            console.log("company not exists");
+                            error.error = "company not exists";
+                            callback(404, error);
+                        }
+                    }
+                });
             } else {
-                console.log("company not exists");
-                error.error = "company not exists";
+                console.log("user not exists");
+                error.error = "user not exists";
                 callback(404, error);
             }
         }
     });
+
+
+
 
 }
 
