@@ -7,10 +7,10 @@ module.exports = function(server) {
 
     webSocketServer.on('connection', function (webSocket) {
 
-        console.log("webSocket.upgradeReq.url " + webSocket.upgradeReq.url.substr(1));
+        //console.log("webSocket.upgradeReq.url " + webSocket.upgradeReq.url.substr(1));
         var userID = webSocket.upgradeReq.url.substr(1);
         webSockets[userID] = webSocket;
-        console.log('connected: ' + userID + ' in ' + Object.getOwnPropertyNames(webSockets));
+        //console.log('connected: ' + userID + ' in ' + Object.getOwnPropertyNames(webSockets));
 
         webSocket.on('message', function(message) {
             console.log('received from ' + userID + ': ' + message);
@@ -25,7 +25,7 @@ module.exports = function(server) {
 
         webSocket.on('close', function () {
             delete webSockets[userID];
-            console.log('deleted: ' + userID)
+           // console.log('deleted: ' + userID)
         })
     });
 
