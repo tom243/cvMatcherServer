@@ -45,6 +45,7 @@ module.exports = function (app) {
     app.post('/employer/getJobsBySector', employerController.getJobsBySector);
     app.post('/employer/getUnreadCvsForJob', employerController.getUnreadCvsForJob);
     app.post('/employer/getRateCvsForJob', employerController.getRateCvsForJob);
+    app.post('/employer/seenCV', employerController.seenCV);
     app.post('/employer/rateCV', employerController.rateCV);
     app.post('/employer/updateRateCV', employerController.updateRateCV);
     app.post('/employer/hireToJob', employerController.hireToJob);

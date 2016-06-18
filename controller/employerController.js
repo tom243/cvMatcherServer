@@ -57,6 +57,21 @@ function getRateCvsForJob(req, res) {
 
 }
 
+function seenCV(req, res) {
+
+    console.log("in seenCV");
+
+    if (validation.seenCV(req)) {
+        employerDAO.seenCV(req.body.cv_id, req.body.timestamp,  function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
+
 //** rate specific cv  **//
 function rateCV(req, res) {
 
@@ -154,6 +169,7 @@ function setDecision(req, res) {
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
+exports.seenCV = seenCV;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;

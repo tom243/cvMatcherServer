@@ -140,18 +140,45 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
     });
 }
 
+function seenCV(cvId, timestamp, callback) {
+
+    var query = {"_id": cvId};
+    var update = {
+        status: {
+            current_status: "seen",
+            timestamp: timestamp
+        }
+    };
+    var options = {new: true};
+    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to save seen to cv";
+            callback(500, error);
+        } else {
+            if (results !== null) {
+                console.log("cv set to seen successfully");
+                callback(200, result);
+            } else {
+                errorMessage = "cv not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
+        }
+    });
+
+}
+
 // Add Status
 function rateCV(cvId, status, callback) {
 
     var statusToAdd = new StatusModel({
-        seen: null,
         rate: {
-            status: true,
             stars: status.stars,
             description: status.description,
             timestamp: status.timestamp
-        },
-        received: null
+        }
     });
 
     /* save the Status to db*/
@@ -367,6 +394,7 @@ function setDecision(personalPropertiesId, decision, callback) {
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
+exports.seenCV = seenCV;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;

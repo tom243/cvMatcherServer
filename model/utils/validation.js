@@ -626,6 +626,12 @@ function getRateCvsForJob(req) {
         && ( req.body.current_status === "liked" || req.body.current_status === "unliked" );
 }
 
+function seenCV(req) {
+    return req.body
+        && fieldValidation(req.body.cv_id, "cv_id")
+        && fieldValidation(req.body.timestamp, "timestamp");
+}
+
 function rateCV(req) {
     return req.body
         && fieldValidation(req.body.cv_id, "cv_id")
@@ -778,6 +784,7 @@ exports.updateMatchingObject = updateMatchingObject;
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
+exports.seenCV = seenCV;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;
