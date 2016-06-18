@@ -380,10 +380,10 @@ function getEmployees(userId, callback) {
                     {_id: results[0].company},{employees:1}
                 ).limit(1).populate({
                     path: 'employees',
-                    select: 'personal_properties user',
+                    select: 'user personal_properties',
                     populate: {
-                        path: 'user',
-                        select: "first_name last_name personal_id"
+                        path: 'user personal_properties',
+                        select: "first_name last_name personal_id decision"
                     }
                 });
 
@@ -411,7 +411,7 @@ function getEmployees(userId, callback) {
             }
         }
     });
-    
+
 }
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
