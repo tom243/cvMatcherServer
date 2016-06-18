@@ -204,9 +204,6 @@ function getCompany(userId, callback) {
         }
     });
 
-
-
-
 }
 
 function getCompanies(callback) {
@@ -228,7 +225,7 @@ function getCompanies(callback) {
     });
 }
 
-function addPersonalPropertiesToCompany(userId, personalPropertiesId, callback) {
+function addJobSeekerToCompany(userId, cvId, callback) {
 
     console.log("in addPersonalPropertiesToCompany");
 
@@ -246,18 +243,18 @@ function addPersonalPropertiesToCompany(userId, personalPropertiesId, callback) 
 
                 var query = {"_id": results[0].company};
                 var update = {
-                    $addToSet: {'employees': personalPropertiesId}
+                    $addToSet: {'employees': cvId}
                 };
                 var options = {new: true};
                 CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
                     if (err) {
                         console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to add personal properties to company employers";
+                        error.error = "something went wrong while trying to add job seeker to company";
                         callback(500, error);
                     } else {
 
                         if (result !== null) {
-                            console.log("the personal properties added to company employers successfully");
+                            console.log("the job seeker added to company successfully");
                             callback(null, result);
                         } else {
                             console.log("company not exists");
@@ -277,7 +274,7 @@ function addPersonalPropertiesToCompany(userId, personalPropertiesId, callback) 
 
 }
 
-function removePersonalPropertiesFromCompany(userId, personalPropertiesId, callback) {
+function removeJobSeekerFromCompany(userId, cvId, callback) {
 
     var query = UserModel.find(
         {_id: userId, active: true}, {company: 1}
@@ -293,18 +290,18 @@ function removePersonalPropertiesFromCompany(userId, personalPropertiesId, callb
 
                 var query = {"_id": results[0].company};
                 var update = {
-                    $pull: {'employees': personalPropertiesId}
+                    $pull: {'employees': cvId}
                 };
                 var options = {new: true};
                 CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
                     if (err) {
                         console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to remove personal properties from company";
+                        error.error = "something went wrong while trying to remove job seeker from company";
                         callback(500, error);
                     } else {
 
                         if (result !== null) {
-                            console.log("the personal properties removed from the company successfully");
+                            console.log("the job seeker removed from the company successfully");
                             callback(null, result);
                         } else {
                             console.log("company not exists");
@@ -365,6 +362,58 @@ function changeCompanyPassword(companyId, oldPassword, newPassword, callback) {
 
 }
 
+function getEmployees(userId, callback) {
+
+    var query = UserModel.find(
+        {_id: userId, active: true}, {company: 1}
+    ).limit(1);
+
+    query.exec(function (err, results) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the user from the db";
+            callback(500, error);
+        } else {
+            if (results.length > 0) {
+
+                var query = CompanyModel.find(
+                    {_id: results[0].company},{employees:1}
+                ).limit(1).populate({
+                    path: 'employees',
+                    select: 'personal_properties user',
+                    populate: {
+                        path: 'user',
+                        select: "first_name last_name personal_id"
+                    }
+                });
+
+                query.exec(function (err, results) {
+                    if (err) {
+                        console.log("something went wrong " + err);
+                        error.error = "something went wrong while trying to get the company from the db";
+                        callback(500, error);
+                    } else {
+                        if (results.length > 0) {
+                            console.log("the employees extracted successfully");
+                            callback(200,results[0].employees);
+                        } else {
+                            console.log("company not exists");
+                            error.error = "company not exists";
+                            callback(404, error);
+                        }
+                    }
+                });
+
+            } else {
+                console.log("user not exists");
+                error.error = "user not exists";
+                callback(404, error);
+            }
+        }
+    });
+    
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addCompany = addCompany;
@@ -373,6 +422,7 @@ exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.getCompanies = getCompanies;
-exports.addPersonalPropertiesToCompany = addPersonalPropertiesToCompany;
-exports.removePersonalPropertiesFromCompany = removePersonalPropertiesFromCompany;
+exports.addJobSeekerToCompany = addJobSeekerToCompany;
+exports.removeJobSeekerFromCompany = removeJobSeekerFromCompany;
 exports.changeCompanyPassword = changeCompanyPassword;
+exports.getEmployees = getEmployees;

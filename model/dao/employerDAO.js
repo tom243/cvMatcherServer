@@ -178,7 +178,7 @@ function rateCV(cvId, status, callback) {
                 } else {
                     if (results !== null) {
                         console.log("cv rated successfully");
-                        callback(null, results);
+                        callback(200, result);
                     } else {
                         errorMessage = "cv not exists";
                         console.log(errorMessage);
@@ -229,7 +229,7 @@ function updateRateCV(cvId, status, callback) {
                     } else {
                         if (result !== null) {
                             console.log("status of cv updated successfully");
-                            callback(null, result);
+                            callback(200, result);
                         } else {
                             errorMessage = "status id not exists";
                             console.log(errorMessage);
@@ -258,7 +258,7 @@ function hireToJob(cvId, callback) {
     var update = {
         hired: true
     };
-    var options = {new: true};
+    var options = {new: true, fields:{hired:1}};
     MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
@@ -267,32 +267,7 @@ function hireToJob(cvId, callback) {
         } else {
             if (results !== null) {
                 console.log("job seeker hired successfully");
-
-                var query = {
-                    _id: results.personal_properties
-                };
-                var update = {
-                    decision: true
-                };
-                var options = {new: true};
-                PersonalPropertiesModel.findOneAndUpdate(query, update, options, function (err, result) {
-                    if (err) {
-                        console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to update decision to true";
-                        callback(500, error);
-                    } else {
-                        if (result !== null) {
-                            console.log("decision updated to true successfully");
-                            callback(null, result._id);
-                        } else {
-                            errorMessage = "personal properties not exists";
-                            console.log(errorMessage);
-                            error.error = errorMessage;
-                            callback(404, error);
-                        }
-                    }
-                });
-
+                callback(null, results);
             } else {
                 errorMessage = "cv not exists";
                 console.log(errorMessage);

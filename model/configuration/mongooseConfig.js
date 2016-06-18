@@ -24,6 +24,7 @@ module.exports = function () {
     // When the connection is disconnected
     mongoose.connection.on('disconnected', function () {
         console.log('Mongoose default connection disconnected');
+        mongoose.connect(dbURI);
     });
 
     // If the Node process ends, close the Mongoose connection

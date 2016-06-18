@@ -100,6 +100,20 @@ function changeCompanyPassword(req, res) {
 
 }
 
+function getEmployees(req, res) {
+
+    console.log("in getEmployees");
+
+    if (validation.getEmployees(req)) {
+        companyDAO.getEmployees(req.body.user_id, function (status, result) {
+                res.status(status).json(result);
+            });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addCompany = addCompany;
@@ -109,3 +123,4 @@ exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.getCompanies = getCompanies;
 exports.changeCompanyPassword = changeCompanyPassword;
+exports.getEmployees = getEmployees;

@@ -63,45 +63,9 @@ function rateCV(req, res) {
     console.log("in rateCV");
 
     if (validation.rateCV(req)) {
-
-
-        if (req.body.status.current_status === "liked") {
-
-            employerDAO.rateCV(req.body.cv_id, req.body.status, function (status, result) {
-
-                if (status === null) {
-                    res.status(200).json(result);
-                } else {
-                    res.status(status).json(result);
-                }
-            });
-        } else { // === unliked
-
-            function waterfallTasks(cvId, userId, callback) {
-
-                async.waterfall([
-                    async.apply(employerDAO.setDecisionToFalse, cvId),
-                    async.apply(companyDAO.addPersonalPropertiesToCompany, userId)
-                ], callback);
-            }
-
-            async.parallel([
-                async.apply(employerDAO.rateCV, req.body.cv_id, req.body.status),
-                async.apply(waterfallTasks, req.body.cv_id, req.body.user_id)
-
-            ], function (status, results) {
-
-                console.log("in callback");
-
-                if (status === null) {
-                    res.status(200).json(results[0]);
-                } else {
-                    res.status(status).json(results);
-                }
-
-            });
-
-        }
+        employerDAO.rateCV(req.body.cv_id, req.body.status, function (status, result) {
+            res.status(status).json(result);
+        });
     } else {
         utils.sendErrorValidation(res);
     }
@@ -115,38 +79,8 @@ function updateRateCV(req, res) {
 
     if (validation.updateRateCV(req)) {
 
-        function waterfallTasks(cvId, userId, callback) {
-
-            var waterfallArr = [];
-
-            if (req.body.status.current_status === "liked") {
-                waterfallArr = [
-                    async.apply(employerDAO.getPersonalPropertiesID, cvId),
-                    async.apply(companyDAO.removePersonalPropertiesFromCompany, userId)
-                ];
-            } else {// === unliked
-                waterfallArr = [
-                    async.apply(employerDAO.setDecisionToFalse, cvId),
-                    async.apply(companyDAO.addPersonalPropertiesToCompany, userId)
-                ];
-            }
-
-            async.waterfall(waterfallArr, callback);
-
-        }
-
-        async.parallel([
-            async.apply(employerDAO.updateRateCV, req.body.cv_id, req.body.status),
-            async.apply(waterfallTasks, req.body.cv_id, req.body.user_id)
-
-        ], function (status, results) {
-
-            if (status === null) {
-                res.status(200).json(results[0]);
-            } else {
-                res.status(status).json(results);
-            }
-
+        employerDAO.updateRateCV(req.body.cv_id, req.body.status, function (status, result) {
+            res.status(status).json(result);
         });
 
     } else {
@@ -162,16 +96,16 @@ function hireToJob(req, res) {
 
     if (validation.hireToJob(req)) {
 
-        async.waterfall([
+        async.parallel([
             async.apply(employerDAO.hireToJob, req.body.cv_id),
-            async.apply(companyDAO.addPersonalPropertiesToCompany, req.body.user_id)
+            async.apply(companyDAO.addJobSeekerToCompany, req.body.user_id, req.body.cv_id)
 
         ], function (status, results) {
 
             if (status == null) {
 
                 console.log("job seeker hired to job successfully");
-                res.status(200).json(results);
+                res.status(200).json(results[0]);
 
             } else {
                 console.log("error while trying to hire job seeker to job");

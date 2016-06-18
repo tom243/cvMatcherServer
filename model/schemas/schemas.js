@@ -91,7 +91,7 @@ var companiesSchema = new companies_schema({
         type: Number,
         required: true
     },
-    employees:[{ type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' }],
+    employees:[{ type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' }],
     password: {
         type: String,
         required: true
@@ -380,35 +380,18 @@ var validationSchema = validation_schema({
     }]
 }, {collection: 'Validation'});
 
-
-var UserModel                   = mongoose.model('UserModel', usersSchema);
-var StatusModel                 = mongoose.model('StatusModel',statusSchema);
-var RequirementsModel           = mongoose.model('RequirementsModel',requirementSchema);
-var CompanyModel                = mongoose.model('CompanyModel', companiesSchema);
-var FormulaModel                = mongoose.model('FormulaModel', formulasSchema);
-var MatchingObjectsModel        = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
-var OriginalTextModel           = mongoose.model('OriginalTextModel', originalTextSchema);
-var PersonalPropertiesModel     = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
-var HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', historyTimelineSchema);
-var AcademyModel                = mongoose.model('AcademyModel', academySchema);
-var ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', professionalKnowledgeSchema);
-var MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', matchingDetailsSchema);
-var KeyWordsModel               = mongoose.model('KeyWordsModel', keyWordsSchema);
-var JobSeekerJobsModel          = mongoose.model('JobSeekerJobsModel', jobSeekerJobsSchema);
-var ValidationModel             = mongoose.model('ValidationModel', validationSchema);
-
-exports.CompanyModel                = CompanyModel;
-exports.MatchingObjectsModel        = MatchingObjectsModel;
-exports.FormulaModel                = FormulaModel;
-exports.UserModel                   = UserModel;
-exports.StatusModel                 = StatusModel;
-exports.RequirementsModel           = RequirementsModel;
-exports.OriginalTextModel           = OriginalTextModel;
-exports.PersonalPropertiesModel     = PersonalPropertiesModel;
-exports.HistoryTimelineModel        = HistoryTimelineModel;
-exports.AcademyModel                = AcademyModel;
-exports.ProfessionalKnowledgeModel  = ProfessionalKnowledgeModel;
-exports.MatchingDetailsModel        = MatchingDetailsModel;
-exports.KeyWordsModel               = KeyWordsModel;
-exports.JobSeekerJobsModel          = JobSeekerJobsModel;
-exports.ValidationModel             = ValidationModel;
+exports.UserModel                   = mongoose.model('UserModel', usersSchema);
+exports.StatusModel                 = mongoose.model('StatusModel',statusSchema);
+exports.RequirementsModel           = mongoose.model('RequirementsModel',requirementSchema);
+exports.CompanyModel                = mongoose.model('CompanyModel', companiesSchema);
+exports.FormulaModel                = mongoose.model('FormulaModel', formulasSchema);
+exports.MatchingObjectsModel        = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
+exports.OriginalTextModel           = mongoose.model('OriginalTextModel', originalTextSchema);
+exports.PersonalPropertiesModel     = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
+exports.HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', historyTimelineSchema);
+exports.AcademyModel                = mongoose.model('AcademyModel', academySchema);
+exports.ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', professionalKnowledgeSchema);
+exports.MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', matchingDetailsSchema);
+exports.KeyWordsModel               = mongoose.model('KeyWordsModel', keyWordsSchema);
+exports.JobSeekerJobsModel          = mongoose.model('JobSeekerJobsModel', jobSeekerJobsSchema);
+exports.ValidationModel             = mongoose.model('ValidationModel', validationSchema);

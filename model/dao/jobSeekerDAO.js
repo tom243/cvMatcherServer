@@ -713,13 +713,13 @@ function getLastTenJobs(userId, sector, callback) {
                         _id: {$nin: jobs},
                         archive: false
                     }
-                ).sort({date:-1}).limit(10)
+                ).sort({date:-1}).limit(30)
+                    .populate('original_text')
                     .populate('academy')
                     .populate({
-                        path: 'requirements',
-                        populate: {path: 'combination'}
-                    })
-                    .populate("formula");
+                        path: 'user',
+                        populate: {path: 'company'}
+                    });
 
                 query.exec(function (err, results) {
 

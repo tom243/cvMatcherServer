@@ -505,6 +505,11 @@ function changeCompanyPassword(req) {
         && fieldValidation(req.body.new_password, "new_password");
 }
 
+function getEmployees(req) {
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id");
+}
+
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
 function addMatchingObject(req) {
@@ -756,6 +761,7 @@ exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.changeCompanyPassword = changeCompanyPassword;
+exports.getEmployees = getEmployees;
 
 exports.addMatchingObject = addMatchingObject;
 exports.getMatchingObject = getMatchingObject;
