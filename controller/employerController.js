@@ -135,6 +135,20 @@ function getHiredCvs(req, res) {
 
 }
 
+function setDecision(req, res) {
+
+    console.log("in setDecision");
+
+    if (validation.setDecision(req)) {
+        employerDAO.setDecision(req.body.personal_properties_id, req.body.decision, function (status, result) {
+            res.status(status).json(result);
+        });
+    } else {
+        utils.sendErrorValidation(res);
+    }
+
+}
+
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
 exports.getJobsBySector = getJobsBySector;
@@ -144,3 +158,4 @@ exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;
 exports.getHiredCvs = getHiredCvs;
+exports.setDecision = setDecision;

@@ -49,6 +49,7 @@ module.exports = function (app) {
     app.post('/employer/updateRateCV', employerController.updateRateCV);
     app.post('/employer/hireToJob', employerController.hireToJob);
     app.post('/employer/getHiredCvs', employerController.getHiredCvs);
+    app.post('/employer/setDecision', employerController.setDecision);
 
 //////////////////////////////////////////////////***  Companies  ***//////////////////////////////////
 

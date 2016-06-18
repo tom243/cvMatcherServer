@@ -214,7 +214,7 @@ function updateRateCV(cvId, status, callback) {
                         "rate.stars": status.stars,
                         "rate.timestamp": status.timestamp
                     };
-                }else { // unliked
+                } else { // unliked
                     update = {
                         "rate.description": status.description,
                         "rate.timestamp": status.timestamp
@@ -258,7 +258,7 @@ function hireToJob(cvId, callback) {
     var update = {
         hired: true
     };
-    var options = {new: true, fields:{hired:1}};
+    var options = {new: true, fields: {hired: 1}};
     MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
         if (err) {
             console.log("something went wrong " + err);
@@ -331,79 +331,33 @@ function getHiredCvs(userId, jobId, callback) {
 
 }
 
-function getPersonalPropertiesID(cvId, callback) {
-
-    console.log("in getPersonalDetailsID");
-
-    var query = MatchingObjectsModel.find(
-        {
-            _id: cvId,
-            active: true,
-            matching_object_type: "cv"
-        }
-    ).limit(1);
-
-    query.exec(function (err, results) {
-        if (err) {
-            console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to find the cv";
-            callback(500, error);
-        } else {
-
-            if (results.length > 0) {
-
-                console.log("personal properties id extracted successfully");
-                callback(null, results[0].personal_properties);
-
-            } else {
-                errorMessage = "cv not exists";
-                console.log(errorMessage);
-                error.error = errorMessage;
-                callback(500, error);
-            }
-
-        }
-    });
-
-}
-
-function setDecisionToFalse(cvId, callback) {
+function setDecision(personalPropertiesId, decision, callback) {
 
     console.log("in setDecisionToFalse");
 
-    getPersonalPropertiesID(cvId, function (status, result) {
-
-        if (status === null) {
-
-            var query = {
-                _id: result
-            };
-            var update = {
-                decision: false
-            };
-            var options = {new: true};
-            PersonalPropertiesModel.findOneAndUpdate(query, update, options, function (err, result) {
-                if (err) {
-                    console.log("something went wrong " + err);
-                    error.error = "something went wrong while trying to update decision to false";
-                    callback(500, error);
-                } else {
-                    if (result !== null) {
-                        console.log("decision updated to false successfully");
-                        callback(null, result._id);
-                    } else {
-                        errorMessage = "personal properties not exists";
-                        console.log(errorMessage);
-                        error.error = errorMessage;
-                        callback(404, error);
-                    }
-                }
-            });
-
+    var query = {
+        _id: personalPropertiesId
+    };
+    var update = {
+        decision: decision
+    };
+    var options = {new: true, fields: {decision:1}};
+    PersonalPropertiesModel.findOneAndUpdate(query, update, options, function (err, result) {
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to update decision";
+            callback(500, error);
         } else {
-            callback(status, result);
+            if (result !== null) {
+                console.log("decision updated successfully");
+                callback(200, result);
+            } else {
+                errorMessage = "personal properties not exists";
+                console.log(errorMessage);
+                error.error = errorMessage;
+                callback(404, error);
+            }
         }
-
     });
 
 }
@@ -417,5 +371,4 @@ exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;
 exports.getHiredCvs = getHiredCvs;
-exports.getPersonalPropertiesID = getPersonalPropertiesID;
-exports.setDecisionToFalse = setDecisionToFalse;
+exports.setDecision = setDecision;

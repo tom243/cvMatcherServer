@@ -744,7 +744,6 @@ function getLastTenJobs(userId, sector, callback) {
             }
         }
     });
-    
 
 }
 

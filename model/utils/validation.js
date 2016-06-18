@@ -653,6 +653,12 @@ function getHiredCvs(req) {
         && fieldValidation(req.body.job_id, "job_id");
 }
 
+function setDecision(req) {
+    return req.body
+        && fieldValidation(req.body.personal_properties_id, "personal_properties_id")
+        && fieldValidation(req.body.decision, "decision");
+}
+
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 function getAllJobsBySector(req) {
@@ -768,14 +774,15 @@ exports.getMatchingObject = getMatchingObject;
 exports.deleteMatchingObject = deleteMatchingObject;
 exports.reviveMatchingObject = reviveMatchingObject;
 exports.updateMatchingObject = updateMatchingObject;
-exports.hireToJob = hireToJob;
-exports.getHiredCvs = getHiredCvs;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
+exports.hireToJob = hireToJob;
+exports.getHiredCvs = getHiredCvs;
+exports.setDecision = setDecision;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;

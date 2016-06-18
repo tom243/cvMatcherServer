@@ -114,6 +114,7 @@ function getEmployees(req, res) {
 
 }
 
+
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
 exports.addCompany = addCompany;
