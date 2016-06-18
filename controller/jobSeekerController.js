@@ -148,12 +148,12 @@ function updateActivityJob(req, res) {
 
 getBestMatchJobsFunction = {
 
-    getCurrentCV : function (cvId, type, callback) {
+    getCurrentCV: function (cvId, type, callback) {
 
         matchingObjectDAO.getMatchingObject(cvId, type, function (status, result) {
 
-            if (status === 200)  {
-                callback(null, result );
+            if (status === 200) {
+                callback(null, result);
             } else {
                 callback(status, result);
             }
@@ -200,8 +200,8 @@ function getBestMatchJobs(req, res) {
                                     var newItem = item.toObject();
                                     newItem.matcher_grade = response.body.total_grade;
 
-/*                                  console.log("response.body.total_grade ", response.body.total_grade);
-                                    console.log("item.matcherGrade" + item.matcherGrade);*/
+                                    /*                                  console.log("response.body.total_grade ", response.body.total_grade);
+                                     console.log("item.matcherGrade" + item.matcherGrade);*/
                                     matcherResponseArr.push(newItem);
                                     callbackAsync();
 
@@ -230,7 +230,7 @@ function getBestMatchJobs(req, res) {
                             });
                             // console.log("matcherResponseArr ", matcherResponseArr);
                             res.status(200).json(matcherResponseArr);
-                        }else {
+                        } else {
                             console.log("something went wrong " + err);
                             var errorMessage = "something went wrong while trying to match top ten jobs";
                             error.error = errorMessage;
@@ -252,6 +252,12 @@ function getBestMatchJobs(req, res) {
 
 }
 
+function test(req, res) {
+
+    jobSeekerDAO.test(req.body.user_id, function (status, result) {
+            res.status(status).json(result);
+        });
+}
 
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
@@ -263,3 +269,5 @@ exports.addCvToJob = addCvToJob;
 exports.updateFavoriteJob = updateFavoriteJob;
 exports.updateActivityJob = updateActivityJob;
 exports.getBestMatchJobs = getBestMatchJobs;
+
+exports.test = test;

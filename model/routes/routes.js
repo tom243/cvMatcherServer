@@ -39,6 +39,8 @@ module.exports = function (app) {
     app.post('/jobSeeker/updateFavoriteJob', jobSeekerController.updateFavoriteJob);
     app.post('/jobSeeker/updateActivityJob', jobSeekerController.updateActivityJob);
     app.post('/jobSeeker/getBestMatchJobs', jobSeekerController.getBestMatchJobs);
+    
+    app.post('/jobSeeker/test', jobSeekerController.test);
 
 //////////////////////////////////////////////////////*** Employer *** /////////////////////////////////
 
