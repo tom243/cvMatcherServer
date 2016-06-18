@@ -158,7 +158,7 @@ function seenCV(cvId, timestamp, callback) {
         } else {
             if (results !== null) {
                 console.log("cv set to seen successfully");
-                callback(200, result);
+                callback(200, results);
             } else {
                 errorMessage = "cv not exists";
                 console.log(errorMessage);
