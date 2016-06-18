@@ -204,6 +204,7 @@ var formulasSchema = new formulas_schema({
 // Status Schema
 var statusSchema = new status_schema({
     rate: {
+        status: Boolean,
         stars: Number,
         description: String,
         timestamp: Date
