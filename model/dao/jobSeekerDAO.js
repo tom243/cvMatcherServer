@@ -714,6 +714,11 @@ function getLastTenJobs(userId, sector, callback) {
                         archive: false
                     }
                 ).sort({date:-1}).limit(30)
+                    .populate({
+                        path: 'requirements',
+                        populate: {path: 'combination'}
+                    })
+                    .populate("formula")
                     .populate('original_text')
                     .populate('academy')
                     .populate({
