@@ -149,7 +149,13 @@ function seenCV(cvId, timestamp, callback) {
     var update = {
         status: {
             current_status: "seen",
-            timestamp: timestamp
+            timestamp: timestamp,
+            status_id: {
+                rate: {
+                    stars: 0,
+                    description:""
+                }
+            }
         }
     };
     var options = {new: true};
