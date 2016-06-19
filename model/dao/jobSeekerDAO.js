@@ -557,7 +557,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 
                         if (validation.matcherResponse(response.body)) {
 
-                            if (response.body.total_grade > matchObjectToSend.job.compatibility_level) {
+                            if (response.body.total_grade >= matchObjectToSend.job.compatibility_level) {
 
 
                                 var parallelTasks = function (totalGrade, jobId, CvUser, userPersonalProperties,
