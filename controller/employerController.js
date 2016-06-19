@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var employerDAO = require("./../model/dao/employerDAO"); // dao = data access object = model
 var companyDAO = require("./../model/dao/companyDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
@@ -62,7 +65,7 @@ function seenCV(req, res) {
     console.log("in seenCV");
 
     if (validation.seenCV(req)) {
-        employerDAO.seenCV(req.body.cv_id, req.body.timestamp,  function (status, result) {
+        employerDAO.seenCV(req.body.cv_id, req.body.timestamp, function (status, result) {
             res.status(status).json(result);
         });
     } else {
@@ -117,7 +120,7 @@ function hireToJob(req, res) {
 
         ], function (status, results) {
 
-            if (status == null) {
+            if (status === null) {
 
                 console.log("job seeker hired to job successfully");
                 res.status(200).json(results[0]);
@@ -125,7 +128,7 @@ function hireToJob(req, res) {
             } else {
                 console.log("error while trying to hire job seeker to job");
                 error.error = "error while trying to hire job seeker to job";
-                callback(status, error);
+                res.status(status).json(error);
             }
 
         });

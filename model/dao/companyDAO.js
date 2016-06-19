@@ -1,9 +1,12 @@
-var schemas = require('./../schemas/schemas');
+/*jslint node: true */
+"use strict";
+
+var schemas = require("./../schemas/schemas");
 
 var UserModel = schemas.UserModel;
 var CompanyModel = schemas.CompanyModel;
 
-var md5 = require('md5');
+var md5 = require("md5");
 
 var error = {
     error: null
@@ -41,7 +44,7 @@ function addCompany(addCompany, callback) {
                             company: result._id
                         };
                         var options = {new: true};
-                        UserModel.findOneAndUpdate(query, update, options, function (err, user) {
+                        UserModel.findOneAndUpdate(query, update, options, function (err) {
                             if (err) {
                                 console.log("something went wrong " + err);
                                 error.error = "something went wrong while trying to assign the company to the user";
@@ -76,12 +79,12 @@ function addToExistingCompany(userId, companyId, password, callback) {
         } else {
             if (results.length > 0) {
 
-                var query = {"_id": userId};
+                query = {"_id": userId};
                 var update = {
                     company: companyId
                 };
                 var options = {new: true};
-                UserModel.findOneAndUpdate(query, update, options, function (err, user) {
+                UserModel.findOneAndUpdate(query, update, options, function (err) {
                     if (err) {
                         console.log("something went wrong " + err);
                         error.error = "something went wrong while trying to assign the company to the user";
@@ -176,8 +179,8 @@ function getCompany(userId, callback) {
         } else {
             if (results.length > 0) {
                 console.log("the user extracted successfully ", results);
-                var query = CompanyModel.find(
-                    {_id: results[0].company, active: true}, {password: 0,employees:0,active:0}
+                query = CompanyModel.find(
+                    {_id: results[0].company, active: true}, {password: 0, employees: 0, active: 0}
                 ).limit(1);
 
                 query.exec(function (err, results) {
@@ -241,9 +244,9 @@ function addJobSeekerToCompany(userId, cvId, callback) {
         } else {
             if (results.length > 0) {
 
-                var query = {"_id": results[0].company};
+                query = {"_id": results[0].company};
                 var update = {
-                    $addToSet: {'employees': cvId}
+                    $addToSet: {"employees": cvId}
                 };
                 var options = {new: true};
                 CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
@@ -288,9 +291,9 @@ function removeJobSeekerFromCompany(userId, cvId, callback) {
         } else {
             if (results.length > 0) {
 
-                var query = {"_id": results[0].company};
+                query = {"_id": results[0].company};
                 var update = {
-                    $pull: {'employees': cvId}
+                    $pull: {"employees": cvId}
                 };
                 var options = {new: true};
                 CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
@@ -336,7 +339,7 @@ function changeCompanyPassword(companyId, oldPassword, newPassword, callback) {
         } else {
             if (results.length > 0) {
 
-                var query = {"_id": companyId};
+                query = {"_id": companyId};
                 var update = {
                     password: md5(newPassword)
                 };
@@ -376,13 +379,13 @@ function getEmployees(userId, callback) {
         } else {
             if (results.length > 0) {
 
-                var query = CompanyModel.find(
-                    {_id: results[0].company},{employees:1}
+                query = CompanyModel.find(
+                    {_id: results[0].company}, {employees: 1}
                 ).limit(1).populate({
-                    path: 'employees',
-                    select: 'user personal_properties',
+                    path: "employees",
+                    select: "user personal_properties",
                     populate: {
-                        path: 'user personal_properties',
+                        path: "user personal_properties",
                         select: "first_name last_name personal_id decision"
                     }
                 });
@@ -395,7 +398,7 @@ function getEmployees(userId, callback) {
                     } else {
                         if (results.length > 0) {
                             console.log("the employees extracted successfully");
-                            callback(200,results[0].employees);
+                            callback(200, results[0].employees);
                         } else {
                             console.log("company not exists");
                             error.error = "company not exists";

@@ -1,9 +1,12 @@
+/*jslint node: true */
+"use strict";
+
 var async = require("async");
-var unirest = require('unirest');
+var unirest = require("unirest");
 var validation = require("./../utils/validation");
 var matchingObjectDAO = require("./matchingObjectDAO");
 
-var schemas = require('./../schemas/schemas');
+var schemas = require("./../schemas/schemas");
 
 var JobSeekerJobsModel = schemas.JobSeekerJobsModel;
 var UserModel = schemas.UserModel;
@@ -26,9 +29,9 @@ function getAllJobsBySector(userId, sector, callback) {
     var query = UserModel.find(
         {_id: userId, active: true}, {jobs: 1}
     ).populate({
-            path: 'jobs',
-            select: 'job'
-        });
+        path: "jobs",
+        select: "job"
+    });
 
     query.exec(function (err, results) {
 
@@ -40,12 +43,11 @@ function getAllJobsBySector(userId, sector, callback) {
 
             if (results.length > 0) {
 
-                var jobs = [];
-                for (var i = 0; i < results[0].jobs.length; i++) {
-                    jobs.push(results[0].jobs[i].job);
-                }
+                var jobs = results[0].jobs.map(function (field) {
+                    return field.job;
+                });
 
-                var query = MatchingObjectsModel.find(
+                query = MatchingObjectsModel.find(
                     {
                         sector: sector,
                         active: true,
@@ -53,11 +55,11 @@ function getAllJobsBySector(userId, sector, callback) {
                         _id: {$nin: jobs},
                         archive: false
                     }
-                ).populate('original_text')
-                    .populate('academy')
+                ).populate("original_text")
+                    .populate("academy")
                     .populate({
-                        path: 'user',
-                        populate: {path: 'company'}
+                        path: "user",
+                        populate: {path: "company"}
                     });
 
                 query.exec(function (err, results) {
@@ -86,31 +88,31 @@ function getMyJobs(userId, active, callback) {
         {_id: userId, active: true}, {jobs: 1}
     )
         .populate({
-            path: 'jobs',
+            path: "jobs",
             match: {
                 active: active
             },
             model: JobSeekerJobsModel,
             populate: {
-                path: 'job',
+                path: "job",
                 populate: {
-                    path: 'original_text academy user',
+                    path: "original_text academy user",
                     populate: {
-                        path: 'company',
+                        path: "company",
                         model: CompanyModel
                     }
                 }
             }
         })
         .populate({
-            path: 'jobs',
+            path: "jobs",
             match: {
                 active: active
             },
             populate: {
-                path: 'cv',
-                select: 'status hired',
-                populate: {path: 'status.status_id'}
+                path: "cv",
+                select: "status hired",
+                populate: {path: "status.status_id"}
             }
 
         });
@@ -140,32 +142,32 @@ function getFavoritesJobs(userId, callback) {
         {_id: userId, active: true}, {jobs: 1}
     )
         .populate({
-            path: 'jobs',
+            path: "jobs",
             match: {
                 active: true,
                 favorite: true
             },
             populate: {
-                path: 'job',
+                path: "job",
                 populate: {
-                    path: 'original_text academy user',
+                    path: "original_text academy user",
                     populate: {
-                        path: 'company',
+                        path: "company",
                         model: CompanyModel
                     }
                 }
             }
         })
         .populate({
-            path: 'jobs',
+            path: "jobs",
             match: {
                 active: true,
                 favorite: true
             },
             populate: {
-                path: 'cv',
-                select: 'status hired',
-                populate: {path: 'status.status_id'}
+                path: "cv",
+                select: "status hired",
+                populate: {path: "status.status_id"}
             }
 
         });
@@ -189,351 +191,348 @@ function getFavoritesJobs(userId, callback) {
     });
 }
 
-var addCvToJobFunctions = (function () {
+function buildMatchingDetails(matchingDetails, callback) {
 
-    return {
-        getJob: function (jobId, callback) {
+    if (matchingDetails !== "undefined" && matchingDetails.length > 0) {
 
-            matchingObjectDAO.getMatchingObject(jobId, "job", function (status, jobResults) {
-                if (status === 200) {
-                    //matchObjectToSend.job = jobResults[0];
-                    callback(null, jobResults[0]);
-                } else {
-                    console.log("cannot extract job from db");
-                    callback(status, jobResults);
-                }
-            });
-        },
-        getCV: function (cvId, callback) {
+        var matchingDetailsArray = [];
 
-            matchingObjectDAO.getMatchingObject(cvId, "cv", function (status, cvResults) {
-                if (status === 200) {
-                    //matchObjectToSend.cv = CvResults[0];
-                    callback(null, cvResults[0]);
-                } else {
-                    console.log("cannot extract cv from db");
-                    callback(status, cvResults);
-                }
+        // 1st para in async.each() is the array of items
+        async.each(matchingDetails,
+            // 2nd param is the function that each item is passed to
+            function (item, callbackAsync) {
+                // Call an asynchronous function, often a save() to DB
 
-            });
-        },
-        addJobToUser: function (userId, jobId, cvId, callback) {
+                var matchingDetailsToAdd = new MatchingDetailsModel({
+                    name: item.name,
+                    grade: item.grade
+                });
 
-
-            var jobToAdd = new JobSeekerJobsModel({
-                job: jobId,
-                cv: cvId
-            });
-
-
-            /*save the Formula in db*/
-            jobToAdd.save(function (err, doc) {
-                if (!err) {
-
-                    console.log("job seeker job saved successfully to db");
-
-                    var query = {
-                        '_id': userId
-                    };
-                    var docToAdd = {
-                        $addToSet: {'jobs': doc._id}
-                    };
-                    var options = {
-                        new: true
-                    };
-                    UserModel.findOneAndUpdate(query, docToAdd, options, function (err, results) {
-                        if (err) {
-                            console.log("error in add job to user " + err);
-                            error.error = "error in add job to user";
-                            callback(500, error);
-
-                        } else {
-                            if (results !== null) {
-                                callback(null, results);
-                            } else {
-                                errorMessage = "user not exists";
-                                console.log(errorMessage);
-                                error.error = errorMessage;
-                                callback(500, error);
-                            }
-                        }
-                    });
-                } else {
-                    console.log("something went wrong " + err);
-                    error.error = "something went wrong while trying to save job seeker job";
-                    callback(500, error);
-                }
-            });
-
-        },
-
-        updateDataForCV: function (totalGrade, cvId, callback) {
-
-            var query = {"_id": cvId};
-            var update = {
-                "status.current_status": "unread",
-                compatibility_level: totalGrade
-            };
-            var options = {new: true};
-            MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
-                if (err) {
-                    console.log('error in updating data for cv ' + err);
-                    error.error = "error in updating data for cv";
-                    callback(500, error);
-                } else {
-                    if (results !== null) {
-                        callback();
-                    } else {
-                        errorMessage = "cv not exists";
-                        console.log(errorMessage);
-                        error.error = errorMessage;
-                        callback(500, error);
+                /* save the historyTime to db*/
+                matchingDetailsToAdd.save(function (err, result) {
+                    if (err) {
+                        console.log("error in save matchingDetails to db " + err);
+                        return callbackAsync(new Error("error in save matchingDetails to db "));
                     }
-                }
-            });
-        },
-
-        sendCvForJob: function (cvId, jobId, callback) {
-
-            var query = {
-                '_id': jobId
-            };
-            var doc = {
-                $addToSet: {'cvs': cvId}
-            };
-            var options = {
-                new: true
-            };
-            MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err, results) {
-                if (err) {
-                    console.log("error in add cv to job " + err);
-                    error.error = "error in add cv to job";
-                    callback(500, error);
-
-                } else {
-
-                    if (results !== null) {
-                        console.log("cv added to the job successfully");
-                        callback();
-                    } else {
-                        errorMessage = "job not exists";
-                        console.log(errorMessage);
-                        error.error = errorMessage;
-                        callback(500, error);
-                    }
-
-                }
-            });
-
-        },
-
-        copyCV: function (cv, callback) {
-
-            matchingObjectDAO.addMatchingObject(cv, function (status, results) {
-
-                if (status === 200) {
-                    callback(null, results._id);
-                } else {
-                    callback(status, results);
-                }
-            });
-        },
-
-        ///////////////////////////////////////////// *** Matcher *** ///////////////////////
-
-        saveMatcherFormula: function (cvId, matcherResponse, callback) {
-
-            buildMatchingDetails(matcherResponse.formula.requirements.details, function (err, matchingDetailsArray) {
-
-                if (err) {
-                    console.log("error insert MatcherFormula to DB");
-                    error.error = "error insert MatcherFormula to DB";
-                    callback(500, error);
-
-                } else {
-
-                    var formulaToAdd = new FormulaModel({
-                        locations: matcherResponse.formula.locations,
-                        candidate_type: matcherResponse.formula.candidate_type,
-                        scope_of_position: matcherResponse.formula.scope_of_position,
-                        academy: matcherResponse.formula.academy,
-                        matching_requirements: {
-                            details: matchingDetailsArray,
-                            grade: matcherResponse.formula.requirements.grade
-                        }
-                    });
-
-                    /*save the MatcherFormula in db*/
-                    formulaToAdd.save(function (err, result) {
-                        if (err) {
-                            console.log("error while trying to insert MatcherFormula " + err);
-                            error.error = "error while trying to insert MatcherFormula";
-                            callback(500, error);
-                        } else {
-                            var query = {"_id": cvId};
-                            var update = {
-                                "formula": result._id
-                            };
-                            var options = {new: true};
-                            MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err) {
-                                if (err) {
-                                    console.log('error in updating formula id ' + err);
-                                    error.error = "error in updating formula id to the cv";
-                                    callback(500, error);
-                                } else {
-                                    console.log("matcher formula saved successfully");
-                                    callback(null, matcherResponse);
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        },
-
-        predictorCheck: function (userPersonalProperties, jobUser, cvId, callback) {
-
-            var query = UserModel.find(
-                {_id: jobUser, active: true}, {company: 1}
-            )
-                .populate({
-                    path: 'company',
-                    select: 'employees',
-                    populate: {
-                        path: 'employees',
-                        select: "personal_properties -_id",
-                        populate: {
-                            path: 'personal_properties',
-                            select: "-_id -__v",
-                            model:"PersonalPropertiesModel"
-                        }
-                    }
-                }).limit(1);
-
-            query.exec(function (err, results) {
-
-                if (err) {
-                    console.log("something went wrong " + err);
-                    error.error = "something went wrong while trying to get the personal properties";
-                    callback(500, error);
-                } else {
-                    if (results.length > 0) {
-
-                        console.log("the personal properties extracted successfully");
-
-                        // predictor is accurate with a minimum of 20 employers
-
-                        if (results[0].company.employees.length > 19) {
-                            console.log("employees Array size bigger then 19");
-
-                            var predictObjectToSend = {
-                                employees: results[0].company.employees.map(function(field) {return field.personal_properties;}),
-                                job_seeker: userPersonalProperties
-                            };
-
-                            //console.log("predictObjectToSend", JSON.parse(JSON.stringify(predictObjectToSend)));
-                            unirest.post('https://matcherpredictor.herokuapp.com/prediction')
-                                .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
-                                .send(predictObjectToSend)
-                                .end(function (response) {
-                                    if (response.code == 200) {
-
-                                        if (validation.predictorResponse(response.body)) {
-
-                                            var query = {"_id": cvId};
-                                            var update = {
-                                                predict_result: response.body
-                                            };
-                                            var options = {new: true};
-                                            MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
-                                                if (err) {
-                                                    console.log("something went wrong " + err);
-                                                    error.error = "something went wrong while trying to update predictor result";
-                                                    callback(500, error);
-                                                } else {
-                                                    if (results !== null) {
-                                                        console.log("the predictor result updated successfully");
-                                                        callback(null, results);
-                                                    } else {
-                                                        console.log("cv not exists");
-                                                        error.error = "cv not exists";
-                                                        callback(404, error);
-                                                    }
-                                                }
-                                            });
-
-                                        } else {
-                                            errorMessage = "predictor response format is incorrect";
-                                            console.log(errorMessage);
-                                            error.error = errorMessage;
-                                            callback(400, error);
-                                        }
-                                    } else {
-                                        console.log("error occurred during predictor process: ", response.body);
-                                        callback(response.code, response.body);
-                                    }
-                                });
-
-                        } else {
-                            errorMessage = "employees Array size below 20";
-                            console.log(errorMessage);
-                            error.error = errorMessage;
-                            callback(null, error);
-                        }
-
-                    } else {
-                        console.log("user not exists");
-                        error.error = "user not exists";
-                        callback(404, error);
-                    }
-                }
-            });
-
-        }
-    };
-
-    function buildMatchingDetails(matchingDetails, callback) {
-
-        if (typeof matchingDetails !== 'undefined' && matchingDetails.length > 0) {
-
-            var matchingDetailsArray = [];
-
-            // 1st para in async.each() is the array of items
-            async.each(matchingDetails,
-                // 2nd param is the function that each item is passed to
-                function (item, callbackAsync) {
-                    // Call an asynchronous function, often a save() to DB
-
-                    var matchingDetailsToAdd = new MatchingDetailsModel({
-                        name: item.name,
-                        grade: item.grade
-                    });
-
-                    /* save the historyTime to db*/
-                    matchingDetailsToAdd.save(function (err, result) {
-                        if (err) {
-                            console.log("error in save matchingDetails to db " + err);
-                            return callbackAsync(new Error("error in save matchingDetails to db "));
-                        } else {
-                            matchingDetailsArray.push(result._id);
-                            callbackAsync();
-                        }
-                    });
-                },
-                // 3rd param is the function to call when everything is done
-                function (err) {
-                    // All tasks are done now
-                    callback(err, matchingDetailsArray);
-                }
-            );
-        } else {
-            console.log("matching details is empty or undefined");
-            callback(false, []);
-        }
-
+                    matchingDetailsArray.push(result._id);
+                    callbackAsync();
+                });
+            },
+            // 3rd param is the function to call when everything is done
+            function (err) {
+                // All tasks are done now
+                callback(err, matchingDetailsArray);
+            }
+        );
+    } else {
+        console.log("matching details is empty or undefined");
+        callback(false, []);
     }
 
-})();
+}
+
+var addCvToJobFunctions = {
+
+    getJob: function (jobId, callback) {
+
+        matchingObjectDAO.getMatchingObject(jobId, "job", function (status, jobResults) {
+            if (status === 200) {
+                //matchObjectToSend.job = jobResults[0];
+                callback(null, jobResults[0]);
+            } else {
+                console.log("cannot extract job from db");
+                callback(status, jobResults);
+            }
+        });
+    },
+    getCV: function (cvId, callback) {
+
+        matchingObjectDAO.getMatchingObject(cvId, "cv", function (status, cvResults) {
+            if (status === 200) {
+                //matchObjectToSend.cv = CvResults[0];
+                callback(null, cvResults[0]);
+            } else {
+                console.log("cannot extract cv from db");
+                callback(status, cvResults);
+            }
+
+        });
+    },
+    addJobToUser: function (userId, jobId, cvId, callback) {
+
+
+        var jobToAdd = new JobSeekerJobsModel({
+            job: jobId,
+            cv: cvId
+        });
+
+
+        /*save the Formula in db*/
+        jobToAdd.save(function (err, doc) {
+            if (!err) {
+
+                console.log("job seeker job saved successfully to db");
+
+                var query = {
+                    "_id": userId
+                };
+                var docToAdd = {
+                    $addToSet: {"jobs": doc._id}
+                };
+                var options = {
+                    new: true
+                };
+                UserModel.findOneAndUpdate(query, docToAdd, options, function (err, results) {
+                    if (err) {
+                        console.log("error in add job to user " + err);
+                        error.error = "error in add job to user";
+                        callback(500, error);
+
+                    } else {
+                        if (results !== null) {
+                            callback(null, results);
+                        } else {
+                            errorMessage = "user not exists";
+                            console.log(errorMessage);
+                            error.error = errorMessage;
+                            callback(500, error);
+                        }
+                    }
+                });
+            } else {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to save job seeker job";
+                callback(500, error);
+            }
+        });
+
+    },
+
+    updateDataForCV: function (totalGrade, cvId, callback) {
+
+        var query = {"_id": cvId};
+        var update = {
+            "status.current_status": "unread",
+            compatibility_level: totalGrade
+        };
+        var options = {new: true};
+        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+            if (err) {
+                console.log("error in updating data for cv " + err);
+                error.error = "error in updating data for cv";
+                callback(500, error);
+            } else {
+                if (results !== null) {
+                    callback();
+                } else {
+                    errorMessage = "cv not exists";
+                    console.log(errorMessage);
+                    error.error = errorMessage;
+                    callback(500, error);
+                }
+            }
+        });
+    },
+
+    sendCvForJob: function (cvId, jobId, callback) {
+
+        var query = {
+            "_id": jobId
+        };
+        var doc = {
+            $addToSet: {"cvs": cvId}
+        };
+        var options = {
+            new: true
+        };
+        MatchingObjectsModel.findOneAndUpdate(query, doc, options, function (err, results) {
+            if (err) {
+                console.log("error in add cv to job " + err);
+                error.error = "error in add cv to job";
+                callback(500, error);
+
+            } else {
+
+                if (results !== null) {
+                    console.log("cv added to the job successfully");
+                    callback();
+                } else {
+                    errorMessage = "job not exists";
+                    console.log(errorMessage);
+                    error.error = errorMessage;
+                    callback(500, error);
+                }
+
+            }
+        });
+
+    },
+
+    copyCV: function (cv, callback) {
+
+        matchingObjectDAO.addMatchingObject(cv, function (status, results) {
+
+            if (status === 200) {
+                callback(null, results._id);
+            } else {
+                callback(status, results);
+            }
+        });
+    },
+
+    ///////////////////////////////////////////// *** Matcher *** ///////////////////////
+
+    saveMatcherFormula: function (cvId, matcherResponse, callback) {
+
+        buildMatchingDetails(matcherResponse.formula.requirements.details, function (err, matchingDetailsArray) {
+
+            if (err) {
+                console.log("error insert MatcherFormula to DB");
+                error.error = "error insert MatcherFormula to DB";
+                callback(500, error);
+
+            } else {
+
+                var formulaToAdd = new FormulaModel({
+                    locations: matcherResponse.formula.locations,
+                    candidate_type: matcherResponse.formula.candidate_type,
+                    scope_of_position: matcherResponse.formula.scope_of_position,
+                    academy: matcherResponse.formula.academy,
+                    matching_requirements: {
+                        details: matchingDetailsArray,
+                        grade: matcherResponse.formula.requirements.grade
+                    }
+                });
+
+                /*save the MatcherFormula in db*/
+                formulaToAdd.save(function (err, result) {
+                    if (err) {
+                        console.log("error while trying to insert MatcherFormula " + err);
+                        error.error = "error while trying to insert MatcherFormula";
+                        callback(500, error);
+                    } else {
+                        var query = {"_id": cvId};
+                        var update = {
+                            "formula": result._id
+                        };
+                        var options = {new: true};
+                        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err) {
+                            if (err) {
+                                console.log("error in updating formula id " + err);
+                                error.error = "error in updating formula id to the cv";
+                                callback(500, error);
+                            } else {
+                                console.log("matcher formula saved successfully");
+                                callback(null, matcherResponse);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    },
+
+    predictorCheck: function (userPersonalProperties, jobUser, cvId, callback) {
+
+        var query = UserModel.find(
+            {_id: jobUser, active: true}, {company: 1}
+        )
+            .populate({
+                path: "company",
+                select: "employees",
+                populate: {
+                    path: "employees",
+                    select: "personal_properties -_id",
+                    populate: {
+                        path: "personal_properties",
+                        select: "-_id -__v",
+                        model: "PersonalPropertiesModel"
+                    }
+                }
+            }).limit(1);
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to get the personal properties";
+                callback(500, error);
+            } else {
+                if (results.length > 0) {
+
+                    console.log("the personal properties extracted successfully");
+
+                    // predictor is accurate with a minimum of 20 employers
+
+                    if (results[0].company.employees.length > 19) {
+                        console.log("employees Array size bigger then 19");
+
+                        var predictObjectToSend = {
+                            employees: results[0].company.employees.map(function (field) {
+                                return field.personal_properties;
+                            }),
+                            job_seeker: userPersonalProperties
+                        };
+
+                        unirest.post("https://matcherpredictor.herokuapp.com/prediction")
+                            .headers({"Accept": "application/json", "Content-Type": "application/json"})
+                            .send(predictObjectToSend)
+                            .end(function (response) {
+                                if (response.code === 200) {
+
+                                    if (validation.predictorResponse(response.body)) {
+
+                                        query = {"_id": cvId};
+                                        var update = {
+                                            predict_result: response.body
+                                        };
+                                        var options = {new: true};
+                                        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+                                            if (err) {
+                                                console.log("something went wrong " + err);
+                                                error.error = "something went wrong while trying to update predictor result";
+                                                callback(500, error);
+                                            } else {
+                                                if (results !== null) {
+                                                    console.log("the predictor result updated successfully");
+                                                    callback(null, results);
+                                                } else {
+                                                    console.log("cv not exists");
+                                                    error.error = "cv not exists";
+                                                    callback(404, error);
+                                                }
+                                            }
+                                        });
+
+                                    } else {
+                                        errorMessage = "predictor response format is incorrect";
+                                        console.log(errorMessage);
+                                        error.error = errorMessage;
+                                        callback(400, error);
+                                    }
+                                } else {
+                                    console.log("error occurred during predictor process: ", response.body);
+                                    callback(response.code, response.body);
+                                }
+                            });
+
+                    } else {
+                        errorMessage = "employees Array size below 20";
+                        console.log(errorMessage);
+                        error.error = errorMessage;
+                        callback(null, error);
+                    }
+
+                } else {
+                    console.log("user not exists");
+                    error.error = "user not exists";
+                    callback(404, error);
+                }
+            }
+        });
+
+    }
+};
 
 function addCvToJob(jobId, cvId, addCvCallback) {
 
@@ -550,19 +549,19 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 
         if (status === null) {
 
-            unirest.post('https://matcherlogic.herokuapp.com/calculateMatching')
-                .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
+            unirest.post("https://matcherlogic.herokuapp.com/calculateMatching")
+                .headers({"Accept": "application/json", "Content-Type": "application/json"})
                 .send(matchObjectToSend)
                 .end(function (response) {
-                    if (response.code == 200) {
+                    if (response.code === 200) {
 
                         if (validation.matcherResponse(response.body)) {
 
                             if (response.body.total_grade > matchObjectToSend.job.compatibility_level) {
 
 
-                                var parallelTasks =  function (totalGrade, jobId, CvUser, userPersonalProperties,
-                                                       jobUser, cvId, callback) {
+                                var parallelTasks = function (totalGrade, jobId, CvUser, userPersonalProperties,
+                                                              jobUser, cvId, callback) {
 
                                     var parallelArr = [
                                         async.apply(addCvToJobFunctions.saveMatcherFormula, cvId, response.body),
@@ -627,7 +626,7 @@ function addCvToJob(jobId, cvId, addCvCallback) {
 function updateFavoriteJob(jobId, isFavorite, callback) {
 
     var query = {
-        '_id': jobId
+        "_id": jobId
     };
     var doc = {
         favorite: isFavorite
@@ -659,7 +658,7 @@ function updateFavoriteJob(jobId, isFavorite, callback) {
 function updateActivityJob(jobId, isActive, callback) {
 
     var query = {
-        '_id': jobId
+        "_id": jobId
     };
     var doc = {
         active: isActive
@@ -694,8 +693,8 @@ function getLastTenJobs(userId, sector, callback) {
     var query = UserModel.find(
         {_id: userId, active: true}, {jobs: 1}
     ).populate({
-        path: 'jobs',
-        select: 'job'
+        path: "jobs",
+        select: "job"
     });
 
     query.exec(function (err, results) {
@@ -708,12 +707,11 @@ function getLastTenJobs(userId, sector, callback) {
 
             if (results.length > 0) {
 
-                var jobs = [];
-                for (var i = 0; i < results[0].jobs.length; i++) {
-                    jobs.push(results[0].jobs[i].job);
-                }
+                var jobs = results[0].jobs.map(function (field) {
+                    return field.job;
+                });
 
-                var query = MatchingObjectsModel.find(
+                query = MatchingObjectsModel.find(
                     {
                         sector: sector,
                         active: true,
@@ -721,17 +719,17 @@ function getLastTenJobs(userId, sector, callback) {
                         _id: {$nin: jobs},
                         archive: false
                     }
-                ).sort({date:-1}).limit(30)
+                ).sort({date: -1}).limit(30)
                     .populate({
-                        path: 'requirements',
-                        populate: {path: 'combination'}
+                        path: "requirements",
+                        populate: {path: "combination"}
                     })
                     .populate("formula")
-                    .populate('original_text')
-                    .populate('academy')
+                    .populate("original_text")
+                    .populate("academy")
                     .populate({
-                        path: 'user',
-                        populate: {path: 'company'}
+                        path: "user",
+                        populate: {path: "company"}
                     });
 
                 query.exec(function (err, results) {
@@ -761,15 +759,15 @@ function test(jobUser, callback) {
         {_id: jobUser, active: true}, {company: 1}
     )
         .populate({
-            path: 'company',
-            select: 'employees',
+            path: "company",
+            select: "employees",
             populate: {
-                path: 'employees',
+                path: "employees",
                 select: "personal_properties -_id",
                 populate: {
-                    path: 'personal_properties',
+                    path: "personal_properties",
                     select: "-_id -__v",
-                    model:"PersonalPropertiesModel"
+                    model: "PersonalPropertiesModel"
                 }
             }
         }).limit(1);
@@ -782,9 +780,12 @@ function test(jobUser, callback) {
             callback(500, error);
         } else {
             if (results.length > 0) {
-                callback(200, results[0].company.employees.map(function(field) {return field.personal_properties;}));
+                callback(200, results[0].company.employees.map(function (field) {
+                    return field.personal_properties;
+                }));
             }
-        }})
+        }
+    });
 }
 
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////

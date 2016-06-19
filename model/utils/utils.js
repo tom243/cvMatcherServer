@@ -1,3 +1,5 @@
+/*jslint node: true */
+"use strict";
 
 function sendErrorValidation(res) {
     var error = {

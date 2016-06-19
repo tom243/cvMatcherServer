@@ -1,4 +1,8 @@
-var mongoose = require('mongoose'), Schema = mongoose.Schema;
+/*jslint node: true */
+"use strict";
+
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
 var companies_schema = mongoose.Schema;
 var formulas_schema = mongoose.Schema;
 var key_words_schema = mongoose.Schema;
@@ -36,25 +40,25 @@ var usersSchema = new users_schema({
     },
     birth_date: String,
     address: String,
-    company: { type: Schema.Types.ObjectId, ref: 'CompanyModel' },
+    company: { type: Schema.Types.ObjectId, ref: "CompanyModel" },
     phone_number: String,
     linkedin: String,
-    jobs: [{ type: Schema.Types.ObjectId, ref: 'JobSeekerJobsModel'}],
-    current_cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' },
+    jobs: [{ type: Schema.Types.ObjectId, ref: "JobSeekerJobsModel"}],
+    current_cv: { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" },
     hwid : String,
     active: {
         index: 1,
         type: Boolean,
         default: true
     }
-}, {collection: 'Users'});
+}, {collection: "Users"});
 
 
 // historyTimeline Schema
 var jobSeekerJobsSchema = new jobseeker_jobs_schema({
 
-    job : { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel', required:true },
-    cv: { type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel', required:true },
+    job : { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel", required:true },
+    cv: { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel", required:true },
     favorite: {
         type: Boolean,
         default: false
@@ -64,7 +68,7 @@ var jobSeekerJobsSchema = new jobseeker_jobs_schema({
         default: true
     }
 
-}, {collection: 'JobSeeker_Jobs'});
+}, {collection: "JobSeeker_Jobs"});
 
 // Companies Schema
 var companiesSchema = new companies_schema({
@@ -91,7 +95,7 @@ var companiesSchema = new companies_schema({
         type: Number,
         required: true
     },
-    employees:[{ type: Schema.Types.ObjectId, ref: 'MatchingObjectsModel' }],
+    employees:[{ type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" }],
     password: {
         type: String,
         required: true
@@ -102,7 +106,7 @@ var companiesSchema = new companies_schema({
         default: true
     }
 
-}, {collection: 'Companies'});
+}, {collection: "Companies"});
 
 // Matching Objects Schema
 var matchingObjectsSchema = new matching_objects_schema({
@@ -116,7 +120,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         type: Date,
         required: true
     },
-    original_text: { type: Schema.Types.ObjectId, ref: 'OriginalTextModel', required:true },
+    original_text: { type: Schema.Types.ObjectId, ref: "OriginalTextModel", required:true },
     sector: {
         type: String,
         required: true,
@@ -134,16 +138,16 @@ var matchingObjectsSchema = new matching_objects_schema({
         type: String,
         required:true
     }],
-    academy: { type: Schema.Types.ObjectId, ref: 'AcademyModel', required:true },
-    formula: { type: Schema.Types.ObjectId, ref: 'FormulaModel' },
-    requirements: [{ type: Schema.Types.ObjectId, ref: 'RequirementsModel' }],
+    academy: { type: Schema.Types.ObjectId, ref: "AcademyModel", required:true },
+    formula: { type: Schema.Types.ObjectId, ref: "FormulaModel" },
+    requirements: [{ type: Schema.Types.ObjectId, ref: "RequirementsModel" }],
     compatibility_level: Number,
     status:{
-        status_id: { type: Schema.Types.ObjectId, ref: 'StatusModel' },
+        status_id: { type: Schema.Types.ObjectId, ref: "StatusModel" },
         current_status: String,
-        timestamp: Date //TODO: Not Forget to add to code get it from roni
+        timestamp: Date
     },
-    personal_properties: { type: Schema.Types.ObjectId, ref: 'PersonalPropertiesModel' },
+    personal_properties: { type: Schema.Types.ObjectId, ref: "PersonalPropertiesModel" },
     favorites: [String],
     cvs: [String],
     archive:{
@@ -160,7 +164,7 @@ var matchingObjectsSchema = new matching_objects_schema({
             type: Schema.Types.ObjectId,
             required:true,
             index:1,
-            ref: 'UserModel'
+            ref: "UserModel"
     },
     hired: {
         type: Boolean,
@@ -168,7 +172,7 @@ var matchingObjectsSchema = new matching_objects_schema({
     },
     predict_result: Boolean
 
-}, {collection: 'Matching_Objects'});
+}, {collection: "Matching_Objects"});
 
 
 // Formulas Schema
@@ -194,12 +198,12 @@ var formulasSchema = new formulas_schema({
     matching_requirements : {
         details: [{
          type: Schema.Types.ObjectId,
-         ref: 'MatchingDetailsModel'
+         ref: "MatchingDetailsModel"
          }],
         grade: Number
     }
 
-}, {collection: 'Formulas'});
+}, {collection: "Formulas"});
 
 // Status Schema
 var statusSchema = new status_schema({
@@ -208,12 +212,12 @@ var statusSchema = new status_schema({
         description: String,
         timestamp: Date
     }
-}, {collection: 'Status'});
+}, {collection: "Status"});
 
 // requirement Schema
 var requirementSchema = new requirements_schema({
-    combination:[{ type: Schema.Types.ObjectId, ref: 'ProfessionalKnowledgeModel', required:true }]
-}, {collection: 'Requirements'});
+    combination:[{ type: Schema.Types.ObjectId, ref: "ProfessionalKnowledgeModel", required:true }]
+}, {collection: "Requirements"});
 
 
 // originalTextSchema Schema
@@ -221,8 +225,8 @@ var originalTextSchema = new original_text_schema({
     title: String,
     description: String,
     requirements: String,
-    history_timeline: [{ type: Schema.Types.ObjectId, ref: 'HistoryTimelineModel' }]
-}, {collection: 'Original_Text'});
+    history_timeline: [{ type: Schema.Types.ObjectId, ref: "HistoryTimelineModel" }]
+}, {collection: "Original_Text"});
 
 // personalPropertiesSchema Schema
 var personalPropertiesSchema = new personal_properties_schema({
@@ -268,7 +272,7 @@ var personalPropertiesSchema = new personal_properties_schema({
         required : true
     },
     decision: Boolean
-}, {collection: 'Personal_Properties'});
+}, {collection: "Personal_Properties"});
 
 // historyTimeline Schema
 var historyTimelineSchema = new history_timeline_schema({
@@ -289,7 +293,7 @@ var historyTimelineSchema = new history_timeline_schema({
         required:true
     }
 
-}, {collection: 'History_Timeline'});
+}, {collection: "History_Timeline"});
 
 // AcademySchema Schema
 var academySchema = new academy_schema({
@@ -306,7 +310,7 @@ var academySchema = new academy_schema({
         required:true
     }]
 
-}, {collection: 'Academy'});
+}, {collection: "Academy"});
 
 // ProfessionalKnowledgeSchema Schema
 var professionalKnowledgeSchema = new professional_knowledge_schema({
@@ -321,7 +325,7 @@ var professionalKnowledgeSchema = new professional_knowledge_schema({
     },
     mode: String,
     percentage: Number
-}, {collection: 'Professional_Knowledge'});
+}, {collection: "Professional_Knowledge"});
 
 // MatchingDetailsSchema Schema
 var matchingDetailsSchema = matching_details_schema({
@@ -333,7 +337,7 @@ var matchingDetailsSchema = matching_details_schema({
         type : Number,
         required : true
     }
-}, {collection: 'Matching_Details'});
+}, {collection: "Matching_Details"});
 
 // keyWords Schema
 var keyWordsSchema = key_words_schema({
@@ -350,7 +354,7 @@ var keyWordsSchema = key_words_schema({
         type: Number,
         default:4
     }
-}, {collection: 'Key_Words'});
+}, {collection: "Key_Words"});
 
 var validationSchema = validation_schema({
     sector: [{
@@ -377,20 +381,20 @@ var validationSchema = validation_schema({
         type: String,
         required:true
     }]
-}, {collection: 'Validation'});
+}, {collection: "Validation"});
 
-exports.UserModel                   = mongoose.model('UserModel', usersSchema);
-exports.StatusModel                 = mongoose.model('StatusModel',statusSchema);
-exports.RequirementsModel           = mongoose.model('RequirementsModel',requirementSchema);
-exports.CompanyModel                = mongoose.model('CompanyModel', companiesSchema);
-exports.FormulaModel                = mongoose.model('FormulaModel', formulasSchema);
-exports.MatchingObjectsModel        = mongoose.model('MatchingObjectsModel', matchingObjectsSchema);
-exports.OriginalTextModel           = mongoose.model('OriginalTextModel', originalTextSchema);
-exports.PersonalPropertiesModel     = mongoose.model('PersonalPropertiesModel', personalPropertiesSchema);
-exports.HistoryTimelineModel        = mongoose.model('HistoryTimelineModel', historyTimelineSchema);
-exports.AcademyModel                = mongoose.model('AcademyModel', academySchema);
-exports.ProfessionalKnowledgeModel  = mongoose.model('ProfessionalKnowledgeModel', professionalKnowledgeSchema);
-exports.MatchingDetailsModel        = mongoose.model('MatchingDetailsModel', matchingDetailsSchema);
-exports.KeyWordsModel               = mongoose.model('KeyWordsModel', keyWordsSchema);
-exports.JobSeekerJobsModel          = mongoose.model('JobSeekerJobsModel', jobSeekerJobsSchema);
-exports.ValidationModel             = mongoose.model('ValidationModel', validationSchema);
+exports.UserModel                   = mongoose.model("UserModel", usersSchema);
+exports.StatusModel                 = mongoose.model("StatusModel",statusSchema);
+exports.RequirementsModel           = mongoose.model("RequirementsModel",requirementSchema);
+exports.CompanyModel                = mongoose.model("CompanyModel", companiesSchema);
+exports.FormulaModel                = mongoose.model("FormulaModel", formulasSchema);
+exports.MatchingObjectsModel        = mongoose.model("MatchingObjectsModel", matchingObjectsSchema);
+exports.OriginalTextModel           = mongoose.model("OriginalTextModel", originalTextSchema);
+exports.PersonalPropertiesModel     = mongoose.model("PersonalPropertiesModel", personalPropertiesSchema);
+exports.HistoryTimelineModel        = mongoose.model("HistoryTimelineModel", historyTimelineSchema);
+exports.AcademyModel                = mongoose.model("AcademyModel", academySchema);
+exports.ProfessionalKnowledgeModel  = mongoose.model("ProfessionalKnowledgeModel", professionalKnowledgeSchema);
+exports.MatchingDetailsModel        = mongoose.model("MatchingDetailsModel", matchingDetailsSchema);
+exports.KeyWordsModel               = mongoose.model("KeyWordsModel", keyWordsSchema);
+exports.JobSeekerJobsModel          = mongoose.model("JobSeekerJobsModel", jobSeekerJobsSchema);
+exports.ValidationModel             = mongoose.model("ValidationModel", validationSchema);

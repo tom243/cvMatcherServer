@@ -1,32 +1,35 @@
+/*jslint node: true */
+"use strict";
+
 var WebSocketServerInit = require("ws").Server;
 
-module.exports = function(server) {
+module.exports = function (server) {
 
-    var webSocketServer = new WebSocketServerInit({server: server}),
-        webSockets = {};// userID: webSocket
+    var webSocketServer = new WebSocketServerInit({server: server});
+    var webSockets = {};// userID: webSocket
 
-    webSocketServer.on('connection', function (webSocket) {
+    webSocketServer.on("connection", function (webSocket) {
 
         //console.log("webSocket.upgradeReq.url " + webSocket.upgradeReq.url.substr(1));
         var userID = webSocket.upgradeReq.url.substr(1);
         webSockets[userID] = webSocket;
-        //console.log('connected: ' + userID + ' in ' + Object.getOwnPropertyNames(webSockets));
+        //console.log("connected: " + userID + " in " + Object.getOwnPropertyNames(webSockets));
 
-        webSocket.on('message', function(message) {
-            console.log('received from ' + userID + ': ' + message);
+        webSocket.on("message", function (message) {
+            console.log("received from " + userID + ": " + message);
             var messageArray = JSON.parse(message);
-            var toUserWebSocket = webSockets[messageArray['user']];
+            var toUserWebSocket = webSockets[messageArray.user];
             if (toUserWebSocket) {
-                console.log('sent to ' + messageArray['user'] + ': ' + JSON.stringify(messageArray));
+                console.log("sent to " + messageArray.user + ": " + JSON.stringify(messageArray));
                 messageArray[0] = userID;
-                toUserWebSocket.send(JSON.stringify(messageArray))
+                toUserWebSocket.send(JSON.stringify(messageArray));
             }
         });
 
-        webSocket.on('close', function () {
+        webSocket.on("close", function () {
             delete webSockets[userID];
-           // console.log('deleted: ' + userID)
-        })
+            // console.log("deleted: " + userID)
+        });
     });
 
 };

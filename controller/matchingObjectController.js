@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
 var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
@@ -8,9 +11,9 @@ function checkIfAddingIsAllow(req, callback) {
     if (req.body.matching_object_type === "job") {
         usersDAO.verifyEmployerAddedCompany(req.body.user, function (status, result) {
             callback(status, result);
-        })
+        });
     } else { // cv
-        callback(200,null);
+        callback(200, null);
     }
 }
 
@@ -29,15 +32,15 @@ function addMatchingObject(req, res) {
                     if (status === 200 && result.matching_object_type === "cv") {
                         usersDAO.saveCurrentCV(result.user, result._id, function (status, result) {
                             res.status(status).json(result);
-                        })
+                        });
                     } else {
                         res.status(status).json(result);
                     }
                 });
-            }else {
+            } else {
                 res.status(status).json(result);
             }
-        })
+        });
     } else {
         utils.sendErrorValidation(res);
     }

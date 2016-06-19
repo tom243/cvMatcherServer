@@ -1,6 +1,9 @@
+/*jslint node: true */
+"use strict";
+
 var async = require("async");
 
-var schemas = require('./../schemas/schemas');
+var schemas = require("./../schemas/schemas");
 
 var MatchingObjectsModel = schemas.MatchingObjectsModel;
 var FormulaModel = schemas.FormulaModel;
@@ -24,9 +27,9 @@ var error = {
 function getKeyWordsBySector(sector, callback) {
 
     var query = KeyWordsModel.find({
-            sector: sector,
-            count: {$gt: 4}
-        },{word:1});
+        sector: sector,
+        count: {$gt: 4}
+    }, {word: 1});
 
     query.exec(function (err, results) {
 
@@ -36,7 +39,9 @@ function getKeyWordsBySector(sector, callback) {
             callback(500, error);
         } else {
             console.log("the keywords extracted successfully from the db ");
-            var wordsArr = results.map(function(value) {return value.word;});
+            var wordsArr = results.map(function (value) {
+                return value.word;
+            });
             callback(200, wordsArr);
         }
     });
@@ -53,13 +58,17 @@ function addKeyWords(sector, wordsList, callback) {
         function (item, callbackAsync) {
             // Call an asynchronous function, often a save() to DB
 
-            var query = {word: item, sector : sector};
+            var query = {word: item, sector: sector};
             var update = {
-                $inc: { count: 1 }
+                $inc: {count: 1}
                 //count:5
             };
-            var options = {new: true , upsert: true};
+            var options = {new: true, upsert: true};
             KeyWordsModel.findOneAndUpdate(query, update, options, function (err, result) {
+                if (err) {
+                    console.log("error in add new word " + err);
+                    return callbackAsync(new Error("error in add new word"));
+                }
                 resultArr.push(result);
                 callbackAsync();
             });
@@ -73,8 +82,8 @@ function addKeyWords(sector, wordsList, callback) {
                 callback(500, error);
             } else {
                 console.log("key words updated successfully");
-                console.log("resultArr" , resultArr);
-                callback(200,resultArr);
+                console.log("resultArr", resultArr);
+                callback(200, resultArr);
             }
 
         }
@@ -86,48 +95,48 @@ function cleanDB(cleanDBCallback) { // TODO: DELETE IT
 
     async.parallel([
         function (callback) {
-            AcademyModel.remove({}, callback)
+            AcademyModel.remove({}, callback);
         },
         function (callback) {
-            FormulaModel.remove({}, callback)
+            FormulaModel.remove({}, callback);
         },
         function (callback) {
-            HistoryTimelineModel.remove({}, callback)
+            HistoryTimelineModel.remove({}, callback);
         },
         function (callback) {
-            MatchingDetailsModel.remove({}, callback)
+            MatchingDetailsModel.remove({}, callback);
         },
         function (callback) {
-            MatchingObjectsModel.remove({}, callback)
+            MatchingObjectsModel.remove({}, callback);
         },
         function (callback) {
-            OriginalTextModel.remove({}, callback)
+            OriginalTextModel.remove({}, callback);
         },
         function (callback) {
-            PersonalPropertiesModel.remove({}, callback)
+            PersonalPropertiesModel.remove({}, callback);
         },
         function (callback) {
-            ProfessionalKnowledgeModel.remove({}, callback)
+            ProfessionalKnowledgeModel.remove({}, callback);
         },
         function (callback) {
-            RequirementsModel.remove({}, callback)
+            RequirementsModel.remove({}, callback);
         },
         function (callback) {
-            StatusModel.remove({}, callback)
+            StatusModel.remove({}, callback);
         },
         function (callback) {
-            JobSeekerJobsModel.remove({}, callback)
+            JobSeekerJobsModel.remove({}, callback);
         },
         function (callback) {
-            CompanyModel.remove({}, callback)
+            CompanyModel.remove({}, callback);
         },
         function (callback) {
-            UserModel.remove({}, callback)
+            UserModel.remove({}, callback);
         }
 
     ], function (err) {
-        cleanDBCallback(err)
-    })
+        cleanDBCallback(err);
+    });
 
 }
 

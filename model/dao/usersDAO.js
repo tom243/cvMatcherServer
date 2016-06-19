@@ -1,10 +1,39 @@
-var schemas = require('./../schemas/schemas');
+/*jslint node: true */
+"use strict";
+
+var schemas = require("./../schemas/schemas");
 
 var UserModel = schemas.UserModel;
 
 var error = {
     error: null
 };
+
+function getUserId(googleUserId, callback) {
+
+    var query = UserModel.find(
+        {google_user_id: googleUserId, active: true},
+        {_id: 1}
+    ).limit(1);
+
+    query.exec(function (err, results) {
+
+        if (err) {
+            console.log("something went wrong " + err);
+            error.error = "something went wrong while trying to get the user id";
+            callback(500, error);
+        } else {
+            if (results.length > 0) {
+                console.log("the user id extracted successfully ", results);
+                callback(200, results);
+            } else {
+                console.log("google user id not exists");
+                error.error = "google user id not exists";
+                callback(200, false);
+            }
+        }
+    });
+}
 
 // Add User
 function addUser(newUser, callback) {
@@ -16,7 +45,7 @@ function addUser(newUser, callback) {
         email: newUser.email
     });
 
-    var query = UserModel.find().where('google_user_id', newTable.google_user_id);
+    var query = UserModel.find().where("google_user_id", newTable.google_user_id);
 
     query.exec(function (err, results) {
         if (err) {
@@ -24,7 +53,7 @@ function addUser(newUser, callback) {
             error.error = "something went wrong while trying to find if user already exist";
             callback(500, error);
         }
-        if (results.length == 0) {
+        if (results.length === 0) {
             /*save the User in db*/
             newTable.save(function (err, result) {
                 if (err) {
@@ -42,7 +71,7 @@ function addUser(newUser, callback) {
             console.log("user already exists with the same google id, user id returns to client!!!");
             getUserId(newUser.google_user_id, function (status, userId) {
                 callback(status, userId);
-            })
+            });
         }
     });
 }
@@ -61,7 +90,7 @@ function deleteUser(userId, callback) {
             error.error = "something went wrong while delete user";
             callback(500, error);
         } else {
-            if (results != null) {
+            if (results !== null) {
                 console.log("the user deleted successfully ", results);
                 callback(200, results);
             } else {
@@ -96,7 +125,7 @@ function updateUser(updateUser, callback) {
             callback(500, error);
         } else {
 
-            if (results != null) {
+            if (results !== null) {
                 console.log("the user updated successfully, user: ", results);
                 callback(200, results);
             } else {
@@ -113,18 +142,6 @@ function getUser(userId, callback) {
     var query = UserModel.find(
         {_id: userId, active: true}
     ).limit(1);
-    /*    .populate({
-     path: 'current_cv',
-     populate: {
-     path: 'original_text academy personal_properties requirements formula',
-     populate: {
-     path: 'history_timeline', options: {sort: {'start_year': 1}},
-     path: 'combination',
-     path: 'matching_requirements.details'
-
-     }
-     }
-     });*/
 
     query.exec(function (err, results) {
         if (err) {
@@ -144,32 +161,6 @@ function getUser(userId, callback) {
     });
 }
 
-function getUserId(googleUserId, callback) {
-
-    var query = UserModel.find(
-        {google_user_id: googleUserId, active: true},
-        {_id: 1}
-    ).limit(1);
-
-    query.exec(function (err, results) {
-
-        if (err) {
-            console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user id";
-            callback(500, error);
-        } else {
-            if (results.length > 0) {
-                console.log("the user id extracted successfully ", results);
-                callback(200, results);
-            } else {
-                console.log("google user id not exists");
-                error.error = "google user id not exists";
-                callback(200, false);
-            }
-        }
-    });
-}
-
 function saveCurrentCV(userId, cvId, callback) {
 
     var query = {"_id": userId};
@@ -184,7 +175,7 @@ function saveCurrentCV(userId, cvId, callback) {
             callback(500, error);
         } else {
 
-            if (results != null) {
+            if (results !== null) {
                 console.log("the current cv updated successfully");
                 callback(200, results);
             } else {
@@ -200,7 +191,7 @@ function saveCurrentCV(userId, cvId, callback) {
 function verifyEmployerAddedCompany(userId, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true, 'company' : { '$exists' : true }}
+        {_id: userId, active: true, "company": {"$exists": true}}
     ).limit(1);
 
     query.exec(function (err, results) {
@@ -237,7 +228,7 @@ function updateHWID(googleUserId, hwid, callback) {
             callback(500, error);
         } else {
 
-            if (results != null) {
+            if (results !== null) {
                 console.log("the current hwid updated successfully");
                 callback(200, results);
             } else {
@@ -253,7 +244,7 @@ function updateHWID(googleUserId, hwid, callback) {
 function getHWID(userId, callback) {
 
     var query = UserModel.find(
-        {_id: userId, active: true},{hwid:1}
+        {_id: userId, active: true}, {hwid: 1}
     ).limit(1);
 
     query.exec(function (err, results) {

@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var usersDAO = require("./../model/dao/usersDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");

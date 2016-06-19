@@ -1,8 +1,11 @@
+/*jslint node: true */
+"use strict";
+
 var jobSeekerDAO = require("./../model/dao/jobSeekerDAO"); // dao = data access object = model
 var matchingObjectDAO = require("./../model/dao/matchingObjectDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
-var unirest = require('unirest');
+var unirest = require("unirest");
 var async = require("async");
 
 var error = {
@@ -81,8 +84,8 @@ function checkCV(req, res) {
                     return res.status(status).json(results);
                 }
 
-                unirest.post('https://matcherlogic.herokuapp.com/calculateMatching')
-                    .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
+                unirest.post("https://matcherlogic.herokuapp.com/calculateMatching")
+                    .headers({"Accept": "application/json", "Content-Type": "application/json"})
                     .send(matchObjectToSend)
                     .end(function (response) {
                         console.log("response from matcher: ", response.body);
@@ -94,7 +97,7 @@ function checkCV(req, res) {
                         }
 
                     });
-            })
+            });
         });
     } else {
         utils.sendErrorValidation(res);
@@ -136,8 +139,8 @@ function updateActivityJob(req, res) {
     console.log("in updateJobSeekerJob");
 
     if (validation.updateActivityJob(req)) {
-        jobSeekerDAO.updateActivityJob(req.body.job_seeker_job_id, req.body.active
-            , function (status, result) {
+        jobSeekerDAO.updateActivityJob(req.body.job_seeker_job_id, req.body.active,
+            function (status, result) {
                 res.status(status).json(result);
             });
     } else {
@@ -146,7 +149,7 @@ function updateActivityJob(req, res) {
 
 }
 
-getBestMatchJobsFunction = {
+var getBestMatchJobsFunction = {
 
     getCurrentCV: function (cvId, type, callback) {
 
@@ -158,7 +161,7 @@ getBestMatchJobsFunction = {
                 callback(status, result);
             }
 
-        })
+        });
     }
 
 };
@@ -190,8 +193,8 @@ function getBestMatchJobs(req, res) {
                     function (item, callbackAsync) {
                         // Call an asynchronous function
                         matchObjectToSend.job = item;
-                        unirest.post('https://matcherlogic.herokuapp.com/calculateMatching')
-                            .headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
+                        unirest.post("https://matcherlogic.herokuapp.com/calculateMatching")
+                            .headers({"Accept": "application/json", "Content-Type": "application/json"})
                             .send(matchObjectToSend)
                             .end(function (response) {
 
@@ -228,7 +231,6 @@ function getBestMatchJobs(req, res) {
                                 // a must be equal to b
                                 return 0;
                             });
-                            // console.log("matcherResponseArr ", matcherResponseArr);
                             res.status(200).json(matcherResponseArr);
                         } else {
                             console.log("something went wrong " + err);
@@ -236,8 +238,7 @@ function getBestMatchJobs(req, res) {
                             error.error = errorMessage;
                             res.status(500).json(error);
                         }
-                    }
-                );
+                    });
 
             } else {
                 console.log("something went wrong while trying to match top ten jobs, status " + status);
@@ -255,8 +256,8 @@ function getBestMatchJobs(req, res) {
 function test(req, res) {
 
     jobSeekerDAO.test(req.body.user_id, function (status, result) {
-            res.status(status).json(result);
-        });
+        res.status(status).json(result);
+    });
 }
 
 ////////////////////////////////// *** EXPORTS *** /////////////////////////

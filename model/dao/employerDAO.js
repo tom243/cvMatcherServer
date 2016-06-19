@@ -1,4 +1,7 @@
-var schemas = require('./../schemas/schemas');
+/*jslint node: true */
+"use strict";
+
+var schemas = require("./../schemas/schemas");
 
 var MatchingObjectsModel = schemas.MatchingObjectsModel;
 var StatusModel = schemas.StatusModel;
@@ -16,8 +19,8 @@ function getJobsBySector(userId, sector, isArchive, callback) {
 
     var query = MatchingObjectsModel.find(
         {user: userId, sector: sector, active: true, matching_object_type: "job", archive: isArchive}
-    ).populate('original_text')
-        .populate('academy');
+    ).populate("original_text")
+        .populate("academy");
 
 
     query.exec(function (err, results) {
@@ -50,15 +53,15 @@ function getUnreadCvsForJob(userId, jobId, callback) {
             if (results.length > 0) {
                 if (results[0].cvs.length > 0) {
 
-                    var query = MatchingObjectsModel.find(
+                    query = MatchingObjectsModel.find(
                         {
                             _id: {$in: results[0].cvs},
                             active: true,
                             "status.current_status": "unread",
                             matching_object_type: "cv"
                         }
-                    ).populate('user').populate('original_text')
-                        .populate('academy');
+                    ).populate("user").populate("original_text")
+                        .populate("academy");
                     query.exec(function (err, results) {
                         if (err) {
                             console.log("something went wrong " + err);
@@ -101,7 +104,7 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
             if (results.length > 0) {
                 if (results[0].cvs.length > 0) {
 
-                    var query = MatchingObjectsModel.find(
+                    query = MatchingObjectsModel.find(
                         {
                             _id: {$in: results[0].cvs},
                             active: true,
@@ -109,10 +112,10 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
                             matching_object_type: "cv",
                             hired: false
                         }
-                    ).populate('user')
-                        .populate('status.status_id')
-                        .populate('original_text')
-                        .populate('academy');
+                    ).populate("user")
+                        .populate("status.status_id")
+                        .populate("original_text")
+                        .populate("academy");
                     query.exec(function (err, results) {
                         if (err) {
                             console.log("something went wrong " + err);
@@ -234,8 +237,7 @@ function updateRateCV(cvId, status, callback) {
         } else {
 
             if (result !== null) {
-                var query = {"_id": result.status.status_id};
-                var update;
+                query = {"_id": result.status.status_id};
                 if (status.current_status === "liked") {
                     update = {
                         "rate.stars": status.stars,
@@ -247,7 +249,7 @@ function updateRateCV(cvId, status, callback) {
                         "rate.timestamp": status.timestamp
                     };
                 }
-                var options = {new: true};
+                options = {new: true};
                 StatusModel.findOneAndUpdate(query, update, options, function (err, result) {
                     if (err) {
                         console.log("something went wrong " + err);
@@ -323,15 +325,15 @@ function getHiredCvs(userId, jobId, callback) {
             if (results.length > 0) {
                 if (results[0].cvs.length > 0) {
 
-                    var query = MatchingObjectsModel.find(
+                    query = MatchingObjectsModel.find(
                         {
                             _id: {$in: results[0].cvs},
                             active: true,
                             matching_object_type: "cv",
                             hired: true
                         }
-                    ).populate('user').populate('original_text')
-                        .populate('academy');
+                    ).populate("user").populate("original_text")
+                        .populate("academy");
                     query.exec(function (err, results) {
                         if (err) {
                             console.log("something went wrong " + err);
@@ -368,7 +370,7 @@ function setDecision(personalPropertiesId, decision, callback) {
     var update = {
         decision: decision
     };
-    var options = {new: true, fields: {decision:1}};
+    var options = {new: true, fields: {decision: 1}};
     PersonalPropertiesModel.findOneAndUpdate(query, update, options, function (err, result) {
         if (err) {
             console.log("something went wrong " + err);

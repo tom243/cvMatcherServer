@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var companyDAO = require("./../model/dao/companyDAO"); // dao = data access object = model
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
@@ -90,7 +93,7 @@ function changeCompanyPassword(req, res) {
     console.log("in changeCompanyPassword");
 
     if (validation.changeCompanyPassword(req)) {
-        companyDAO.changeCompanyPassword(req.body.company_id,req.body.old_password,
+        companyDAO.changeCompanyPassword(req.body.company_id, req.body.old_password,
             req.body.new_password, function (status, result) {
                 res.status(status).json(result);
             });
@@ -106,8 +109,8 @@ function getEmployees(req, res) {
 
     if (validation.getEmployees(req)) {
         companyDAO.getEmployees(req.body.user_id, function (status, result) {
-                res.status(status).json(result);
-            });
+            res.status(status).json(result);
+        });
     } else {
         utils.sendErrorValidation(res);
     }
