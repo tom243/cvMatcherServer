@@ -38,7 +38,7 @@ function loadValidationValues() {
 /* Common */
 
 function fieldValidation(field, fieldName) {
-    var isValid = !!(typeof field !== "undefined" && field !== null);
+    var isValid = typeof field !== "undefined" && field !== null;
 
     if (!isValid) {
         console.log("error in field: " + fieldName);
