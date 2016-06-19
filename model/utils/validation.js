@@ -1,7 +1,4 @@
-/*jslint node: true */
-"use strict";
-
-var validationDAO = require("./../dao/validationDAO");
+var validationDAO = require('./../dao/validationDAO');
 
 /* Load validation values from DB */
 
@@ -31,19 +28,19 @@ function loadValidationValues() {
             console.log("error while trying to upload init data");
         }
     });
-}
+};
 
 /* Private Functions */
 
 /* Common */
 
 function fieldValidation(field, fieldName) {
-    var isValid = !!(typeof field !== "undefined" && field !== null);
+    var isValid = !!(typeof field !== 'undefined' && field != null);
 
     if (!isValid) {
         console.log("error in field: " + fieldName);
     }
-    return isValid;
+    return isValid
 }
 
 /* Input types validations */
@@ -55,7 +52,7 @@ function validateYear(year) {
     if (!isValid) {
         console.log("error in validate year");
     }
-    return isValid;
+    return isValid
 }
 
 function validatePositiveNumber(number) {
@@ -65,14 +62,11 @@ function validatePositiveNumber(number) {
     if (!isValid) {
         console.log("error in validate positive number");
     }
-    return isValid;
+    return isValid
 }
 
 function validatePersonalId(id) {
-    var multiply;
-    var digit;
-    var sum;
-    var numeric;
+    var multiply, digit, sum, numeric;
 
     // Numeric only
     if (!/^\d{1,9}$/g.test(id)) {
@@ -108,11 +102,11 @@ function validatePersonalId(id) {
     if (!isValid) {
         console.log("error in validate personal id");
     }
-    return isValid;
+    return isValid
 }
 
 function validateEmail(email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
     var isValid = re.test(email);
 
@@ -132,8 +126,8 @@ function matcherRequirementsValidation(requirements) {
         fieldValidation(requirements.details, "requirements.details")) {
         if (requirements.details.constructor === Array) {
             for (var i = 0; i < requirements.details.length; i++) {
-                if (!(fieldValidation(requirements.details[i].name, "requirements.details.name") &&
-                    fieldValidation(requirements.details[i].grade, "requirements.details.grade"))) {
+                if (!(fieldValidation(requirements.details[i].name, "requirements.details.name")
+                    && fieldValidation(requirements.details[i].grade, "requirements.details.grade"))) {
                     isValid = false;
                     break;
                 }
@@ -151,12 +145,12 @@ function matcherRequirementsValidation(requirements) {
 
 function matcherFormulaValidation(formula) {
 
-    var isValid = fieldValidation(formula.requirements, "requirements") &&
-        matcherRequirementsValidation(formula.requirements) &&
-        fieldValidation(formula.candidate_type, "candidate_type") &&
-        fieldValidation(formula.locations, "locations") &&
-        fieldValidation(formula.scope_of_position, "scope_of_position") &&
-        fieldValidation(formula.academy, "academy");
+    var isValid = fieldValidation(formula.requirements, "requirements")
+        && matcherRequirementsValidation(formula.requirements)
+        && fieldValidation(formula.candidate_type, "candidate_type")
+        && fieldValidation(formula.locations, "locations")
+        && fieldValidation(formula.scope_of_position, "scope_of_position")
+        && fieldValidation(formula.academy, "academy");
 
     if (!isValid) {
         console.log("error in validate matcherFormulaValidations");
@@ -168,10 +162,10 @@ function matcherFormulaValidation(formula) {
 
 function statusValidation(status) {
 
-    var isValid = fieldValidation(status.current_status, "current_status") &&
-        ( status.current_status === "liked" || status.current_status === "unliked" ) &&
-        ( (status.current_status === "liked" && fieldValidation(status.stars, "stars") ) ||
-        ( status.current_status === "unliked" && fieldValidation(status.description, "description") ) );
+    var isValid = fieldValidation(status.current_status, "current_status")
+        && ( status.current_status === "liked" || status.current_status === "unliked" )
+        && ( (status.current_status === "liked" && fieldValidation(status.stars, "stars") )
+        || ( status.current_status === "unliked" && fieldValidation(status.description, "description") ) );
 
     if (!isValid) {
         console.log("error in validate statusValidation");
@@ -183,21 +177,21 @@ function statusValidation(status) {
 
 function personalPropertiesValidation(personalProperties) {
 
-    var isValid = personalProperties &&
-        fieldValidation(personalProperties.university_degree, "university_degree") &&
-        fieldValidation(personalProperties.degree_graduation_with_honors, "degree_graduation_with_honors") &&
-        fieldValidation(personalProperties.above_two_years_experience, "above_two_years_experience") &&
-        fieldValidation(personalProperties.psychometric_above_680, "psychometric_above_680") &&
-        fieldValidation(personalProperties.multilingual, "multilingual") &&
-        fieldValidation(personalProperties.volunteering, "volunteering") &&
-        fieldValidation(personalProperties.full_army_service, "full_army_service") &&
-        fieldValidation(personalProperties.officer_in_the_military, "officer_in_the_military") &&
-        fieldValidation(personalProperties.high_school_graduation_with_honors, "high_school_graduation_with_honors") &&
-        fieldValidation(personalProperties.youth_movements, "youth_movements");
+    var isValid = personalProperties
+        && fieldValidation(personalProperties.university_degree, "university_degree")
+        && fieldValidation(personalProperties.degree_graduation_with_honors, "degree_graduation_with_honors")
+        && fieldValidation(personalProperties.above_two_years_experience, "above_two_years_experience")
+        && fieldValidation(personalProperties.psychometric_above_680, "psychometric_above_680")
+        && fieldValidation(personalProperties.multilingual, "multilingual")
+        && fieldValidation(personalProperties.volunteering, "volunteering")
+        && fieldValidation(personalProperties.full_army_service, "full_army_service")
+        && fieldValidation(personalProperties.officer_in_the_military, "officer_in_the_military")
+        && fieldValidation(personalProperties.high_school_graduation_with_honors, "high_school_graduation_with_honors")
+        && fieldValidation(personalProperties.youth_movements, "youth_movements");
 
     if (isValid) {
         for (var property in personalProperties) {
-            if (typeof(personalProperties[property]) !== "boolean" && property != "_id") {
+            if (!(typeof(personalProperties[property]) === "boolean" ) && property != "_id") {
                 isValid = false;
                 break;
             }
@@ -214,11 +208,11 @@ function historyTimelineValidation(historyTimeline) {
 
     var isValid = true;
     for (var i = 0; i < historyTimeline.length; i++) {
-        isValid = historyTimeline[i].text &&
-            (historyTimeline[i].start_year && validateYear(historyTimeline[i].start_year)) &&
-            (historyTimeline[i].end_year && validateYear(historyTimeline[i].end_year)) &&
-            (historyTimeline[i].type &&
-            (historyTimeline[i].type === "experience" || historyTimeline[i].type === "education" ));
+        isValid = historyTimeline[i].text
+            && (historyTimeline[i].start_year && validateYear(historyTimeline[i].start_year))
+            && (historyTimeline[i].end_year && validateYear(historyTimeline[i].end_year))
+            && (historyTimeline[i].type
+            && (historyTimeline[i].type === "experience" || historyTimeline[i].type === "education" ));
 
         if (!isValid) {
             console.log("error in validate historyTimelineValidation");
@@ -235,14 +229,14 @@ function originalTextValidation(originalText, type) {
 
     if (originalText) {
         if (type === "cv") {
-            isValid = originalText.history_timeline &&
-                originalText.history_timeline.constructor === Array &&
-                historyTimelineValidation(originalText.history_timeline);
+            isValid = originalText.history_timeline
+                && originalText.history_timeline.constructor === Array
+                && historyTimelineValidation(originalText.history_timeline);
 
         } else if (type === "job") {
-            isValid = fieldValidation(originalText.title, "title") &&
-                fieldValidation(originalText.description, "description") &&
-                fieldValidation(originalText.requirements, "requirements");
+            isValid = fieldValidation(originalText.title, "title")
+                && fieldValidation(originalText.description, "description")
+                && fieldValidation(originalText.requirements, "requirements");
         } else {
             console.log("type not valid");
             return false;
@@ -260,10 +254,10 @@ function originalTextValidation(originalText, type) {
 
 function locationsValidation(locations) {
 
-    var isValid = locations &&
-        fieldValidation(locations, "locations") &&
-        locations.constructor === Array &&
-        locations.length > 0;
+    var isValid = locations
+        && fieldValidation(locations, "locations")
+        && locations.constructor === Array
+        && locations.length > 0;
 
     if (!isValid) {
         console.log("error in locationsValidation");
@@ -274,9 +268,9 @@ function locationsValidation(locations) {
 function candidateTypeValidation(candidateType) {
 
 
-    var isValid = candidateType &&
-    candidateType.constructor === Array &&
-    candidateType.length > 0 ? true : false;
+    var isValid = candidateType
+    && candidateType.constructor === Array
+    && candidateType.length > 0 ? true : false;
 
     if (isValid) {
         for (var i = 0; i < candidateType.length; i++) {
@@ -293,9 +287,9 @@ function candidateTypeValidation(candidateType) {
 
 function scopeOfPositionValidation(scopeOfPosition) {
 
-    var isValid = scopeOfPosition &&
-    scopeOfPosition.constructor === Array &&
-    scopeOfPosition.length > 0 ? true : false;
+    var isValid = scopeOfPosition
+    && scopeOfPosition.constructor === Array
+    && scopeOfPosition.length > 0 ? true : false;
 
     if (isValid) {
         for (var i = 0; i < scopeOfPosition.length; i++) {
@@ -312,12 +306,12 @@ function scopeOfPositionValidation(scopeOfPosition) {
 
 function academyValidation(academy) {
 
-    var isValid = academy &&
-        (fieldValidation(academy.academy_type, "academy_type") && academy.academy_type.constructor === Array &&
-        academy.academy_type.length > 0) &&
-        (fieldValidation(academy.degree_name, "degree_name") && degreeNameArr.indexOf(academy.degree_name) != -1) &&
-        (fieldValidation(academy.degree_type, "degree_type") && academy.degree_type.constructor === Array &&
-        academy.degree_type.length > 0);
+    var isValid = academy
+        && (fieldValidation(academy.academy_type, "academy_type") && academy.academy_type.constructor === Array
+        && academy.academy_type.length > 0)
+        && (fieldValidation(academy.degree_name, "degree_name") && degreeNameArr.indexOf(academy.degree_name) != -1)
+        && (fieldValidation(academy.degree_type, "degree_type") && academy.degree_type.constructor === Array
+        && academy.degree_type.length > 0);
 
     if (isValid) {
         for (var i = 0; i < academy.academy_type.length; i++) {
@@ -341,12 +335,12 @@ function academyValidation(academy) {
 
 function formulaValidation(formula) {
 
-    var isValid = formula &&
-    fieldValidation(formula.locations, "locations") &&
-    fieldValidation(formula.candidate_type, "candidate_type") &&
-    fieldValidation(formula.scope_of_position, "scope_of_position") &&
-    fieldValidation(formula.academy, "academy") &&
-    fieldValidation(formula.requirements, "requirements") ? true : false;
+    var isValid = formula
+    && fieldValidation(formula.locations, "locations")
+    && fieldValidation(formula.candidate_type, "candidate_type")
+    && fieldValidation(formula.scope_of_position, "scope_of_position")
+    && fieldValidation(formula.academy, "academy")
+    && fieldValidation(formula.requirements, "requirements") ? true : false;
 
     var formulaAmount = 0;
     if (isValid) {
@@ -374,42 +368,44 @@ function requirementsValidation(requirements, type) {
 
     var mustPercentageSum = 0;
     var mustExist = false;
-    var isValid = requirements && requirements.constructor === Array;
+    var isValid = requirements
+        && requirements.constructor === Array;
 
     if (isValid) {
         for (var i = 0; i < requirements.length; i++) {
-            isValid = fieldValidation(requirements[i].combination, "combination") &&
-                requirements[i].combination.constructor === Array;
+            isValid = fieldValidation(requirements[i].combination, "combination")
+                && requirements[i].combination.constructor === Array;
             if (isValid) {
                 for (var j = 0; j < requirements[i].combination.length; j++) {
                     if (type === "cv") {
-                        isValid = fieldValidation(requirements[i].combination[j].name, "combination.name") &&
-                            (fieldValidation(requirements[i].combination[j].years, "combination.years") &&
-                            validatePositiveNumber(requirements[i].combination[j].years));
+                        isValid = fieldValidation(requirements[i].combination[j].name, "combination.name")
+                            && (fieldValidation(requirements[i].combination[j].years, "combination.years")
+                            && validatePositiveNumber(requirements[i].combination[j].years));
                         if (!isValid) break;
                     } else if (type === "job") {
                         if (fieldValidation(requirements[i].combination[j].mode, "combination.mode")) {
                             switch (requirements[i].combination[j].mode) {
                                 case "must" :
                                     mustExist = true;
-                                    isValid = fieldValidation(requirements[i].combination[j].name, "combination.name") &&
-                                        (fieldValidation(requirements[i].combination[j].years, "combination.years") &&
-                                        validatePositiveNumber(requirements[i].combination[j].years)) &&
-                                        (fieldValidation(requirements[i].combination[j].percentage, "combination.percentage") &&
-                                        validatePositiveNumber(requirements[i].combination[j].percentage));
+                                    isValid = fieldValidation(requirements[i].combination[j].name, "combination.name")
+                                        && (fieldValidation(requirements[i].combination[j].years, "combination.years")
+                                        && validatePositiveNumber(requirements[i].combination[j].years))
+                                        && (fieldValidation(requirements[i].combination[j].percentage, "combination.percentage")
+                                        && validatePositiveNumber(requirements[i].combination[j].percentage));
                                     if (isValid) {
                                         mustPercentageSum += requirements[i].combination[j].percentage;
                                     } else return false;
                                     break;
                                 case "adv":
                                 case "or" :
-                                    isValid = fieldValidation(requirements[i].combination[j].name, "combination.name") &&
-                                        (fieldValidation(requirements[i].combination[j].years, "combination.years") &&
-                                        validatePositiveNumber(requirements[i].combination[j].years));
+                                    isValid = fieldValidation(requirements[i].combination[j].name, "combination.name")
+                                        && (fieldValidation(requirements[i].combination[j].years, "combination.years")
+                                        && validatePositiveNumber(requirements[i].combination[j].years));
                                     break;
                                 default :
                                     console.log("wrong mode");
                                     return false; // wrong mode sent
+                                    break;
                             }
                         } else return false;
                     } else return false;
@@ -434,9 +430,9 @@ function requirementsValidation(requirements, type) {
 /////////////////////////////////////////////////// *** Users *** /////////////////////////////////
 
 function addUser(req) {
-    return req.body &&
-        fieldValidation(req.body.google_user_id, "google_user_id") &&
-        (fieldValidation(req.body.email, "email") && validateEmail(req.body.email));
+    return req.body
+        && fieldValidation(req.body.google_user_id, "google_user_id")
+        && (fieldValidation(req.body.email, "email") && validateEmail(req.body.email));
 }
 
 function deleteUser(req) {
@@ -444,16 +440,16 @@ function deleteUser(req) {
 }
 
 function updateUser(req) {
-    return req.body &&
-        fieldValidation(req.body._id, "_id") &&
-        (fieldValidation(req.body.personal_id, "personal_id") && validatePersonalId(req.body.personal_id)) &&
-        fieldValidation(req.body.first_name, "first_name") &&
-        fieldValidation(req.body.last_name, "last_name") &&
-        fieldValidation(req.body.birth_date, "birth_date") &&
-        fieldValidation(req.body.address, "address") &&
-        (fieldValidation(req.body.email, "email") && validateEmail(req.body.email)) &&
-        fieldValidation(req.body.phone_number, "phone_number") &&
-        fieldValidation(req.body.linkedin, "linkedin");
+    return req.body
+        && fieldValidation(req.body._id, "_id")
+        && (fieldValidation(req.body.personal_id, "personal_id") && validatePersonalId(req.body.personal_id))
+        && fieldValidation(req.body.first_name, "first_name")
+        && fieldValidation(req.body.last_name, "last_name")
+        && fieldValidation(req.body.birth_date, "birth_date")
+        && fieldValidation(req.body.address, "address")
+        && (fieldValidation(req.body.email, "email") && validateEmail(req.body.email))
+        && fieldValidation(req.body.phone_number, "phone_number")
+        && fieldValidation(req.body.linkedin, "linkedin");
 }
 
 function getUser(req) {
@@ -467,21 +463,21 @@ function getUserId(req) {
 ////////////////////////////////////////////// ***  Companies  *** ////////////////////////////////////
 
 function addCompany(req) {
-    return req.body &&
-        fieldValidation(req.body.name, "name") &&
-        fieldValidation(req.body.logo, "logo") &&
-        fieldValidation(req.body.p_c, "p_c") &&
-        fieldValidation(req.body.address, "address") &&
-        fieldValidation(req.body.phone_number, "phone_number") &&
-        fieldValidation(req.body.password, "password") &&
-        fieldValidation(req.body.user_id, "user_id");
+    return req.body
+        && fieldValidation(req.body.name, "name")
+        && fieldValidation(req.body.logo, "logo")
+        && fieldValidation(req.body.p_c, "p_c")
+        && fieldValidation(req.body.address, "address")
+        && fieldValidation(req.body.phone_number, "phone_number")
+        && fieldValidation(req.body.password, "password")
+        && fieldValidation(req.body.user_id, "user_id");
 }
 
 function addToExistingCompany(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.company_id, "company_id") &&
-        fieldValidation(req.body.password, "password");
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.company_id, "company_id")
+        && fieldValidation(req.body.password, "password");
 }
 
 function deleteCompany(req) {
@@ -489,13 +485,13 @@ function deleteCompany(req) {
 }
 
 function updateCompany(req) {
-    return req.body &&
-        fieldValidation(req.body._id, "_id") &&
-        fieldValidation(req.body.name, "name") &&
-        fieldValidation(req.body.logo, "logo") &&
-        fieldValidation(req.body.p_c, "p_c") &&
-        fieldValidation(req.body.address, "address") &&
-        fieldValidation(req.body.phone_number, "phone_number");
+    return req.body
+        && fieldValidation(req.body._id, "_id")
+        && fieldValidation(req.body.name, "name")
+        && fieldValidation(req.body.logo, "logo")
+        && fieldValidation(req.body.p_c, "p_c")
+        && fieldValidation(req.body.address, "address")
+        && fieldValidation(req.body.phone_number, "phone_number");
 }
 
 function getCompany(req) {
@@ -503,30 +499,26 @@ function getCompany(req) {
 }
 
 function changeCompanyPassword(req) {
-    return req.body &&
-        fieldValidation(req.body.company_id, "company_id") &&
-        fieldValidation(req.body.old_password, "old_password") &&
-        fieldValidation(req.body.new_password, "new_password");
-}
-
-function getEmployees(req) {
-    return req.body && fieldValidation(req.body.user_id, "user_id");
+    return req.body
+        && fieldValidation(req.body.company_id, "company_id")
+        && fieldValidation(req.body.old_password, "old_password")
+        && fieldValidation(req.body.new_password, "new_password");
 }
 
 ////////////////////////////////// *** Matching Objects *** ///////////////////////////
 
 function addMatchingObject(req) {
     var matchingObject = req.body;
-    if (matchingObject &&
-        fieldValidation(matchingObject.date, "date") &&
-        fieldValidation(matchingObject.sector, "sector") &&
-        fieldValidation(matchingObject.user, "user") &&
-        fieldValidation(matchingObject.matching_object_type, "matching_object_type") &&
-        originalTextValidation(matchingObject.original_text, matchingObject.matching_object_type) &&
-        locationsValidation(matchingObject.locations) &&
-        candidateTypeValidation(matchingObject.candidate_type) &&
-        scopeOfPositionValidation(matchingObject.scope_of_position) &&
-        academyValidation(matchingObject.academy)
+    if (matchingObject
+        && fieldValidation(matchingObject.date, "date")
+        && fieldValidation(matchingObject.sector, "sector")
+        && fieldValidation(matchingObject.user, "user")
+        && fieldValidation(matchingObject.matching_object_type, "matching_object_type")
+        && originalTextValidation(matchingObject.original_text, matchingObject.matching_object_type)
+        && locationsValidation(matchingObject.locations)
+        && candidateTypeValidation(matchingObject.candidate_type)
+        && scopeOfPositionValidation(matchingObject.scope_of_position)
+        && academyValidation(matchingObject.academy)
 
     ) {
 
@@ -538,9 +530,9 @@ function addMatchingObject(req) {
         if (matchingObject.matching_object_type === "cv") {
             return personalPropertiesValidation(matchingObject.personal_properties);
         } else if (matchingObject.matching_object_type === "job") {
-            return fieldValidation(matchingObject.compatibility_level, "compatibility_level") &&
-                validatePositiveNumber(matchingObject.compatibility_level) &&  // check number between 1-100
-                formulaValidation(matchingObject.formula);
+            return fieldValidation(matchingObject.compatibility_level, "compatibility_level")
+                && validatePositiveNumber(matchingObject.compatibility_level) // check number between 1-100
+                && formulaValidation(matchingObject.formula);
         } else {
             console.log("matching_object_type not valid");
             return false;
@@ -551,10 +543,10 @@ function addMatchingObject(req) {
 }
 
 function getMatchingObject(req) {
-    return req.body &&
-        fieldValidation(req.body.matching_object_id, "matching_object_id") &&
-        fieldValidation(req.body.matching_object_type, "matching_object_type") &&
-        (req.body.matching_object_type == "cv" || req.body.matching_object_type == "job" );
+    return req.body
+        && fieldValidation(req.body.matching_object_id, "matching_object_id")
+        && fieldValidation(req.body.matching_object_type, "matching_object_type")
+        && (req.body.matching_object_type == "cv" || req.body.matching_object_type == "job" );
 }
 
 function deleteMatchingObject(req) {
@@ -567,17 +559,17 @@ function reviveMatchingObject(req) {
 
 function updateMatchingObject(req) {
     var matchingObject = req.body;
-    if (matchingObject &&
-        fieldValidation(matchingObject._id, "_id") &&
-        fieldValidation(matchingObject.sector, "sector") &&
-        fieldValidation(matchingObject.matching_object_type, "matching_object_type") &&
-        fieldValidation(matchingObject.original_text._id, "original_text._id") &&
-        originalTextValidation(matchingObject.original_text, matchingObject.matching_object_type) &&
-        locationsValidation(matchingObject.locations) &&
-        candidateTypeValidation(matchingObject.candidate_type) &&
-        scopeOfPositionValidation(matchingObject.scope_of_position) &&
-        fieldValidation(matchingObject.academy._id, "academy._id") &&
-        academyValidation(matchingObject.academy)
+    if (matchingObject
+        && fieldValidation(matchingObject._id, "_id")
+        && fieldValidation(matchingObject.sector, "sector")
+        && fieldValidation(matchingObject.matching_object_type, "matching_object_type")
+        && fieldValidation(matchingObject.original_text._id, "original_text._id")
+        && originalTextValidation(matchingObject.original_text, matchingObject.matching_object_type)
+        && locationsValidation(matchingObject.locations)
+        && candidateTypeValidation(matchingObject.candidate_type)
+        && scopeOfPositionValidation(matchingObject.scope_of_position)
+        && fieldValidation(matchingObject.academy._id, "academy._id")
+        && academyValidation(matchingObject.academy)
 
     ) {
 
@@ -588,12 +580,12 @@ function updateMatchingObject(req) {
 
         if (matchingObject.matching_object_type === "cv") {
             return fieldValidation(matchingObject.personal_properties._id, "personal_properties._id") &&
-                personalPropertiesValidation(matchingObject.personal_properties);
+                personalPropertiesValidation(matchingObject.personal_properties)
         } else if (matchingObject.matching_object_type === "job") {
-            return fieldValidation(matchingObject.compatibility_level, "compatibility_level") &&
-                validatePositiveNumber(matchingObject.compatibility_level) && // check number between 1-100
-                fieldValidation(matchingObject.formula._id, "formula._id") &&
-                formulaValidation(matchingObject.formula);
+            return fieldValidation(matchingObject.compatibility_level, "compatibility_level")
+                && validatePositiveNumber(matchingObject.compatibility_level) // check number between 1-100
+                && fieldValidation(matchingObject.formula._id, "formula._id")
+                && formulaValidation(matchingObject.formula);
         } else {
             console.log("matching_object_type not valid");
             return false;
@@ -607,157 +599,147 @@ function updateMatchingObject(req) {
 ///////////////////////////////////////////// *** Employer *** ///////////////////////
 
 function getJobsBySector(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.sector, "sector") &&
-        sectorArr.indexOf(req.body.sector) != -1 &&
-        fieldValidation(req.body.archive, "archive") &&
-        typeof(req.body.archive) === "boolean";
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.sector, "sector")
+        && sectorArr.indexOf(req.body.sector) != -1
+        && fieldValidation(req.body.archive, "archive")
+        && typeof(req.body.archive) === "boolean";
 }
 
 function getUnreadCvsForJob(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.job_id, "job_id");
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.job_id, "job_id");
 }
 
 function getRateCvsForJob(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.job_id, "job_id") &&
-        fieldValidation(req.body.current_status, "current_status") &&
-        ( req.body.current_status === "liked" || req.body.current_status === "unliked" );
-}
-
-function seenCV(req) {
-    return req.body &&
-        fieldValidation(req.body.cv_id, "cv_id") &&
-        fieldValidation(req.body.timestamp, "timestamp");
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.job_id, "job_id")
+        && fieldValidation(req.body.current_status, "current_status")
+        && ( req.body.current_status === "liked" || req.body.current_status === "unliked" );
 }
 
 function rateCV(req) {
-    return req.body &&
-        fieldValidation(req.body.cv_id, "cv_id") &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.status, "status") &&
-        statusValidation(req.body.status);
+    return req.body
+        && fieldValidation(req.body.cv_id, "cv_id")
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.status, "status")
+        && statusValidation(req.body.status);
 }
 
 function updateRateCV(req) {
-    return req.body &&
-        fieldValidation(req.body.cv_id, "cv_id") &&
-        fieldValidation(req.body.status, "status") &&
-        statusValidation(req.body.status);
+    return req.body
+        && fieldValidation(req.body.cv_id, "cv_id")
+        && fieldValidation(req.body.status, "status")
+        && statusValidation(req.body.status);
 }
 
 function hireToJob(req) {
-    return req.body &&
-        fieldValidation(req.body.cv_id, "cv_id") &&
-        fieldValidation(req.body.user_id, "user_id");
+    return req.body
+        && fieldValidation(req.body.cv_id, "cv_id")
+        && fieldValidation(req.body.user_id, "user_id");
 }
 
 function getHiredCvs(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.job_id, "job_id");
-}
-
-function setDecision(req) {
-    return req.body &&
-        fieldValidation(req.body.personal_properties_id, "personal_properties_id") &&
-        fieldValidation(req.body.decision, "decision");
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.job_id, "job_id");
 }
 
 ////////////////////////////////// *** JobSeeker *** ///////////////////////
 
 function getAllJobsBySector(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id)") &&
-        fieldValidation(req.body.sector, "sector") &&
-        sectorArr.indexOf(req.body.sector) != -1;
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id)")
+        && fieldValidation(req.body.sector, "sector")
+        && sectorArr.indexOf(req.body.sector) != -1;
 }
 
 function getMyJobs(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.active, "active") &&
-        typeof(req.body.active) === "boolean";
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.active, "active")
+        && typeof(req.body.active) === "boolean";
 }
 
 function getFavoritesJobs(req) {
-    return req.body && fieldValidation(req.body.user_id, "user_id");
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id");
 }
 
 function checkCV(req) {
-    return req.body &&
-        fieldValidation(req.body.job_id, "job_id") &&
-        fieldValidation(req.body.cv_id, "cv_id");
+    return req.body
+        && fieldValidation(req.body.job_id, "job_id")
+        && fieldValidation(req.body.cv_id, "cv_id");
 }
 
 function addCvToJob(req) {
-    return req.body &&
-        fieldValidation(req.body.job_id, "job_id") &&
-        fieldValidation(req.body.cv_id, "cv_id");
+    return req.body
+        && fieldValidation(req.body.job_id, "job_id")
+        && fieldValidation(req.body.cv_id, "cv_id");
 }
 
 function matcherResponse(response) {
     console.log("response", response);
-    return response &&
-        fieldValidation(response.total_grade, "total_grade") &&
-        fieldValidation(response.formula, "formula") &&
-        matcherFormulaValidation(response.formula);
+    return response
+        && fieldValidation(response.total_grade, "total_grade")
+        && fieldValidation(response.formula, "formula")
+        && matcherFormulaValidation(response.formula);
 }
 
 function predictorResponse(response) {
-    return typeof(response) === "boolean";
+    return typeof(response) === "boolean"
 }
 
 function updateFavoriteJob(req) {
-    return req.body &&
-        fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id") &&
-        fieldValidation(req.body.favorite, "favorite") &&
-        typeof(req.body.favorite) === "boolean";
+    return req.body
+        && fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id")
+        && fieldValidation(req.body.favorite, "favorite")
+        && typeof(req.body.favorite) === "boolean";
 }
 
 function updateActivityJob(req) {
-    return req.body &&
-        fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id") &&
-        fieldValidation(req.body.active, "active") &&
-        typeof(req.body.active) === "boolean";
+    return req.body
+        && fieldValidation(req.body.job_seeker_job_id, "job_seeker_job_id")
+        && fieldValidation(req.body.active, "active")
+        && typeof(req.body.active) === "boolean";
 }
 
 function getBestMatchJobs(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.sector, "sector") &&
-        fieldValidation(req.body.cv, "cv");
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.sector, "sector")
+        && fieldValidation(req.body.cv, "cv")
 }
 
 ///////////////////////////////////////////// *** Utils *** ///////////////////////
 
 function getKeyWordsBySector(req) {
-    return req.body &&
-        fieldValidation(req.body.sector, "sector") &&
-        sectorArr.indexOf(req.body.sector) != -1;
+    return req.body
+        && fieldValidation(req.body.sector, "sector")
+        && sectorArr.indexOf(req.body.sector) != -1;
 }
 
 function addKeyWords(req) {
-    return req.body &&
-        fieldValidation(req.body.sector, "sector") &&
-        fieldValidation(req.body.words_list, "words_list") &&
-        req.body.words_list.constructor === Array;
+    return req.body
+        && fieldValidation(req.body.sector, "sector")
+        && fieldValidation(req.body.words_list, "words_list")
+        && req.body.words_list.constructor === Array;
 
 }
 
 function updateHWID(req) {
-    return req.body && fieldValidation(req.body.google_user_id, "google_user_id") &&
-        fieldValidation(req.body.hwid, "hwid");
+    return req.body
+        && fieldValidation(req.body.google_user_id, "google_user_id")
+        && fieldValidation(req.body.hwid, "hwid");
 }
 
 function sendNotification(req) {
-    return req.body &&
-        fieldValidation(req.body.user_id, "user_id") &&
-        fieldValidation(req.body.message, "message");
+    return req.body
+        && fieldValidation(req.body.user_id, "user_id")
+        && fieldValidation(req.body.message, "message");
 }
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
@@ -774,23 +756,20 @@ exports.deleteCompany = deleteCompany;
 exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.changeCompanyPassword = changeCompanyPassword;
-exports.getEmployees = getEmployees;
 
 exports.addMatchingObject = addMatchingObject;
 exports.getMatchingObject = getMatchingObject;
 exports.deleteMatchingObject = deleteMatchingObject;
 exports.reviveMatchingObject = reviveMatchingObject;
 exports.updateMatchingObject = updateMatchingObject;
+exports.hireToJob = hireToJob;
+exports.getHiredCvs = getHiredCvs;
 
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
-exports.seenCV = seenCV;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
-exports.hireToJob = hireToJob;
-exports.getHiredCvs = getHiredCvs;
-exports.setDecision = setDecision;
 
 exports.getAllJobsBySector = getAllJobsBySector;
 exports.getMyJobs = getMyJobs;
