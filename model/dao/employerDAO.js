@@ -57,7 +57,7 @@ function getUnreadCvsForJob(userId, jobId, callback) {
                         {
                             _id: {$in: results[0].cvs},
                             active: true,
-                            "status.current_status": "unread",
+                            $or:[ {"status.current_status": "unread"}, {"status.current_status": "seen"}],
                             matching_object_type: "cv"
                         }
                     ).populate("user").populate("original_text")
@@ -149,13 +149,7 @@ function seenCV(cvId, timestamp, callback) {
     var update = {
         status: {
             current_status: "seen",
-            timestamp: timestamp,
-            status_id: {
-                rate: {
-                    stars: 0,
-                    description:""
-                }
-            }
+            timestamp: timestamp
         }
     };
     var options = {new: true};
