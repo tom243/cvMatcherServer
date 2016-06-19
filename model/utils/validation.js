@@ -74,9 +74,8 @@ function validatePersonalId(id) {
     var sum;
     var numeric;
 
-    var reg = "!/^\d{1,9}$/g";
     // Numeric only
-    if (reg.test(id)) {
+    if (!/^\d{1,9}$/g.test(id)) {
         console.log("error in validate personal id");
         return false;
     }
