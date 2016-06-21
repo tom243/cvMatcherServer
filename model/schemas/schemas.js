@@ -36,7 +36,6 @@ var usersSchema = new users_schema({
     last_name: String,
     email:{
         type:String,
-        unique: true,
         required:true
     },
     birth_date: String,
