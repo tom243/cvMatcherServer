@@ -36,16 +36,23 @@ var usersSchema = new users_schema({
     last_name: String,
     email:{
         type:String,
+        unique: true,
         required:true
     },
     birth_date: String,
     address: String,
     company: { type: Schema.Types.ObjectId, ref: "CompanyModel" },
-    phone_number: String,
+    phone_number: {
+        type:String,
+        unique: true
+    },
     linkedin: String,
     jobs: [{ type: Schema.Types.ObjectId, ref: "JobSeekerJobsModel"}],
     current_cv: { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" },
-    hwid : String,
+    hwid : {
+        type: String,
+        unique: true
+    },
     active: {
         index: 1,
         type: Boolean,
@@ -85,6 +92,7 @@ var companiesSchema = new companies_schema({
     },
     p_c: {
         type: String,
+        unique: true,
         required: true
     },
     address: {

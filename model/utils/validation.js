@@ -169,9 +169,11 @@ function matcherFormulaValidation(formula) {
 function statusValidation(status) {
 
     var isValid = fieldValidation(status.current_status, "current_status") &&
-        ( status.current_status === "liked" || status.current_status === "unliked" ) &&
+        ( status.current_status === "liked" || status.current_status === "unliked" ||
+        status.current_status === "seen" ) &&
         ( (status.current_status === "liked" && fieldValidation(status.stars, "stars") ) ||
         ( status.current_status === "unliked" && fieldValidation(status.description, "description") ) );
+
 
     if (!isValid) {
         console.log("error in validate statusValidation");

@@ -1,10 +1,12 @@
 /*jslint node: true */
 "use strict";
 
+var async = require("async");
 var schemas = require("./../schemas/schemas");
 
 var UserModel = schemas.UserModel;
 var CompanyModel = schemas.CompanyModel;
+var MatchingObjectsModel = schemas.MatchingObjectsModel;
 
 var md5 = require("md5");
 
@@ -228,51 +230,109 @@ function getCompanies(callback) {
     });
 }
 
+var addJobSeekerToCompanyFunctions = {
+
+    getJobSeekerCurrentCvId: function (cvId, callback) {
+
+        var query = MatchingObjectsModel.find(
+            {_id: cvId, active: true, matching_object_type: "cv"}, {user: 1}
+        ).limit(1)
+            .populate({
+                path: "user",
+                select: "current_cv"
+            });
+
+
+        query.exec(function (err, results) {
+
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to get the cv";
+                callback(500, error);
+            } else {
+                if (results.length > 0) {
+                    console.log(" the cv extracted successfully");
+                    callback(null, results[0].user.current_cv);
+                } else {
+                    console.log("cv not exists");
+                    error.error = "cv not exists";
+                    callback(404, error);
+                }
+            }
+        });
+    },
+
+    addToCompany : function (userId, cvId, callback) {
+
+
+        var query = UserModel.find(
+            {_id: userId, active: true}, {company: 1}
+        ).limit(1);
+
+        query.exec(function (err, results) {
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to get the user from the db";
+                callback(500, error);
+            } else {
+                if (results.length > 0) {
+
+                    query = {"_id": results[0].company};
+                    var update = {
+                        $addToSet: {"employees": cvId}
+                    };
+                    var options = {new: true};
+                    CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
+                        if (err) {
+                            console.log("something went wrong " + err);
+                            error.error = "something went wrong while trying to add job seeker to company";
+                            callback(500, error);
+                        } else {
+
+                            if (result !== null) {
+                                console.log("the job seeker added to company successfully");
+                                callback(null, result);
+                            } else {
+                                console.log("company not exists");
+                                error.error = "company not exists";
+                                callback(404, error);
+                            }
+                        }
+                    });
+
+                } else {
+                    console.log("user not exists");
+                    error.error = "user not exists";
+                    callback(404, error);
+                }
+            }
+        });
+
+    }
+
+};
+
 function addJobSeekerToCompany(userId, cvId, callback) {
 
-    console.log("in addPersonalPropertiesToCompany");
+    console.log("in addJobSeekerToCompany");
 
-    var query = UserModel.find(
-        {_id: userId, active: true}, {company: 1}
-    ).limit(1);
+    async.waterfall([
+        async.apply(addJobSeekerToCompanyFunctions.getJobSeekerCurrentCvId, cvId),
+        async.apply(addJobSeekerToCompanyFunctions.addToCompany, userId)
 
-    query.exec(function (err, results) {
-        if (err) {
-            console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the user from the db";
-            callback(500, error);
+    ], function (status, results) {
+
+        if (status === null) {
+
+            console.log("job seeker added to company successfully");
+            callback(null, results[1]);
+
         } else {
-            if (results.length > 0) {
-
-                query = {"_id": results[0].company};
-                var update = {
-                    $addToSet: {"employees": cvId}
-                };
-                var options = {new: true};
-                CompanyModel.findOneAndUpdate(query, update, options, function (err, result) {
-                    if (err) {
-                        console.log("something went wrong " + err);
-                        error.error = "something went wrong while trying to add job seeker to company";
-                        callback(500, error);
-                    } else {
-
-                        if (result !== null) {
-                            console.log("the job seeker added to company successfully");
-                            callback(null, result);
-                        } else {
-                            console.log("company not exists");
-                            error.error = "company not exists";
-                            callback(404, error);
-                        }
-                    }
-                });
-
-            } else {
-                console.log("user not exists");
-                error.error = "user not exists";
-                callback(404, error);
-            }
+            console.log("error while trying to add job seeker to company");
+            error.error = "error while trying to add job seeker to company";
+            callback(status, error);
         }
+
     });
 
 }
