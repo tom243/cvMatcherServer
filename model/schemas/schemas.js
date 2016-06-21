@@ -42,10 +42,7 @@ var usersSchema = new users_schema({
     birth_date: String,
     address: String,
     company: { type: Schema.Types.ObjectId, ref: "CompanyModel" },
-    phone_number: {
-        type:String,
-        unique: true
-    },
+    phone_number: String,
     linkedin: String,
     jobs: [{ type: Schema.Types.ObjectId, ref: "JobSeekerJobsModel"}],
     current_cv: { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" },
