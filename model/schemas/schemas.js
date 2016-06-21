@@ -46,10 +46,7 @@ var usersSchema = new users_schema({
     linkedin: String,
     jobs: [{ type: Schema.Types.ObjectId, ref: "JobSeekerJobsModel"}],
     current_cv: { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" },
-    hwid : {
-        type: String,
-        unique: true
-    },
+    hwid : String,
     active: {
         index: 1,
         type: Boolean,
@@ -89,7 +86,6 @@ var companiesSchema = new companies_schema({
     },
     p_c: {
         type: String,
-        unique: true,
         required: true
     },
     address: {
