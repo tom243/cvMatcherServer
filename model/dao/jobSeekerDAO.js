@@ -14,6 +14,7 @@ var MatchingObjectsModel = schemas.MatchingObjectsModel;
 var CompanyModel = schemas.CompanyModel;
 var FormulaModel = schemas.FormulaModel;
 var MatchingDetailsModel = schemas.MatchingDetailsModel;
+var StatusModel = schemas.StatusModel;
 
 var errorMessage;
 
@@ -310,28 +311,51 @@ var addCvToJobFunctions = {
 
     updateDataForCV: function (totalGrade, cvId, callback) {
 
-        var query = {"_id": cvId};
-        var update = {
-            "status.current_status": "unread",
-            compatibility_level: totalGrade
-        };
-        var options = {new: true};
-        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
-            if (err) {
-                console.log("error in updating data for cv " + err);
-                error.error = "error in updating data for cv";
-                callback(500, error);
-            } else {
-                if (results !== null) {
-                    callback();
-                } else {
-                    errorMessage = "cv not exists";
-                    console.log(errorMessage);
-                    error.error = errorMessage;
-                    callback(500, error);
-                }
+        var statusToAdd = new StatusModel({
+            rate: {
+                stars: 0,
+                description: "",
+                timestamp: new Date()
             }
         });
+
+        /* save the Status to db*/
+        statusToAdd.save(function (err, result) {
+            if (err) {
+                console.log("something went wrong " + err);
+                error.error = "something went wrong while trying to save the status to the db";
+                callback(500, error);
+            } else {
+
+                var query = {"_id": cvId};
+                var update = {
+                    status: {
+                        status_id: result._id,
+                        current_status: "unread"
+                    },
+                    status_id: result._id,
+                    compatibility_level: totalGrade
+                };
+                var options = {new: true};
+                MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+                    if (err) {
+                        console.log("error in updating data for cv " + err);
+                        error.error = "error in updating data for cv";
+                        callback(500, error);
+                    } else {
+                        if (results !== null) {
+                            callback();
+                        } else {
+                            errorMessage = "cv not exists";
+                            console.log(errorMessage);
+                            error.error = errorMessage;
+                            callback(500, error);
+                        }
+                    }
+                });
+            }
+        })
+
     },
 
     sendCvForJob: function (cvId, jobId, callback) {

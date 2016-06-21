@@ -55,9 +55,8 @@ function getLogoImages(req, res) {
                     // 2nd param is the function that each item is passed to
                     function (item, callbackAsync) {
                         // Call an asynchronous function
-                        checkUrlExists(item.MediaUrl, function (isValidUrl) {
+                        checkUrlExists(item.MediaUrl, function (isValidUrl) { // verify url exists
                             if (isValidUrl) {
-                                console.log("isValidUrl " + isValidUrl);
                                 imagesResponse.push(item.MediaUrl);
                             }
                             callbackAsync();

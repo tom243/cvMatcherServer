@@ -96,6 +96,10 @@ var companiesSchema = new companies_schema({
         required: true
     },
     employees:[{ type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" }],
+/*    predict_count:{
+        type: Number,
+        default:0
+    },*/
     password: {
         type: String,
         required: true
