@@ -665,6 +665,7 @@ function getHiredCvs(req) {
 
 function setDecision(req) {
     return req.body &&
+        fieldValidation(req.body.user_id, "user_id") &&
         fieldValidation(req.body.personal_properties_id, "personal_properties_id") &&
         fieldValidation(req.body.decision, "decision");
 }

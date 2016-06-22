@@ -158,7 +158,8 @@ function setDecision(req, res) {
     console.log("in setDecision");
 
     if (validation.setDecision(req)) {
-        employerDAO.setDecision(req.body.personal_properties_id, req.body.decision, function (status, result) {
+        employerDAO.setDecision(req.body.user_id, req.body.personal_properties_id, 
+            req.body.decision, function (status, result) {
             res.status(status).json(result);
         });
     } else {

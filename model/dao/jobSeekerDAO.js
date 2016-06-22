@@ -24,7 +24,6 @@ var error = {
 
 ///////////////////////////////////////////// *** JobSeeker *** ///////////////////////
 
-
 function getAllJobsBySector(userId, sector, callback) {
 
     var query = UserModel.find(
@@ -463,13 +462,14 @@ var addCvToJobFunctions = {
         )
             .populate({
                 path: "company",
-                select: "employees",
+                select: "employees predict_count",
                 populate: {
                     path: "employees",
                     select: "personal_properties -_id",
                     populate: {
                         path: "personal_properties",
                         select: "-_id -__v",
+                        match:{$or: [{"decision": true}, {"decision": false}] },
                         model: "PersonalPropertiesModel"
                     }
                 }
@@ -488,64 +488,64 @@ var addCvToJobFunctions = {
 
                     // predictor is accurate with a minimum of 20 employers
 
-                    if (results[0].company.employees.length > 19) {
-                        console.log("employees Array size bigger then 19");
-
-                        var predictObjectToSend = {
-                            employees: results[0].company.employees.map(function (field) {
-                                return field.personal_properties;
-                            }),
-                            job_seeker: userPersonalProperties
-                        };
-
-                        unirest.post("https://matcherpredictor.herokuapp.com/prediction")
-                            .headers({"Accept": "application/json", "Content-Type": "application/json"})
-                            .send(predictObjectToSend)
-                            .end(function (response) {
-                                if (response.code === 200) {
-
-                                    if (validation.predictorResponse(response.body)) {
-
-                                        query = {"_id": cvId};
-                                        var update = {
-                                            predict_result: response.body
-                                        };
-                                        var options = {new: true};
-                                        MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
-                                            if (err) {
-                                                console.log("something went wrong " + err);
-                                                error.error = "something went wrong while trying to update predictor result";
-                                                callback(500, error);
-                                            } else {
-                                                if (results !== null) {
-                                                    console.log("the predictor result updated successfully");
-                                                    callback(null, results);
-                                                } else {
-                                                    console.log("cv not exists");
-                                                    error.error = "cv not exists";
-                                                    callback(404, error);
-                                                }
-                                            }
-                                        });
-
-                                    } else {
-                                        errorMessage = "predictor response format is incorrect";
-                                        console.log(errorMessage);
-                                        error.error = errorMessage;
-                                        callback(400, error);
-                                    }
-                                } else {
-                                    console.log("error occurred during predictor process: ", response.body);
-                                    callback(response.code, response.body);
-                                }
-                            });
-
+                    var predictObjectToSend = {
+                        employees: null,
+                        job_seeker: userPersonalProperties,
+                        default_predictor: true
+                    };
+                    if (results[0].company.predict_count > 19) {
+                        console.log("predict_count size bigger then 19");
+                        predictObjectToSend.default_predictor = false;
+                        predictObjectToSend.employees = results[0].company.employees.map(function (field) {
+                            return field.personal_properties;
+                        }).filter(function (field) {
+                            return field !== null;
+                        });
                     } else {
-                        errorMessage = "employees Array size below 20";
-                        console.log(errorMessage);
-                        error.error = errorMessage;
-                        callback(null, error);
+                        console.log("employees Array size below 20");
                     }
+
+                    unirest.post("https://matcherpredictor.herokuapp.com/prediction")
+                        .headers({"Accept": "application/json", "Content-Type": "application/json"})
+                        .send(predictObjectToSend)
+                        .end(function (response) {
+                            if (response.code === 200) {
+
+                                if (validation.predictorResponse(response.body)) {
+
+                                    query = {"_id": cvId};
+                                    var update = {
+                                        predict_result: response.body
+                                    };
+                                    var options = {new: true};
+                                    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
+                                        if (err) {
+                                            console.log("something went wrong " + err);
+                                            error.error = "something went wrong while trying to update predictor result";
+                                            callback(500, error);
+                                        } else {
+                                            if (results !== null) {
+                                                console.log("the predictor result updated successfully");
+                                                callback(null, results);
+                                            } else {
+                                                console.log("cv not exists");
+                                                error.error = "cv not exists";
+                                                callback(404, error);
+                                            }
+                                        }
+                                    });
+
+                                } else {
+                                    errorMessage = "predictor response format is incorrect";
+                                    console.log(errorMessage);
+                                    error.error = errorMessage;
+                                    callback(400, error);
+                                }
+                            } else {
+                                console.log("error occurred during predictor process: ", response.body);
+                                callback(response.code, response.body);
+                            }
+                        });
 
                 } else {
                     console.log("user not exists");
@@ -553,6 +553,7 @@ var addCvToJobFunctions = {
                     callback(404, error);
                 }
             }
+
         });
 
     }
@@ -784,13 +785,14 @@ function test(jobUser, callback) {
     )
         .populate({
             path: "company",
-            select: "employees",
+            select: "employees predict_count",
             populate: {
                 path: "employees",
                 select: "personal_properties -_id",
                 populate: {
                     path: "personal_properties",
                     select: "-_id -__v",
+                    match:{$or: [{"decision": true}, {"decision": false}] },
                     model: "PersonalPropertiesModel"
                 }
             }
@@ -806,7 +808,9 @@ function test(jobUser, callback) {
             if (results.length > 0) {
                 callback(200, results[0].company.employees.map(function (field) {
                     return field.personal_properties;
-                }));
+                }).filter(function (field) {
+                    return field !== null;
+                }))
             }
         }
     });
