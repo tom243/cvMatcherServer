@@ -505,7 +505,7 @@ var addCvToJobFunctions = {
                         console.log("employees Array size below 20");
                     }
 
-                    unirest.post("https://matcherpredictor.herokuapp.com/prediction")
+                    unirest.post("https://matcherprediction.herokuapp.com/prediction")
                         .headers({"Accept": "application/json", "Content-Type": "application/json"})
                         .send(predictObjectToSend)
                         .end(function (response) {
