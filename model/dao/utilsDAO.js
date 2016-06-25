@@ -56,7 +56,7 @@ function addKeyWords(sector, wordsList, callback) {
     async.each(wordsList,
         // 2nd param is the function that each item is passed to
         function (item, callbackAsync) {
-            // Call an asynchronous function, often a save() to DB
+            // Call an asynchronous function
 
             var query = {word: item, sector: sector};
             var update = {

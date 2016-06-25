@@ -22,7 +22,7 @@ var validation_schema = mongoose.Schema;
 // Users Schema
 var usersSchema = new users_schema({
 
-    google_user_id :{
+    google_user_id: {
         type: String,
         required: true,
         index: 1,
@@ -34,18 +34,18 @@ var usersSchema = new users_schema({
     },
     first_name: String,
     last_name: String,
-    email:{
-        type:String,
-        required:true
+    email: {
+        type: String,
+        required: true
     },
     birth_date: String,
     address: String,
-    company: { type: Schema.Types.ObjectId, ref: "CompanyModel" },
+    company: {type: Schema.Types.ObjectId, ref: "CompanyModel"},
     phone_number: String,
     linkedin: String,
-    jobs: [{ type: Schema.Types.ObjectId, ref: "JobSeekerJobsModel"}],
-    current_cv: { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" },
-    hwid : String,
+    jobs: [{type: Schema.Types.ObjectId, ref: "JobSeekerJobsModel"}],
+    current_cv: {type: Schema.Types.ObjectId, ref: "MatchingObjectsModel"},
+    hwid: String,
     active: {
         index: 1,
         type: Boolean,
@@ -57,8 +57,8 @@ var usersSchema = new users_schema({
 // historyTimeline Schema
 var jobSeekerJobsSchema = new jobseeker_jobs_schema({
 
-    job : { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel", required:true },
-    cv: { type: Schema.Types.ObjectId, ref: "MatchingObjectsModel", required:true },
+    job: {type: Schema.Types.ObjectId, ref: "MatchingObjectsModel", required: true},
+    cv: {type: Schema.Types.ObjectId, ref: "MatchingObjectsModel", required: true},
     favorite: {
         type: Boolean,
         default: false
@@ -95,10 +95,10 @@ var companiesSchema = new companies_schema({
         type: Number,
         required: true
     },
-    employees:[{ type: Schema.Types.ObjectId, ref: "MatchingObjectsModel" }],
-    predict_count:{
+    employees: [{type: Schema.Types.ObjectId, ref: "MatchingObjectsModel"}],
+    predict_count: {
         type: Number,
-        default:0
+        default: 0
     },
     password: {
         type: String,
@@ -124,7 +124,7 @@ var matchingObjectsSchema = new matching_objects_schema({
         type: Date,
         required: true
     },
-    original_text: { type: Schema.Types.ObjectId, ref: "OriginalTextModel", required:true },
+    original_text: {type: Schema.Types.ObjectId, ref: "OriginalTextModel", required: true},
     sector: {
         type: String,
         required: true,
@@ -132,29 +132,29 @@ var matchingObjectsSchema = new matching_objects_schema({
     },
     locations: [{
         type: String,
-        required:true
+        required: true
     }],
-    candidate_type:[{
+    candidate_type: [{
         type: String,
-        required:true
+        required: true
     }],
-    scope_of_position:[{
+    scope_of_position: [{
         type: String,
-        required:true
+        required: true
     }],
-    academy: { type: Schema.Types.ObjectId, ref: "AcademyModel", required:true },
-    formula: { type: Schema.Types.ObjectId, ref: "FormulaModel" },
-    requirements: [{ type: Schema.Types.ObjectId, ref: "RequirementsModel" }],
+    academy: {type: Schema.Types.ObjectId, ref: "AcademyModel", required: true},
+    formula: {type: Schema.Types.ObjectId, ref: "FormulaModel"},
+    requirements: [{type: Schema.Types.ObjectId, ref: "RequirementsModel"}],
     compatibility_level: Number,
-    status:{
-        status_id: { type: Schema.Types.ObjectId, ref: "StatusModel" },
+    status: {
+        status_id: {type: Schema.Types.ObjectId, ref: "StatusModel"},
         current_status: String,
         timestamp: Date
     },
-    personal_properties: { type: Schema.Types.ObjectId, ref: "PersonalPropertiesModel" },
+    personal_properties: {type: Schema.Types.ObjectId, ref: "PersonalPropertiesModel"},
     favorites: [String],
     cvs: [String],
-    archive:{
+    archive: {
         index: 1,
         type: Boolean,
         default: false
@@ -165,10 +165,10 @@ var matchingObjectsSchema = new matching_objects_schema({
         default: true
     },
     user: {
-            type: Schema.Types.ObjectId,
-            required:true,
-            index:1,
-            ref: "UserModel"
+        type: Schema.Types.ObjectId,
+        required: true,
+        index: 1,
+        ref: "UserModel"
     },
     hired: {
         type: Boolean,
@@ -199,11 +199,11 @@ var formulasSchema = new formulas_schema({
         required: true
     },
     requirements: Number,
-    matching_requirements : {
+    matching_requirements: {
         details: [{
-         type: Schema.Types.ObjectId,
-         ref: "MatchingDetailsModel"
-         }],
+            type: Schema.Types.ObjectId,
+            ref: "MatchingDetailsModel"
+        }],
         grade: Number
     }
 
@@ -220,7 +220,7 @@ var statusSchema = new status_schema({
 
 // requirement Schema
 var requirementSchema = new requirements_schema({
-    combination:[{ type: Schema.Types.ObjectId, ref: "ProfessionalKnowledgeModel", required:true }]
+    combination: [{type: Schema.Types.ObjectId, ref: "ProfessionalKnowledgeModel", required: true}]
 }, {collection: "Requirements"});
 
 
@@ -229,51 +229,51 @@ var originalTextSchema = new original_text_schema({
     title: String,
     description: String,
     requirements: String,
-    history_timeline: [{ type: Schema.Types.ObjectId, ref: "HistoryTimelineModel" }]
+    history_timeline: [{type: Schema.Types.ObjectId, ref: "HistoryTimelineModel"}]
 }, {collection: "Original_Text"});
 
 // personalPropertiesSchema Schema
 var personalPropertiesSchema = new personal_properties_schema({
 
-    university_degree:{
-        type : Boolean,
-        required : true
+    university_degree: {
+        type: Boolean,
+        required: true
     },
     degree_graduation_with_honors: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     above_two_years_experience: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     psychometric_above_680: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     multilingual: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     volunteering: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     full_army_service: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     officer_in_the_military: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     high_school_graduation_with_honors: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     youth_movements: {
-        type : Boolean,
-        required : true
+        type: Boolean,
+        required: true
     },
     decision: Boolean
 }, {collection: "Personal_Properties"});
@@ -282,19 +282,19 @@ var personalPropertiesSchema = new personal_properties_schema({
 var historyTimelineSchema = new history_timeline_schema({
     text: {
         type: String,
-        required:true
+        required: true
     },
     start_year: {
         type: Number,
-        required:true
+        required: true
     },
     end_year: {
         type: Number,
-        required:true
+        required: true
     },
     type: {
         type: String,
-        required:true
+        required: true
     }
 
 }, {collection: "History_Timeline"});
@@ -303,15 +303,15 @@ var historyTimelineSchema = new history_timeline_schema({
 var academySchema = new academy_schema({
     academy_type: [{
         type: String,
-        required:true
+        required: true
     }],
     degree_name: {
         type: String,
-        required:true
+        required: true
     },
     degree_type: [{
         type: String,
-        required:true
+        required: true
     }]
 
 }, {collection: "Academy"});
@@ -319,13 +319,13 @@ var academySchema = new academy_schema({
 // ProfessionalKnowledgeSchema Schema
 var professionalKnowledgeSchema = new professional_knowledge_schema({
     name: {
-        type : String,
+        type: String,
         lowercase: true,
-        required : true
+        required: true
     },
     years: {
-        type : Number,
-        required : true
+        type: Number,
+        required: true
     },
     mode: String,
     percentage: Number
@@ -334,12 +334,12 @@ var professionalKnowledgeSchema = new professional_knowledge_schema({
 // MatchingDetailsSchema Schema
 var matchingDetailsSchema = matching_details_schema({
     name: {
-        type : String,
-        required : true
+        type: String,
+        required: true
     },
     grade: {
-        type : Number,
-        required : true
+        type: Number,
+        required: true
     }
 }, {collection: "Matching_Details"});
 
@@ -347,58 +347,58 @@ var matchingDetailsSchema = matching_details_schema({
 var keyWordsSchema = key_words_schema({
     sector: {
         type: String,
-        required:true
+        required: true
     },
     word: {
         type: String,
-        unique:true,
-        required:true
+        unique: true,
+        required: true
     },
     count: {
         type: Number,
-        default:4
+        default: 4
     }
 }, {collection: "Key_Words"});
 
 var validationSchema = validation_schema({
     sector: [{
         type: String,
-        required:true
+        required: true
     }],
     candidate_type: [{
         type: String,
-        required:true
+        required: true
     }],
     scope_of_position: [{
         type: String,
-        required:true
+        required: true
     }],
     academy_type: [{
         type: String,
-        required:true
+        required: true
     }],
     degree_name: [{
         type: String,
-        required:true
+        required: true
     }],
     degree_type: [{
         type: String,
-        required:true
+        required: true
     }]
 }, {collection: "Validation"});
 
-exports.UserModel                   = mongoose.model("UserModel", usersSchema);
-exports.StatusModel                 = mongoose.model("StatusModel",statusSchema);
-exports.RequirementsModel           = mongoose.model("RequirementsModel",requirementSchema);
-exports.CompanyModel                = mongoose.model("CompanyModel", companiesSchema);
-exports.FormulaModel                = mongoose.model("FormulaModel", formulasSchema);
-exports.MatchingObjectsModel        = mongoose.model("MatchingObjectsModel", matchingObjectsSchema);
-exports.OriginalTextModel           = mongoose.model("OriginalTextModel", originalTextSchema);
-exports.PersonalPropertiesModel     = mongoose.model("PersonalPropertiesModel", personalPropertiesSchema);
-exports.HistoryTimelineModel        = mongoose.model("HistoryTimelineModel", historyTimelineSchema);
-exports.AcademyModel                = mongoose.model("AcademyModel", academySchema);
-exports.ProfessionalKnowledgeModel  = mongoose.model("ProfessionalKnowledgeModel", professionalKnowledgeSchema);
-exports.MatchingDetailsModel        = mongoose.model("MatchingDetailsModel", matchingDetailsSchema);
-exports.KeyWordsModel               = mongoose.model("KeyWordsModel", keyWordsSchema);
-exports.JobSeekerJobsModel          = mongoose.model("JobSeekerJobsModel", jobSeekerJobsSchema);
-exports.ValidationModel             = mongoose.model("ValidationModel", validationSchema);
+exports.UserModel = mongoose.model("UserModel", usersSchema);
+exports.StatusModel = mongoose.model("StatusModel", statusSchema);
+exports.RequirementsModel = mongoose.model("RequirementsModel", requirementSchema);
+exports.CompanyModel = mongoose.model("CompanyModel", companiesSchema);
+exports.FormulaModel = mongoose.model("FormulaModel", formulasSchema);
+exports.MatchingObjectsModel = mongoose.model("MatchingObjectsModel", matchingObjectsSchema);
+exports.OriginalTextModel = mongoose.model("OriginalTextModel", originalTextSchema);
+exports.PersonalPropertiesModel = mongoose.model("PersonalPropertiesModel", personalPropertiesSchema);
+exports.HistoryTimelineModel = mongoose.model("HistoryTimelineModel", historyTimelineSchema);
+exports.AcademyModel = mongoose.model("AcademyModel", academySchema);
+exports.ProfessionalKnowledgeModel = mongoose.model("ProfessionalKnowledgeModel", professionalKnowledgeSchema);
+exports.MatchingDetailsModel = mongoose.model("MatchingDetailsModel", matchingDetailsSchema);
+exports.KeyWordsModel = mongoose.model("KeyWordsModel", keyWordsSchema);
+exports.JobSeekerJobsModel = mongoose.model("JobSeekerJobsModel", jobSeekerJobsSchema);
+exports.ValidationModel = mongoose.model("ValidationModel", validationSchema);

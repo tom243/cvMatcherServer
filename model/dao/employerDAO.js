@@ -147,36 +147,6 @@ function getRateCvsForJob(userId, jobId, current_status, callback) {
     });
 }
 
-function seenCV(cvId, timestamp, callback) {
-
-    var query = {"_id": cvId};
-    var update = {
-        status: {
-            current_status: "seen",
-            timestamp: timestamp
-        }
-    };
-    var options = {new: true};
-    MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
-        if (err) {
-            console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to save seen to cv";
-            callback(500, error);
-        } else {
-            if (results !== null) {
-                console.log("cv set to seen successfully");
-                callback(200, results);
-            } else {
-                errorMessage = "cv not exists";
-                console.log(errorMessage);
-                error.error = errorMessage;
-                callback(404, error);
-            }
-        }
-    });
-
-}
-
 // Add Status
 function rateCV(cvId, status, callback) {
 
@@ -392,7 +362,7 @@ var setDecisionFunctions = {
 
     },
 
-    incrementPredictCounterByOne : function (companyId, isExist, callback) {
+    incrementPredictCounterByOne: function (companyId, isExist, callback) {
 
         console.log("isExist " + isExist);
 
@@ -407,21 +377,21 @@ var setDecisionFunctions = {
                 if (err) {
                     console.log("error while trying to increment predict count " + err);
                     error.error = "error while trying to increment predict count";
-                    callback(500,error);
-                }else {
+                    callback(500, error);
+                } else {
                     console.log("predict count incremented by one");
                     callback(null);
                 }
             });
 
-        }else { // predict count already exist
+        } else { // predict count already exist
             console.log("predict count already exist");
             callback(null);
         }
 
     },
 
-    setDecisionToPersonalProperties : function (personalPropertiesId, decision, callback) {
+    setDecisionToPersonalProperties: function (personalPropertiesId, decision, callback) {
 
         var query = {
             _id: personalPropertiesId
@@ -498,7 +468,6 @@ function setDecision(userId, personalPropertiesId, decision, callback) {
 exports.getJobsBySector = getJobsBySector;
 exports.getUnreadCvsForJob = getUnreadCvsForJob;
 exports.getRateCvsForJob = getRateCvsForJob;
-exports.seenCV = seenCV;
 exports.rateCV = rateCV;
 exports.updateRateCV = updateRateCV;
 exports.hireToJob = hireToJob;

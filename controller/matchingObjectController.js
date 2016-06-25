@@ -17,7 +17,7 @@ function checkIfAddingIsAllow(req, callback) {
     }
 }
 
-//** Adding a new object **//
+//** Adding a new  matching object ( CV or Job ) **//
 function addMatchingObject(req, res) {
 
     console.log("in addMatchingObject");
@@ -47,7 +47,7 @@ function addMatchingObject(req, res) {
 
 }
 
-//** Delete an existing object **//
+//** Delete an existing matching object **//
 function deleteMatchingObject(req, res) {
 
     console.log("in deleteMatchingObject");
@@ -62,7 +62,7 @@ function deleteMatchingObject(req, res) {
 
 }
 
-//** Delete an existing object **//
+//** revive an existing matching object **//
 function reviveMatchingObject(req, res) {
 
     console.log("in reviveMatchingObject");
@@ -77,7 +77,7 @@ function reviveMatchingObject(req, res) {
 
 }
 
-//** Update an existing object **//
+//** Update an existing matching object **//
 function updateMatchingObject(req, res) {
 
     console.log("in updateMatchingObject");
@@ -92,7 +92,7 @@ function updateMatchingObject(req, res) {
 
 }
 
-//** get Matching Object  **//
+//** get a Matching Object  **//
 function getMatchingObject(req, res) {
 
     console.log("in getMatchingObject");

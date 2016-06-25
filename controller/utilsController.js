@@ -23,6 +23,7 @@ function getKeyWordsBySector(req, res) {
 
 }
 
+/* verify that url is not broken */
 function checkUrlExists(url, callback) {
 
     request(url, function (error, response) {
@@ -35,7 +36,7 @@ function checkUrlExists(url, callback) {
     });
 }
 
-
+/* get top 10 logo images for company */
 function getLogoImages(req, res) {
     var imagesResponse = [];
     Bing.images(req.body.word + " logo",
@@ -79,6 +80,7 @@ function getLogoImages(req, res) {
         });
 }
 
+/* add key words to db */
 function addKeyWords(req, res) {
 
     console.log("in addKeyWords");

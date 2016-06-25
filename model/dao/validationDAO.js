@@ -22,7 +22,7 @@ function loadValidationValues(callback) {
         } else {
             if (results.length > 0) {
                 console.log("validation values extracted successfully");
-                callback(200,results[0]);
+                callback(200, results[0]);
 
             } else {
                 console.log("id of validation not exists");
@@ -36,4 +36,4 @@ function loadValidationValues(callback) {
 
 ///////////////////////////////////// *** EXPORTS *** /////////////////////////////////
 
-exports.loadValidationValues =  loadValidationValues;
+exports.loadValidationValues = loadValidationValues;

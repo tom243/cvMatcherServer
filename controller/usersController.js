@@ -77,6 +77,7 @@ function getUserId(req, res) {
     }
 }
 
+/* update the hwid for android device */
 function updateHWID(req, res) {
 
     console.log("in updateHWID");

@@ -10,11 +10,10 @@ module.exports = function (server) {
 
     webSocketServer.on("connection", function (webSocket) {
 
-        //console.log("webSocket.upgradeReq.url " + webSocket.upgradeReq.url.substr(1));
         var userID = webSocket.upgradeReq.url.substr(1);
         webSockets[userID] = webSocket;
-        //console.log("connected: " + userID + " in " + Object.getOwnPropertyNames(webSockets));
 
+        /* when message is received */
         webSocket.on("message", function (message) {
             console.log("received from " + userID + ": " + message);
             var messageArray = JSON.parse(message);
@@ -22,13 +21,12 @@ module.exports = function (server) {
             if (toUserWebSocket) {
                 console.log("sent to " + messageArray.user + ": " + JSON.stringify(messageArray));
                 messageArray[0] = userID;
-                toUserWebSocket.send(JSON.stringify(messageArray));
+                toUserWebSocket.send(JSON.stringify(messageArray)); // send message
             }
         });
 
         webSocket.on("close", function () {
             delete webSockets[userID];
-            // console.log("deleted: " + userID)
         });
     });
 

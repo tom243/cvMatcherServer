@@ -14,6 +14,7 @@ var error = {
     error: null
 };
 
+/*  send a notification to android device  */
 function sendNotification(req, res) {
 
     console.log("in sendNotification");

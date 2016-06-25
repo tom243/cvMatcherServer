@@ -5,7 +5,6 @@ var companyDAO = require("./../model/dao/companyDAO"); // dao = data access obje
 var utils = require("./../model/utils/utils");
 var validation = require("./../model/utils/validation");
 
-//** Adding a new company **//
 function addCompany(req, res) {
 
     console.log("in addCompany");
@@ -34,7 +33,6 @@ function addToExistingCompany(req, res) {
 
 }
 
-//** Delete an existing company **//
 function deleteCompany(req, res) {
 
     console.log("in deleteCompany");
@@ -49,7 +47,6 @@ function deleteCompany(req, res) {
 
 }
 
-//** Update an existing company **//
 function updateCompany(req, res) {
 
     console.log("in updateCompany");
@@ -64,7 +61,6 @@ function updateCompany(req, res) {
 
 }
 
-//** get an existing company **//
 function getCompany(req, res) {
 
     console.log("in getCompany");

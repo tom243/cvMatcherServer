@@ -505,7 +505,7 @@ var addCvToJobFunctions = {
                         console.log("employees Array size below 20");
                     }
 
-                    unirest.post("https://matcherprediction.herokuapp.com/prediction")
+                    unirest.post("https://matcherpredictor.herokuapp.com/prediction")
                         .headers({"Accept": "application/json", "Content-Type": "application/json"})
                         .send(predictObjectToSend)
                         .end(function (response) {
@@ -778,44 +778,6 @@ function getLastTenJobs(userId, sector, callback) {
 
 }
 
-function test(jobUser, callback) {
-
-    var query = UserModel.find(
-        {_id: jobUser, active: true}, {company: 1}
-    )
-        .populate({
-            path: "company",
-            select: "employees predict_count",
-            populate: {
-                path: "employees",
-                select: "personal_properties -_id",
-                populate: {
-                    path: "personal_properties",
-                    select: "-_id -__v",
-                    match:{$or: [{"decision": true}, {"decision": false}] },
-                    model: "PersonalPropertiesModel"
-                }
-            }
-        }).limit(1);
-
-    query.exec(function (err, results) {
-
-        if (err) {
-            console.log("something went wrong " + err);
-            error.error = "something went wrong while trying to get the personal properties";
-            callback(500, error);
-        } else {
-            if (results.length > 0) {
-                callback(200, results[0].company.employees.map(function (field) {
-                    return field.personal_properties;
-                }).filter(function (field) {
-                    return field !== null;
-                }))
-            }
-        }
-    });
-}
-
 ///////////////////////////////////////////// *** EXPORTS *** ///////////////////////
 
 exports.getAllJobsBySector = getAllJobsBySector;
@@ -825,5 +787,3 @@ exports.addCvToJob = addCvToJob;
 exports.updateFavoriteJob = updateFavoriteJob;
 exports.updateActivityJob = updateActivityJob;
 exports.getLastTenJobs = getLastTenJobs;
-
-exports.test = test;

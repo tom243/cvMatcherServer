@@ -262,7 +262,7 @@ var addJobSeekerToCompanyFunctions = {
         });
     },
 
-    addToCompany : function (userId, cvId, callback) {
+    addToCompany: function (userId, cvId, callback) {
 
 
         var query = UserModel.find(
@@ -381,7 +381,6 @@ function removeJobSeekerFromCompany(userId, cvId, callback) {
             }
         }
     });
-
 
 }
 

@@ -12,8 +12,6 @@ var error = {
     error: null
 };
 
-////////////////////////////////// *** JobSeeker *** ///////////////////////
-
 //** get jobs by sector for jobSeeker  **//
 function getAllJobsBySector(req, res) {
 
@@ -29,7 +27,7 @@ function getAllJobsBySector(req, res) {
 
 }
 
-//**  get the jobs that the user has sent his cvs to them  **//
+//**  get the jobs that the user sent his cv's to them  **//
 function getMyJobs(req, res) {
 
     console.log("in getMyJobs");
@@ -43,7 +41,8 @@ function getMyJobs(req, res) {
     }
 
 }
-//**  get the  favourites jobs  **//
+
+//**  get the favorites jobs  **//
 function getFavoritesJobs(req, res) {
 
     console.log("in getFavoritesJobs");
@@ -58,7 +57,7 @@ function getFavoritesJobs(req, res) {
 
 }
 
-//**  check cv with matcher  **//
+//**  check the candidate cv with  the matcher API  **//
 function checkCV(req, res) {
 
     console.log("in checkCV");
@@ -105,7 +104,7 @@ function checkCV(req, res) {
 
 }
 
-//** add the current cv to job **//
+//** add the current cv to the job **//
 function addCvToJob(req, res) {
 
     console.log("in addCvToJob");
@@ -253,13 +252,6 @@ function getBestMatchJobs(req, res) {
 
 }
 
-function test(req, res) {
-
-    jobSeekerDAO.test(req.body.user_id, function (status, result) {
-        res.status(status).json(result);
-    });
-}
-
 ////////////////////////////////// *** EXPORTS *** /////////////////////////
 
 exports.getAllJobsBySector = getAllJobsBySector;
@@ -270,5 +262,3 @@ exports.addCvToJob = addCvToJob;
 exports.updateFavoriteJob = updateFavoriteJob;
 exports.updateActivityJob = updateActivityJob;
 exports.getBestMatchJobs = getBestMatchJobs;
-
-exports.test = test;

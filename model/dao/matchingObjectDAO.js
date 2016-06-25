@@ -19,7 +19,6 @@ var error = {
     error: null
 };
 
-
 /////////////////////////////////////// ***  OriginalText  *** /////////////////////////////
 
 function buildTimelineHistory(timeline, callback) {
@@ -30,7 +29,7 @@ function buildTimelineHistory(timeline, callback) {
     async.each(timeline,
         // 2nd param is the function that each item is passed to
         function (item, callbackAsync) {
-            // Call an asynchronous function, often a save() to DB
+            // Call an asynchronous function
 
             var historyTimeLineToadd = new HistoryTimelineModel({
                 text: item.text,
@@ -255,7 +254,6 @@ function updateOriginalText(originalText, type, originalTextCallback) {
 
 }
 
-
 /////////////////////////////////////// ***  Academy  *** /////////////////////////////
 
 function addAcademy(academy, callback) {
@@ -322,7 +320,7 @@ function buildProfessionalKnowledge(professionalKnowledges, callback) {
     async.each(professionalKnowledges,
         // 2nd param is the function that each item is passed to
         function (item, callbackAsync) {
-            // Call an asynchronous function, often a save() to DB
+            // Call an asynchronous function
 
             var professionalKnowledgeToAdd = new ProfessionalKnowledgeModel({
                 name: item.name,
@@ -361,7 +359,7 @@ function addRequirements(requirements, callback) {
     async.each(requirements,
         // 2nd param is the function that each item is passed to
         function (item, callbackAsync) {
-            // Call an asynchronous function, often a save() to DB
+            // Call an asynchronous function
 
             buildProfessionalKnowledge(item.combination, function (err, professionalKnowledgeArr) {
                 if (err) {
@@ -455,10 +453,6 @@ var updateRequirementsFunctions = {
                     results.forEach(function (entry) {
                         combinationArr.push.apply(combinationArr, entry.combination);
                     });
-
-                    /*        for (var i = 0; i < results.length; i++) {
-                     combinationArr.push.apply(combinationArr, results[i].combination);
-                     }*/
 
                     callback(null, requirementsArr, combinationArr);
 
