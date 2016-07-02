@@ -201,9 +201,7 @@ function getBestMatchJobs(req, res) {
 
                                     var newItem = item.toObject();
                                     newItem.matcher_grade = response.body.total_grade;
-
-                                    /*                                  console.log("response.body.total_grade ", response.body.total_grade);
-                                     console.log("item.matcherGrade" + item.matcherGrade);*/
+                                    
                                     matcherResponseArr.push(newItem);
                                     callbackAsync();
 

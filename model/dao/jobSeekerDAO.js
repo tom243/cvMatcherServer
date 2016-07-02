@@ -536,7 +536,7 @@ var addCvToJobFunctions = {
                                     });
 
                                 } else {
-                                    errorMessage = "predictor response format is incorrect";
+                                    errorMessage = "predictor response format is incorrect " + response.body;
                                     console.log(errorMessage);
                                     error.error = errorMessage;
                                     callback(400, error);
