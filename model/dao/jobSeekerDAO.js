@@ -511,11 +511,11 @@ var addCvToJobFunctions = {
                         .end(function (response) {
                             if (response.code === 200) {
 
-                                if (validation.predictorResponse(response.body)) {
+                                if (validation.predictorResponse(response.body.predictor_response)) {
 
                                     query = {"_id": cvId};
                                     var update = {
-                                        predict_result: response.body
+                                        predict_result: response.body.predictor_response
                                     };
                                     var options = {new: true};
                                     MatchingObjectsModel.findOneAndUpdate(query, update, options, function (err, results) {
@@ -536,14 +536,15 @@ var addCvToJobFunctions = {
                                     });
 
                                 } else {
-                                    errorMessage = "predictor response format is incorrect " + response.body;
-                                    console.log(errorMessage);
+
+                                    errorMessage = "predictor response format is incorrect ";
+                                    console.log(errorMessage , response);
                                     error.error = errorMessage;
                                     callback(400, error);
                                 }
                             } else {
-                                console.log("error occurred during predictor process: ", response.body);
-                                callback(response.code, response.body);
+                                console.log("error occurred during predictor process: ", response);
+                                callback(response.code, "error occurred during predictor process");
                             }
                         });
 
