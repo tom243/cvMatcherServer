@@ -54,7 +54,7 @@ var usersSchema = new users_schema({
 }, {collection: "Users"});
 
 
-// historyTimeline Schema
+// jobSeekerJobs Schema
 var jobSeekerJobsSchema = new jobseeker_jobs_schema({
 
     job: {type: Schema.Types.ObjectId, ref: "MatchingObjectsModel", required: true},
@@ -360,6 +360,7 @@ var keyWordsSchema = key_words_schema({
     }
 }, {collection: "Key_Words"});
 
+// validation Schema
 var validationSchema = validation_schema({
     sector: [{
         type: String,
